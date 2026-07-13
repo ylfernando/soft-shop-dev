@@ -39,11 +39,11 @@ function Index() {
   return (
     <div className="min-h-screen text-foreground">
       {/* Ticker */}
-      <div className="bg-[color:var(--sage)]/40 text-[color:var(--pink-deep)] font-pixel text-xl overflow-hidden py-2 border-b border-[color:var(--pink-deep)]/20">
+      <div className="bg-[#a882f4] text-white font-pixel text-xl overflow-hidden py-2 border-b border-[color:var(--pink-deep)]/20">
         <div className="whitespace-nowrap animate-[marquee_30s_linear_infinite] flex gap-8">
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} className="flex items-center gap-3">
-              ✦ use nosso cupom de primeira compra no site ✿ com carinho, naniiicas
+              ✦ use nosso cupom de primeira compra no site ✿
             </span>
           ))}
         </div>
