@@ -71,7 +71,7 @@ function Index() {
           </div>
         </div>
         {menuOpen && (
-          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[color:var(--pink-deep)] font-pixel text-lg">
+          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#fdddf3] font-pixel text-lg">
             <NavBtn active>ínicio</NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
