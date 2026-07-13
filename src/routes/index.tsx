@@ -50,7 +50,7 @@ function Index() {
       </div>
 
       {/* Header */}
-      <header className="bg-[color:var(--pink-soft)] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
+      <header className="bg-[#fffffe] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
         <div className="max-w-7xl mx-auto flex items-center gap-3 px-4 py-3">
           <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain" width={56} height={56} />
           <nav className="flex-1 flex flex-wrap items-center gap-2 text-[color:var(--pink-deep)] font-pixel text-xl">
