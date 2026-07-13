@@ -37,6 +37,7 @@ const produtos = [
 ];
 
 function Index() {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="min-h-screen text-foreground">
       {/* Ticker */}
