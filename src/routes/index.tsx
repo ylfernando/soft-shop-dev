@@ -3,6 +3,7 @@ import heroImg from "@/assets/nani-hero.jpg";
 import plaidBg from "@/assets/plaid-bg.jpg";
 import tagImg from "@/assets/tag.png";
 import lambImg from "@/assets/lamb.png";
+import softLogo from "@/assets/soft-logo.png.asset.json";
 import catUp from "@/assets/cat-upcycling.png";
 import catRw from "@/assets/cat-rework.png";
 import catAu from "@/assets/cat-autorais.png";
@@ -58,7 +59,7 @@ function Index() {
           <button aria-label="menu" onClick={() => setMenuOpen(v => !v)} className="p-1">
             {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
-          <img src={lambImg} alt="Nani lamb mascote" className="w-10 h-10 object-contain" width={40} height={40} />
+          <img src={softLogo.url} alt="Soft Shop logo" className="h-10 w-auto object-contain" height={40} />
           <div className="flex items-center gap-3">
             <button aria-label="carrinho" className="relative flex items-center gap-1 font-pixel text-xl">
               <ShoppingBasket className="w-6 h-6" />
@@ -86,7 +87,7 @@ function Index() {
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
           </nav>
-          <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain justify-self-center shrink-0" width={56} height={56} />
+          <img src={softLogo.url} alt="Soft Shop logo" className="h-14 w-auto object-contain justify-self-center shrink-0" height={56} />
           <div className="flex items-center gap-2 justify-end text-[color:var(--pink-deep)] font-pixel text-xl min-w-0">
             <NavBtn>PROMOS EBAA</NavBtn>
             <NavBtn>categorias de produtos ⌄</NavBtn>
