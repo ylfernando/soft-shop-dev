@@ -43,7 +43,7 @@ function Index() {
         <div className="whitespace-nowrap animate-[marquee_30s_linear_infinite] flex gap-8">
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} className="flex items-center gap-3">
-              ✦ — 1 Coríntios 16:14 ✦ com carinho, naniiicas
+              ✦ use nosso cupom de primeira compra no site ✿ com carinho, naniiicas
             </span>
           ))}
         </div>
