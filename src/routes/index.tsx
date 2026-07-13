@@ -87,7 +87,7 @@ function Index() {
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
           </nav>
-          <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain justify-self-center shrink-0" width={56} height={56} />
+          <img src={softLogo.url} alt="Soft Shop logo" className="h-14 w-auto object-contain justify-self-center shrink-0" height={56} />
           <div className="flex items-center gap-2 justify-end text-[color:var(--pink-deep)] font-pixel text-xl min-w-0">
             <NavBtn>PROMOS EBAA</NavBtn>
             <NavBtn>categorias de produtos ⌄</NavBtn>
