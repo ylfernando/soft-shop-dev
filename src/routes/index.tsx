@@ -59,7 +59,7 @@ function Index() {
           <button aria-label="menu" onClick={() => setMenuOpen(v => !v)} className="p-1">
             {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
-          <img src={softLogo.url} alt="Soft Shop logo" className="h-10 w-auto object-contain" height={40} />
+          <img src={softLogo.url} alt="Soft Shop logo" className="h-16 w-auto object-contain" height={64} />
           <div className="flex items-center gap-3">
             <button aria-label="carrinho" className="relative flex items-center gap-1 font-pixel text-xl">
               <ShoppingBasket className="w-6 h-6" />
