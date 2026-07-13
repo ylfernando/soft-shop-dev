@@ -51,17 +51,17 @@ function Index() {
 
       {/* Header */}
       <header className="bg-[#fffffe] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
-        <div className="max-w-7xl mx-auto flex items-center gap-3 px-4 py-3">
-          <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain" width={56} height={56} />
-          <nav className="flex-1 flex flex-wrap items-center gap-2 text-[color:var(--pink-deep)] font-pixel text-xl">
+        <div className="max-w-7xl mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
+          <nav className="flex flex-wrap items-center gap-2 text-[color:var(--pink-deep)] font-pixel text-xl justify-start">
             <NavBtn active>home 谷</NavBtn>
             <NavBtn>Loja (onde voce é feliz)</NavBtn>
             <NavBtn>Sobre a nani</NavBtn>
+          </nav>
+          <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain justify-self-center" width={56} height={56} />
+          <div className="flex items-center gap-2 justify-end text-[color:var(--pink-deep)] font-pixel text-xl">
             <NavBtn>Todos os produtos</NavBtn>
             <NavBtn>Configurações ⌄</NavBtn>
-          </nav>
-          <div className="flex items-center gap-4 text-[color:var(--pink-deep)]">
-            <button className="relative flex items-center gap-1 font-pixel text-2xl">
+            <button className="relative flex items-center gap-1 font-pixel text-2xl ml-2">
               <ShoppingBasket className="w-7 h-7" />
               <span>0</span>
             </button>
