@@ -3,6 +3,7 @@ import heroImg from "@/assets/nani-hero.jpg";
 import plaidBg from "@/assets/plaid-bg.jpg";
 import tagImg from "@/assets/tag.png";
 import lambImg from "@/assets/lamb.png";
+import softLogo from "@/assets/soft-logo.png.asset.json";
 import catUp from "@/assets/cat-upcycling.png";
 import catRw from "@/assets/cat-rework.png";
 import catAu from "@/assets/cat-autorais.png";
