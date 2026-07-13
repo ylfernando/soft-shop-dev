@@ -53,14 +53,14 @@ function Index() {
       <header className="bg-[#fffffe] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
         <div className="max-w-7xl mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
           <nav className="flex flex-wrap items-center gap-2 text-[color:var(--pink-deep)] font-pixel text-xl justify-start">
-            <NavBtn active>home 谷</NavBtn>
-            <NavBtn>Loja (onde voce é feliz)</NavBtn>
-            <NavBtn>Sobre a nani</NavBtn>
+            <NavBtn active>ínicio</NavBtn>
+            <NavBtn>sobre a Soft!</NavBtn>
+            <NavBtn>new DROP</NavBtn>
           </nav>
           <img src={lambImg} alt="Nani lamb mascote" className="w-14 h-14 object-contain justify-self-center" width={56} height={56} />
           <div className="flex items-center gap-2 justify-end text-[color:var(--pink-deep)] font-pixel text-xl">
-            <NavBtn>Todos os produtos</NavBtn>
-            <NavBtn>Configurações ⌄</NavBtn>
+            <NavBtn>PROMOS EBAA</NavBtn>
+            <NavBtn>categorias de produtos ⌄</NavBtn>
             <button className="relative flex items-center gap-1 font-pixel text-2xl ml-2">
               <ShoppingBasket className="w-7 h-7" />
               <span>0</span>
@@ -117,9 +117,10 @@ function Index() {
       <section className="bg-[color:var(--cream)] py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="font-pixel text-4xl md:text-5xl text-[color:var(--pink-deep)]">
-            O que você encontra aqui:
+            ÚLTIMOS GARIMPOS:
           </h2>
-          <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">Entenda a diferença!</p>
+          <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">
+</p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
             {categorias.map((c) => (
@@ -142,9 +143,10 @@ function Index() {
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-pixel text-5xl md:text-6xl text-[color:var(--pink-deep)]">queridinhas</h2>
-            <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-1">sinta-se em casa... ♥</p>
-            <a href="#" className="inline-block mt-3 font-pixel text-xl text-[color:var(--pink-deep)] underline">ver tudo! ☆</a>
+            <h2 className="font-pixel text-5xl md:text-6xl text-[color:var(--pink-deep)]">PROMOS DA SEMANA:</h2>
+            <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-1">aproveite enquanto está dispo hihi</p>
+            <a href="#" className="inline-block mt-3 font-pixel text-xl text-[color:var(--pink-deep)] underline">tudo
+</a>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -170,7 +172,7 @@ function Index() {
       {/* Sobre */}
       <section className="bg-[color:var(--pink-soft)] py-20 px-6">
         <div className="max-w-5xl mx-auto text-center space-y-6">
-          <h2 className="font-pixel text-4xl text-[color:var(--pink-deep)]">hora das compras!</h2>
+          <h2 className="font-pixel text-4xl text-[color:var(--pink-deep)]">divas que estão usando Soft</h2>
           <p className="max-w-2xl mx-auto text-foreground/80">
             Aqui temos <b>DROPS diferentes a cada 15 dias</b>, com estilos, paletas e modelos de peças
             diferentes. Nossas "queridinhas" são exclusivas e únicas, com curadoria bem pensada por uma
@@ -199,9 +201,9 @@ function Index() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src={lambImg} alt="lamb" className="w-12 h-12" width={48} height={48} loading="lazy" />
-            <span className="font-pixel text-2xl">naniiicas</span>
+            <span className="font-pixel text-2xl">Soft Shop</span>
           </div>
-          <p className="text-sm opacity-90">com carinho, feito por Nani ♥ @naniiicas</p>
+          <p className="text-sm opacity-90">Suporte - Menu de compras - Redes Sociais&nbsp;</p>
         </div>
       </footer>
 
