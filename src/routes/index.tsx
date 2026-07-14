@@ -3,7 +3,7 @@ import banner1 from "@/assets/banner-1.jpg.asset.json";
 import banner2 from "@/assets/banner-2.jpg";
 import banner3 from "@/assets/banner-3.jpg";
 import plaidBg from "@/assets/plaid-bg.jpg";
-import tagImg from "@/assets/tag.png";
+
 import lambImg from "@/assets/lamb.png";
 import softLogo from "@/assets/soft-logo.png.asset.json";
 import catUp from "@/assets/cat-upcycling.png";
