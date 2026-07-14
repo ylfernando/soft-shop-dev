@@ -63,17 +63,17 @@ function Index() {
           </button>
           <img src={softLogo.url} alt="Soft Shop logo" className="h-16 w-auto object-contain" height={64} />
           <div className="flex items-center gap-3">
-            <button aria-label="carrinho" className="relative flex items-center gap-1 font-pixel text-xl">
+            <button aria-label="carrinho" className="relative flex items-center gap-1 font-menu text-xl">
               <ShoppingBasket className="w-6 h-6" />
               <span>0</span>
             </button>
-            <button aria-label="login" className="flex items-center font-pixel text-xl">
+            <button aria-label="login" className="flex items-center font-menu text-xl">
               <User className="w-6 h-6" />
             </button>
           </div>
         </div>
         {menuOpen && (
-          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#ffb5e3] font-pixel text-lg">
+          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
             <NavBtn active>ínicio</NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
@@ -84,20 +84,20 @@ function Index() {
 
         {/* Desktop bar */}
         <div className="hidden md:grid max-w-7xl mx-auto grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
-          <nav className="flex flex-wrap items-center gap-2 text-[#ffb5e3] font-pixel text-xl justify-start min-w-0">
+          <nav className="flex flex-wrap items-center gap-2 text-[#ffb5e3] font-menu text-xl justify-start min-w-0">
             <NavBtn active>ínicio</NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
           </nav>
           <img src={softLogo.url} alt="Soft Shop logo" className="h-14 w-auto object-contain justify-self-center shrink-0" height={56} />
-          <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-pixel text-xl min-w-0">
+          <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-menu text-xl min-w-0">
             <NavBtn>PROMOS EBAA</NavBtn>
             <NavBtn>produtos ⌄</NavBtn>
-            <button className="relative flex items-center gap-1 font-pixel text-2xl ml-2 shrink-0">
+            <button className="relative flex items-center gap-1 font-menu text-2xl ml-2 shrink-0">
               <ShoppingBasket className="w-7 h-7" />
               <span>0</span>
             </button>
-            <button className="flex items-center gap-1 font-pixel text-2xl shrink-0">
+            <button className="flex items-center gap-1 font-menu text-2xl shrink-0">
               <User className="w-6 h-6" />
               <span>Login</span>
             </button>
