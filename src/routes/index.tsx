@@ -225,7 +225,7 @@ function NavBtn({ children, active }: { children: React.ReactNode; active?: bool
     <button
       className={`px-4 py-1.5 rounded-full border-2 transition ${
         active
-          ? "bg-[color:var(--pink-deep)]/20 border-[color:var(--pink-deep)]/40 underline"
+          ? "bg-[#ebffde] border-[#ebffde] underline"
           : "border-transparent hover:bg-[#ebffde]"
       }`}
     >
