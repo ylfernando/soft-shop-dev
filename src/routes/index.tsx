@@ -109,7 +109,7 @@ function Index() {
       {/* Hero Carousel */}
       <section
         className="relative"
-        style={{ backgroundImage: `url(${plaidBg})`, backgroundSize: "600px" }}
+        style={{ backgroundColor: "#eef9fd" }}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
           <HeroCarousel slides={[banner1.url, banner2, banner3]} />
