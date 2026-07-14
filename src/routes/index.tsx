@@ -78,7 +78,7 @@ function Index() {
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
             <NavBtn>PROMOS EBAA</NavBtn>
-            <NavBtn>categorias de produtos ⌄</NavBtn>
+            <NavBtn>produtos ⌄</NavBtn>
           </nav>
         )}
 
@@ -92,7 +92,7 @@ function Index() {
           <img src={softLogo.url} alt="Soft Shop logo" className="h-14 w-auto object-contain justify-self-center shrink-0" height={56} />
           <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-pixel text-xl min-w-0">
             <NavBtn>PROMOS EBAA</NavBtn>
-            <NavBtn>categorias de produtos ⌄</NavBtn>
+            <NavBtn>produtos ⌄</NavBtn>
             <button className="relative flex items-center gap-1 font-pixel text-2xl ml-2 shrink-0">
               <ShoppingBasket className="w-7 h-7" />
               <span>0</span>
