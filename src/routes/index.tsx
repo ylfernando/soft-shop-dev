@@ -233,3 +233,47 @@ function NavBtn({ children, active }: { children: React.ReactNode; active?: bool
     </button>
   );
 }
+
+function HeroCarousel({ slides }: { slides: string[] }) {
+  const [idx, setIdx] = useState(0);
+  const go = (n: number) => setIdx((n + slides.length) % slides.length);
+  return (
+    <div className="relative">
+      <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/9]">
+        {slides.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            alt={`slide ${i + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${i === idx ? "opacity-100" : "opacity-0"}`}
+            loading={i === 0 ? "eager" : "lazy"}
+          />
+        ))}
+      </div>
+      <button
+        aria-label="anterior"
+        onClick={() => go(idx - 1)}
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[color:var(--pink-deep)] font-pixel text-xl flex items-center justify-center shadow-md"
+      >
+        ‹
+      </button>
+      <button
+        aria-label="próximo"
+        onClick={() => go(idx + 1)}
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[color:var(--pink-deep)] font-pixel text-xl flex items-center justify-center shadow-md"
+      >
+        ›
+      </button>
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`ir para slide ${i + 1}`}
+            onClick={() => setIdx(i)}
+            className={`w-2.5 h-2.5 rounded-full transition ${i === idx ? "bg-white" : "bg-white/50"}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
