@@ -106,43 +106,13 @@ function Index() {
       </header>
 
 
-      {/* Hero */}
+      {/* Hero Carousel */}
       <section
         className="relative"
         style={{ backgroundImage: `url(${plaidBg})`, backgroundSize: "600px" }}
       >
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 px-6 py-16 items-center">
-          <div className="relative">
-            <h1 className="font-pixel text-6xl md:text-7xl text-[color:var(--pink-deep)] leading-tight">
-              Bem vinda ao<br />seu novo
-            </h1>
-            <p className="font-script text-6xl md:text-8xl text-[color:var(--pink-deep)] mt-2">
-              guarda-roupa!
-            </p>
-            <a
-              href="https://www.instagram.com/anocamiau/"
-              className="inline-block mt-6 font-pixel text-xl text-[color:var(--pink-deep)] underline decoration-wavy underline-offset-4"
-            >
-              meus desenhos sz →
-            </a>
-
-            <div className="mt-12 flex items-start gap-4">
-              <img src={tagImg} alt="tag" className="w-24 -rotate-6" width={96} height={144} loading="lazy" />
-              <div className="pt-4">
-                <p className="font-pixel text-xl text-[color:var(--pink-deep)]">
-                  SUPORTE: <a href="https://www.instagram.com/naniiicas" className="underline">@naniiicas</a>
-                </p>
-                <p className="text-sm max-w-xs text-[color:var(--foreground)]/80 mt-1">
-                  Me mande uma mensagem por lá que eu te atendo em qualquer problema que tiver.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40">
-              <img src={heroImg} alt="Nani ilustração" className="w-full h-auto" width={900} height={900} />
-            </div>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
+          <HeroCarousel slides={[banner1.url, banner2, banner3]} />
         </div>
       </section>
 
