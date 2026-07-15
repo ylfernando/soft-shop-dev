@@ -69,4 +69,3 @@
 
 @utility font-pixel { font-family: var(--font-pixel); }
 @utility font-script { font-family: var(--font-script); }
-@utility font-menu { font-family: "Bagel Fat One", var(--font-pixel); }
