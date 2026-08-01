@@ -150,7 +150,7 @@ function Index() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {produtos.map((p) => (
-              <div key={p.nome} className="bg-white/80 backdrop-blur rounded-2xl overflow-hidden shadow-md border border-[color:var(--pink-deep)]/10 hover:-translate-y-1 transition">
+              <div key={p.nome} className="bg-[#fffefe]/80 backdrop-blur rounded-2xl overflow-hidden shadow-md border border-[color:var(--pink-deep)]/10 hover:-translate-y-1 transition">
                 <div className="aspect-[4/5] overflow-hidden bg-[color:var(--pink-soft)]">
                   <img src={p.img} alt={p.nome} className="w-full h-full object-cover" loading="lazy" />
                 </div>
