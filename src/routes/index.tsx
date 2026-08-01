@@ -173,9 +173,7 @@ function Index() {
         <div className="max-w-5xl mx-auto text-center space-y-6">
           <h2 className="font-menu text-4xl text-[color:var(--pink-deep)]">divas que estão usando Soft</h2>
           <p className="max-w-2xl mx-auto text-foreground/80">
-            Aqui temos <b>DROPS diferentes a cada 15 dias</b>, com estilos, paletas e modelos de peças
-            diferentes. Nossas "queridinhas" são exclusivas e únicas, com curadoria bem pensada por uma
-            designer indie ^^
+            não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mt-10">
@@ -190,7 +188,7 @@ function Index() {
           </div>
 
           <p className="max-w-2xl mx-auto mt-8 text-foreground/80 font-script text-2xl">
-            Todo o trabalho é feito 100% por mim, Ana (ou Nani)! Desde a produção até os envios. (= ⩊ =)೨
+            {"\n"}
           </p>
         </div>
       </section>
