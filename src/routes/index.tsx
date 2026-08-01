@@ -108,7 +108,7 @@ function Index() {
         style={{ backgroundColor: "#eef9fd" }}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
-          <HeroCarousel slides={[banner1.url, banner2, banner3]} />
+          <HeroCarousel slides={[banner1.url, banner2.url, banner3.url]} />
         </div>
       </section>
 
