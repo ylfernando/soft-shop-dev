@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import banner1 from "@/assets/banner-1.jpg.asset.json";
+import banner1 from "@/assets/banner-1.jpg";
 import banner2 from "@/assets/banner-2.jpg";
 import banner3 from "@/assets/banner-3.jpg";
-import plaidBg from "@/assets/plaid-bg.jpg";
+import strawberryBg from "@/assets/strawberry-bg.jpg";
 
 import lambImg from "@/assets/lamb.png";
 import softLogo from "@/assets/soft-logo.png.asset.json";
@@ -14,8 +14,6 @@ import p1 from "@/assets/p1.jpg";
 import p2 from "@/assets/p2.jpg";
 import p3 from "@/assets/p3.jpg";
 import p4 from "@/assets/p4.jpg";
-import p5 from "@/assets/p5.jpg";
-import p6 from "@/assets/p6.jpg";
 import { ShoppingBasket, User, Menu, X } from "lucide-react";
 import { useState } from "react";
 
@@ -35,8 +33,6 @@ const produtos = [
   { img: p2, nome: "trench azul marinho M", preco: "R$ 60,00" },
   { img: p3, nome: "[upcycling] sainha jeans M/G", preco: "R$ 60,00" },
   { img: p4, nome: "sainha midi marrom P", preco: "R$ 25,00" },
-  { img: p5, nome: "casaquinho creme P", preco: "R$ 60,00" },
-  { img: p6, nome: "saia midí de poá M/G", preco: "R$ 45,00" },
 ];
 
 function Index() {
@@ -44,11 +40,11 @@ function Index() {
   return (
     <div className="min-h-screen text-foreground">
       {/* Ticker */}
-      <div className="bg-[#a882f4] text-white font-pixel text-xl overflow-hidden py-2 border-b border-[color:var(--pink-deep)]/20">
+      <div className="bg-[#a882f4] text-white font-menu text-[16px] overflow-hidden py-2 border-b border-[color:var(--pink-deep)]/20">
         <div className="whitespace-nowrap animate-[marquee_30s_linear_infinite] flex gap-8">
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} className="flex items-center gap-3">
-              ✦ use nosso cupom de primeira compra no site ✿
+              ✦ use nosso cupom de primeira compra: #FIRSTSHOFT ✿
             </span>
           ))}
         </div>
@@ -67,13 +63,13 @@ function Index() {
               <ShoppingBasket className="w-6 h-6" />
               <span>0</span>
             </button>
-            <button aria-label="login" className="flex items-center font-pixel text-xl">
+            <button aria-label="login" className="flex items-center font-menu text-xl">
               <User className="w-6 h-6" />
             </button>
           </div>
         </div>
         {menuOpen && (
-          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#ffb5e3] font-pixel text-lg">
+          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
             <NavBtn active>ínicio</NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
@@ -84,20 +80,20 @@ function Index() {
 
         {/* Desktop bar */}
         <div className="hidden md:grid max-w-7xl mx-auto grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
-          <nav className="flex flex-wrap items-center gap-2 text-[#ffb5e3] font-pixel text-xl justify-start min-w-0">
+          <nav className="flex flex-wrap items-center gap-2 text-[#ffb5e3] font-menu text-xl justify-start min-w-0">
             <NavBtn active>ínicio</NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
             <NavBtn>new DROP</NavBtn>
           </nav>
           <img src={softLogo.url} alt="Soft Shop logo" className="h-14 w-auto object-contain justify-self-center shrink-0" height={56} />
-          <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-pixel text-xl min-w-0">
+          <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-menu text-xl min-w-0">
             <NavBtn>PROMOS EBAA</NavBtn>
             <NavBtn>produtos ⌄</NavBtn>
             <button className="relative flex items-center gap-1 font-pixel text-2xl ml-2 shrink-0">
               <ShoppingBasket className="w-7 h-7" />
               <span>0</span>
             </button>
-            <button className="flex items-center gap-1 font-pixel text-2xl shrink-0">
+            <button className="flex items-center gap-1 font-menu text-2xl shrink-0">
               <User className="w-6 h-6" />
               <span>Login</span>
             </button>
@@ -119,7 +115,7 @@ function Index() {
       {/* Categorias */}
       <section className="bg-[color:var(--cream)] py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="font-pixel text-4xl md:text-5xl text-[color:var(--pink-deep)]">
+          <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
             ÚLTIMOS GARIMPOS:
           </h2>
           <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">
@@ -131,7 +127,7 @@ function Index() {
                 <div className="aspect-square rounded-3xl bg-[color:var(--pink-soft)] p-4 flex items-center justify-center overflow-hidden border-2 border-[color:var(--pink-deep)]/10 transition-transform group-hover:-translate-y-1">
                   <img src={c.img} alt={c.title} className="w-full h-full object-contain" loading="lazy" />
                 </div>
-                <h3 className="font-pixel text-2xl mt-4 text-[color:var(--pink-deep)]">{c.title}</h3>
+                <h3 className="font-menu text-2xl mt-4 text-[color:var(--pink-deep)]">{c.title}</h3>
                 <p className="text-sm text-foreground/70 mt-2 max-w-[220px] mx-auto">{c.desc}</p>
               </div>
             ))}
@@ -142,13 +138,13 @@ function Index() {
       {/* Queridinhas */}
       <section
         className="py-20 px-6"
-        style={{ backgroundImage: `url(${plaidBg})`, backgroundSize: "600px" }}
+        style={{ backgroundImage: `url(${strawberryBg})`, backgroundSize: "600px" }}
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-pixel text-5xl md:text-6xl text-[color:var(--pink-deep)]">PROMOS DA SEMANA:</h2>
-            <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-1">aproveite enquanto está dispo hihi</p>
-            <a href="#" className="inline-block mt-3 font-pixel text-xl text-[color:var(--pink-deep)] underline">tudo
+            <h2 className="font-menu text-5xl md:text-6xl text-[#fffefe]">PROMOS DA SEMANA</h2>
+            <p className="font-unrulyness text-[60px] text-[#fffefe] mt-1">aproveite enquanto está dispo hihi</p>
+            <a href="#" className="inline-block mt-3 font-menu text-[20px] text-[#fffefe] underline">tudo
 </a>
           </div>
 
@@ -159,7 +155,7 @@ function Index() {
                   <img src={p.img} alt={p.nome} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="p-4 text-center">
-                  <p className="font-pixel text-lg text-[color:var(--pink-deep)] leading-tight">{p.nome}</p>
+                  <p className="font-menu text-lg text-[color:var(--pink-deep)] leading-tight">{p.nome}</p>
                   <div className="my-2 border-t border-dashed border-[color:var(--pink-deep)]/30" />
                   <p className="text-sm">Preço<span className="font-semibold ml-1">{p.preco}</span></p>
                   <button className="mt-3 w-full py-2 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-lg hover:opacity-90">
@@ -175,7 +171,7 @@ function Index() {
       {/* Sobre */}
       <section className="bg-[color:var(--pink-soft)] py-20 px-6">
         <div className="max-w-5xl mx-auto text-center space-y-6">
-          <h2 className="font-pixel text-4xl text-[color:var(--pink-deep)]">divas que estão usando Soft</h2>
+          <h2 className="font-menu text-4xl text-[color:var(--pink-deep)]">divas que estão usando Soft</h2>
           <p className="max-w-2xl mx-auto text-foreground/80">
             Aqui temos <b>DROPS diferentes a cada 15 dias</b>, com estilos, paletas e modelos de peças
             diferentes. Nossas "queridinhas" são exclusivas e únicas, com curadoria bem pensada por uma
@@ -188,7 +184,7 @@ function Index() {
                 <div className="aspect-square rounded-2xl bg-[color:var(--sage)]/40 flex items-center justify-center text-6xl">
                   {["🌸", "✂️", "🎮"][i]}
                 </div>
-                <h3 className="font-pixel text-2xl text-[color:var(--pink-deep)] mt-4">{t}</h3>
+                <h3 className="font-menu text-2xl text-[color:var(--pink-deep)] mt-4">{t}</h3>
               </div>
             ))}
           </div>
