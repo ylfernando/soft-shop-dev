@@ -188,7 +188,7 @@ function Index() {
           </div>
 
           <p className="max-w-2xl mx-auto mt-8 text-foreground/80 font-script text-2xl">
-            Todo o trabalho é feito 100% por mim, Ana (ou Nani)! Desde a produção até os envios. (= ⩊ =)೨
+            {"\n"}
           </p>
         </div>
       </section>
