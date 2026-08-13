@@ -1,23 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import banner1 from "@/assets/banner-1.jpg";
-import banner2 from "@/assets/banner-2.jpg";
-import banner3 from "@/assets/banner-3.jpg";
 import strawberryBg from "@/assets/strawberry-bg.jpg";
 
 import { useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { produtos } from "@/data/produtos";
+import { InstagramEmbedCard } from "@/components/InstagramEmbedCard";
+import { getProdutos } from "@/server-fns/produtos";
+import { getBannersAtivos } from "@/server-fns/banners";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async () => {
+    const [produtos, banners] = await Promise.all([getProdutos(), getBannersAtivos()]);
+    return { produtos, banners };
+  },
 });
 
-const garimpos = produtos.filter((p) => p.categoria === "garimpos");
-const promos = produtos.slice(0, 4);
+// TODO: trocar pelos posts/reels reais das divas que a Soft quer destacar
+const divasDaSoft = [
+  { username: "usuaria1", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
+  { username: "usuaria2", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
+  { username: "usuaria3", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
+];
 
 function Index() {
+  const { produtos, banners } = Route.useLoaderData();
+  // "garimpos" deixou de ser uma categoria própria — mostra o próximo lote de
+  // produtos (depois dos que já aparecem em "promos da semana").
+  const garimpos = produtos.slice(4, 6);
+  const promos = produtos.slice(0, 4);
+
   return (
     <div className="min-h-screen text-foreground">
       <SiteHeader current="inicio" />
@@ -25,7 +38,7 @@ function Index() {
       {/* Hero Carousel */}
       <section className="relative" style={{ backgroundColor: "#eef9fd" }}>
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
-          <HeroCarousel slides={[banner1, banner2, banner3]} />
+          <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
         </div>
       </section>
 
@@ -64,16 +77,21 @@ function Index() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             {promos.map((p) => (
-              <ProductCard key={p.id} produto={p} />
+              <div
+                key={p.id}
+                className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]"
+              >
+                <ProductCard produto={p} />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Sobre */}
-      <section className="bg-[color:var(--pink-soft)] py-20 px-6">
+      <section id="sobre" className="bg-[color:var(--pink-soft)] py-20 px-6">
         <div className="max-w-5xl mx-auto text-center space-y-6">
           <h2 className="font-menu text-4xl text-[color:var(--pink-deep)]">
             divas que estão usando Soft
@@ -83,16 +101,8 @@ function Index() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mt-10">
-            {["Blooming Pieces", "One Woman Show", "Estilo joguinho"].map((t, i) => (
-              <div
-                key={t}
-                className="rounded-3xl bg-white/70 p-6 border border-[color:var(--pink-deep)]/10"
-              >
-                <div className="aspect-square rounded-2xl bg-[color:var(--sage)]/40 flex items-center justify-center text-6xl">
-                  {["🌸", "✂️", "🎮"][i]}
-                </div>
-                <h3 className="font-menu text-2xl text-[color:var(--pink-deep)] mt-4">{t}</h3>
-              </div>
+            {divasDaSoft.map((diva) => (
+              <InstagramEmbedCard key={diva.username} {...diva} />
             ))}
           </div>
 

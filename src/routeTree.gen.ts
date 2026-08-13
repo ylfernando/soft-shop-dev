@@ -14,6 +14,13 @@ import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
+import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
+import { Route as AdminAuthedIndexRouteImport } from './routes/admin/_authed/index'
+import { Route as AdminAuthedBannersRouteImport } from './routes/admin/_authed/banners'
+import { Route as AdminAuthedClientesRouteImport } from './routes/admin/_authed/clientes'
+import { Route as AdminAuthedPedidosRouteImport } from './routes/admin/_authed/pedidos'
+import { Route as AdminAuthedProdutosRouteImport } from './routes/admin/_authed/produtos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +47,41 @@ const ProdutosRoute = ProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAuthedRoute = AdminAuthedRouteImport.update({
+  id: '/admin/_authed',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEntrarRoute = AdminEntrarRouteImport.update({
+  id: '/admin/entrar',
+  path: '/admin/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuthedIndexRoute = AdminAuthedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
+const AdminAuthedBannersRoute = AdminAuthedBannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
+const AdminAuthedClientesRoute = AdminAuthedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
+const AdminAuthedPedidosRoute = AdminAuthedPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
+const AdminAuthedProdutosRoute = AdminAuthedProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +89,13 @@ export interface FileRoutesByFullPath {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/produtos': typeof ProdutosRoute
+  '/admin': typeof AdminAuthedRouteWithChildren
+  '/admin/entrar': typeof AdminEntrarRoute
+  '/admin/banners': typeof AdminAuthedBannersRoute
+  '/admin/clientes': typeof AdminAuthedClientesRoute
+  '/admin/pedidos': typeof AdminAuthedPedidosRoute
+  '/admin/produtos': typeof AdminAuthedProdutosRoute
+  '/admin/': typeof AdminAuthedIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +103,12 @@ export interface FileRoutesByTo {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/produtos': typeof ProdutosRoute
+  '/admin/entrar': typeof AdminEntrarRoute
+  '/admin/banners': typeof AdminAuthedBannersRoute
+  '/admin/clientes': typeof AdminAuthedClientesRoute
+  '/admin/pedidos': typeof AdminAuthedPedidosRoute
+  '/admin/produtos': typeof AdminAuthedProdutosRoute
+  '/admin': typeof AdminAuthedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +117,56 @@ export interface FileRoutesById {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/produtos': typeof ProdutosRoute
+  '/admin/_authed': typeof AdminAuthedRouteWithChildren
+  '/admin/entrar': typeof AdminEntrarRoute
+  '/admin/_authed/banners': typeof AdminAuthedBannersRoute
+  '/admin/_authed/clientes': typeof AdminAuthedClientesRoute
+  '/admin/_authed/pedidos': typeof AdminAuthedPedidosRoute
+  '/admin/_authed/produtos': typeof AdminAuthedProdutosRoute
+  '/admin/_authed/': typeof AdminAuthedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/carrinho' | '/criar-conta' | '/entrar' | '/produtos'
+  fullPaths:
+    | '/'
+    | '/carrinho'
+    | '/criar-conta'
+    | '/entrar'
+    | '/produtos'
+    | '/admin'
+    | '/admin/entrar'
+    | '/admin/banners'
+    | '/admin/clientes'
+    | '/admin/pedidos'
+    | '/admin/produtos'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/carrinho' | '/criar-conta' | '/entrar' | '/produtos'
-  id: '__root__' | '/' | '/carrinho' | '/criar-conta' | '/entrar' | '/produtos'
+  to:
+    | '/'
+    | '/carrinho'
+    | '/criar-conta'
+    | '/entrar'
+    | '/produtos'
+    | '/admin/entrar'
+    | '/admin/banners'
+    | '/admin/clientes'
+    | '/admin/pedidos'
+    | '/admin/produtos'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/carrinho'
+    | '/criar-conta'
+    | '/entrar'
+    | '/produtos'
+    | '/admin/_authed'
+    | '/admin/entrar'
+    | '/admin/_authed/banners'
+    | '/admin/_authed/clientes'
+    | '/admin/_authed/pedidos'
+    | '/admin/_authed/produtos'
+    | '/admin/_authed/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +175,8 @@ export interface RootRouteChildren {
   CriarContaRoute: typeof CriarContaRoute
   EntrarRoute: typeof EntrarRoute
   ProdutosRoute: typeof ProdutosRoute
+  AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
+  AdminEntrarRoute: typeof AdminEntrarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,8 +216,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/_authed': {
+      id: '/admin/_authed'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/entrar': {
+      id: '/admin/entrar'
+      path: '/admin/entrar'
+      fullPath: '/admin/entrar'
+      preLoaderRoute: typeof AdminEntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/_authed/': {
+      id: '/admin/_authed/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminAuthedIndexRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
+    '/admin/_authed/banners': {
+      id: '/admin/_authed/banners'
+      path: '/banners'
+      fullPath: '/admin/banners'
+      preLoaderRoute: typeof AdminAuthedBannersRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
+    '/admin/_authed/clientes': {
+      id: '/admin/_authed/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AdminAuthedClientesRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
+    '/admin/_authed/pedidos': {
+      id: '/admin/_authed/pedidos'
+      path: '/pedidos'
+      fullPath: '/admin/pedidos'
+      preLoaderRoute: typeof AdminAuthedPedidosRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
+    '/admin/_authed/produtos': {
+      id: '/admin/_authed/produtos'
+      path: '/produtos'
+      fullPath: '/admin/produtos'
+      preLoaderRoute: typeof AdminAuthedProdutosRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
   }
 }
+
+interface AdminAuthedRouteChildren {
+  AdminAuthedBannersRoute: typeof AdminAuthedBannersRoute
+  AdminAuthedClientesRoute: typeof AdminAuthedClientesRoute
+  AdminAuthedPedidosRoute: typeof AdminAuthedPedidosRoute
+  AdminAuthedProdutosRoute: typeof AdminAuthedProdutosRoute
+  AdminAuthedIndexRoute: typeof AdminAuthedIndexRoute
+}
+
+const AdminAuthedRouteChildren: AdminAuthedRouteChildren = {
+  AdminAuthedBannersRoute: AdminAuthedBannersRoute,
+  AdminAuthedClientesRoute: AdminAuthedClientesRoute,
+  AdminAuthedPedidosRoute: AdminAuthedPedidosRoute,
+  AdminAuthedProdutosRoute: AdminAuthedProdutosRoute,
+  AdminAuthedIndexRoute: AdminAuthedIndexRoute,
+}
+
+const AdminAuthedRouteWithChildren = AdminAuthedRoute._addFileChildren(
+  AdminAuthedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -125,6 +294,8 @@ const rootRouteChildren: RootRouteChildren = {
   CriarContaRoute: CriarContaRoute,
   EntrarRoute: EntrarRoute,
   ProdutosRoute: ProdutosRoute,
+  AdminAuthedRoute: AdminAuthedRouteWithChildren,
+  AdminEntrarRoute: AdminEntrarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

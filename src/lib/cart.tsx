@@ -1,13 +1,26 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
-import { produtos as catalogo, type Produto } from "@/data/produtos";
+import type { Produto } from "@/data/produtos";
+import {
+  getCart,
+  addItem as addItemFn,
+  removeItem as removeItemFn,
+  clearCart as clearCartFn,
+  type CartLineRow,
+} from "@/server-fns/cart";
 
-export interface CartItem {
+export {
+  FRETE_GRATIS_A_PARTIR_DE_CENTAVOS,
+  FRETE_PADRAO_CENTAVOS,
+  calcularFrete,
+} from "@/lib/frete";
+import { calcularFrete } from "@/lib/frete";
+
+export interface CartLine {
   produtoId: string;
   quantidade: number;
-}
-
-export interface CartLine extends CartItem {
   produto: Produto;
 }
 
@@ -17,9 +30,8 @@ interface CartContextValue {
   subtotalCentavos: number;
   freteCentavos: number;
   totalCentavos: number;
-  addItem: (produtoId: string, quantidade?: number) => void;
+  addItem: (produto: Produto) => void;
   removeItem: (produtoId: string) => void;
-  setQuantidade: (produtoId: string, quantidade: number) => void;
   clear: () => void;
   isOpen: boolean;
   openCart: () => void;
@@ -28,88 +40,87 @@ interface CartContextValue {
 
 export const PENDING_ADD_KEY = "soft-shop-pending-add";
 
-export const FRETE_GRATIS_A_PARTIR_DE_CENTAVOS = 15000;
-export const FRETE_PADRAO_CENTAVOS = 1500;
-
-function calcularFrete(subtotalCentavos: number) {
-  if (subtotalCentavos === 0) return 0;
-  return subtotalCentavos >= FRETE_GRATIS_A_PARTIR_DE_CENTAVOS ? 0 : FRETE_PADRAO_CENTAVOS;
-}
-
 const CartContext = createContext<CartContextValue | null>(null);
 
-function cartKey(email: string) {
-  return `soft-shop-cart:${email}`;
-}
-
-function readCart(email: string): CartItem[] {
-  try {
-    return JSON.parse(localStorage.getItem(cartKey(email)) ?? "[]") as CartItem[];
-  } catch {
-    return [];
-  }
-}
-
-function writeCart(email: string, items: CartItem[]) {
-  localStorage.setItem(cartKey(email), JSON.stringify(items));
-}
-
-/** Adds a product straight to a user's stored cart, bypassing React state — used
- * right after sign-up/login, when the cart context for that user hasn't mounted yet. */
-export function addPendingItemToStorage(email: string, produtoId: string) {
-  const items = readCart(email);
-  const existing = items.find((i) => i.produtoId === produtoId);
-  const next = existing
-    ? items.map((i) => (i.produtoId === produtoId ? { ...i, quantidade: i.quantidade + 1 } : i))
-    : [...items, { produtoId, quantidade: 1 }];
-  writeCart(email, next);
+/** Adds a product straight to a user's cart via the API, bypassing React state —
+ * used right after sign-up/login, when the cart context for that user hasn't mounted yet. */
+export async function addPendingItemForUser(usuarioId: number, produtoId: string) {
+  await addItemFn({ data: { usuarioId, produtoId } });
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartLineRow[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  const getCartCall = useServerFn(getCart);
+  const addItemCall = useServerFn(addItemFn);
+  const removeItemCall = useServerFn(removeItemFn);
+  const clearCartCall = useServerFn(clearCartFn);
+
   useEffect(() => {
-    setItems(user ? readCart(user.email) : []);
-  }, [user]);
+    if (!user) {
+      setItems([]);
+      return;
+    }
+    getCartCall({ data: { usuarioId: user.id } })
+      .then(setItems)
+      .catch(() => toast.error("não deu pra carregar sua sacolinha ✿"));
+  }, [user, getCartCall]);
 
-  function persist(next: CartItem[]) {
-    setItems(next);
-    if (user) writeCart(user.email, next);
-  }
-
-  function addItem(produtoId: string, quantidade = 1) {
+  /** Cada peça é única, então adicionar um produto já presente na sacolinha não faz nada. */
+  function addItem(produto: Produto) {
     if (!user) return;
-    const existing = items.find((i) => i.produtoId === produtoId);
-    const next = existing
-      ? items.map((i) =>
-          i.produtoId === produtoId ? { ...i, quantidade: i.quantidade + quantidade } : i,
-        )
-      : [...items, { produtoId, quantidade }];
-    persist(next);
+    if (items.some((i) => i.produtoId === produto.id)) return;
+    setItems([
+      ...items,
+      {
+        produtoId: produto.id,
+        quantidade: 1,
+        nome: produto.nome,
+        img: produto.img,
+        precoCentavos: produto.precoCentavos,
+        tipo: produto.tipo,
+        categoria: produto.categoria,
+        tamanho: produto.tamanho,
+        medidas: produto.medidas,
+      },
+    ]);
+    addItemCall({ data: { usuarioId: user.id, produtoId: produto.id, quantidade: 1 } }).catch(() =>
+      toast.error("não deu pra salvar sua sacolinha ✿"),
+    );
   }
 
   function removeItem(produtoId: string) {
-    persist(items.filter((i) => i.produtoId !== produtoId));
-  }
-
-  function setQuantidade(produtoId: string, quantidade: number) {
-    if (quantidade <= 0) {
-      removeItem(produtoId);
-      return;
-    }
-    persist(items.map((i) => (i.produtoId === produtoId ? { ...i, quantidade } : i)));
+    if (!user) return;
+    setItems(items.filter((i) => i.produtoId !== produtoId));
+    removeItemCall({ data: { usuarioId: user.id, produtoId } }).catch(() =>
+      toast.error("não deu pra salvar sua sacolinha ✿"),
+    );
   }
 
   function clear() {
-    persist([]);
+    if (!user) return;
+    setItems([]);
+    clearCartCall({ data: { usuarioId: user.id } }).catch(() =>
+      toast.error("não deu pra limpar sua sacolinha ✿"),
+    );
   }
 
-  const lines: CartLine[] = items.flatMap((item) => {
-    const produto = catalogo.find((p) => p.id === item.produtoId);
-    return produto ? [{ ...item, produto }] : [];
-  });
+  const lines: CartLine[] = items.map((item) => ({
+    produtoId: item.produtoId,
+    quantidade: item.quantidade,
+    produto: {
+      id: item.produtoId,
+      nome: item.nome,
+      img: item.img,
+      precoCentavos: item.precoCentavos,
+      tipo: item.tipo,
+      categoria: item.categoria,
+      tamanho: item.tamanho,
+      medidas: item.medidas,
+    },
+  }));
 
   const count = items.reduce((sum, i) => sum + i.quantidade, 0);
   const subtotalCentavos = lines.reduce(
@@ -129,7 +140,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalCentavos,
         addItem,
         removeItem,
-        setQuantidade,
         clear,
         isOpen,
         openCart: () => setIsOpen(true),

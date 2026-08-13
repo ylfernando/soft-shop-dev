@@ -1,95 +1,82 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  signUp as signUpFn,
+  login as loginFn,
+  loginDemo as loginDemoFn,
+} from "@/server-fns/auth";
+import type { AuthUser } from "@/server-fns/auth";
 
-export interface AuthUser {
-  nome: string;
-  email: string;
-}
+export type { AuthUser };
 
-interface StoredUser extends AuthUser {
-  senha: string;
-}
-
-type AuthResult = { ok: true; email: string } | { ok: false; erro: string };
+type AuthResult = { ok: true; user: AuthUser } | { ok: false; erro: string };
 
 interface AuthContextValue {
   user: AuthUser | null;
   hydrated: boolean;
-  signUp: (nome: string, email: string, senha: string) => AuthResult;
-  login: (email: string, senha: string) => AuthResult;
-  loginDemo: () => AuthResult;
+  signUp: (nome: string, email: string, senha: string) => Promise<AuthResult>;
+  login: (email: string, senha: string) => Promise<AuthResult>;
+  loginDemo: () => Promise<AuthResult>;
   logout: () => void;
 }
 
-const USERS_KEY = "soft-shop-users";
 const SESSION_KEY = "soft-shop-session";
-
-const DEMO_EMAIL = "teste@soft.com";
-const DEMO_SENHA = "teste1234";
-const DEMO_NOME = "Conta Teste";
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function readUsers(): Record<string, StoredUser> {
+function readSession(): AuthUser | null {
   try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) ?? "{}") as Record<string, StoredUser>;
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as AuthUser) : null;
   } catch {
-    return {};
+    return null;
   }
 }
 
-function writeUsers(users: Record<string, StoredUser>) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+function writeSession(user: AuthUser) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
+  const signUpFnCall = useServerFn(signUpFn);
+  const loginFnCall = useServerFn(loginFn);
+  const loginDemoFnCall = useServerFn(loginDemoFn);
+
   useEffect(() => {
-    const email = localStorage.getItem(SESSION_KEY);
-    const stored = email ? readUsers()[email] : undefined;
-    if (stored) setUser({ nome: stored.nome, email: stored.email });
+    setUser(readSession());
     setHydrated(true);
   }, []);
 
-  function signUp(nome: string, email: string, senha: string): AuthResult {
-    const key = email.trim().toLowerCase();
-    if (!nome.trim() || !key || senha.length < 4) {
-      return { ok: false, erro: "preenche nome, e-mail e uma senha com pelo menos 4 caracteres." };
+  async function signUp(nome: string, email: string, senha: string): Promise<AuthResult> {
+    const res = await signUpFnCall({ data: { nome, email, senha } });
+    if (res.ok) {
+      writeSession(res.user);
+      setUser(res.user);
     }
-    const users = readUsers();
-    if (users[key]) {
-      return { ok: false, erro: "já existe uma conta com esse e-mail. tenta entrar." };
-    }
-    users[key] = { nome: nome.trim(), email: key, senha };
-    writeUsers(users);
-    localStorage.setItem(SESSION_KEY, key);
-    setUser({ nome: users[key].nome, email: key });
-    return { ok: true, email: key };
+    return res;
   }
 
-  function login(email: string, senha: string): AuthResult {
-    const key = email.trim().toLowerCase();
-    const stored = readUsers()[key];
-    if (!stored || stored.senha !== senha) {
-      return { ok: false, erro: "e-mail ou senha incorretos." };
+  async function login(email: string, senha: string): Promise<AuthResult> {
+    const res = await loginFnCall({ data: { email, senha } });
+    if (res.ok) {
+      writeSession(res.user);
+      setUser(res.user);
     }
-    localStorage.setItem(SESSION_KEY, key);
-    setUser({ nome: stored.nome, email: key });
-    return { ok: true, email: key };
+    return res;
   }
 
-  /** Logs in with a fixed demo account, creating it on first use. Just a shortcut for
-   * testing the cart/modal flow without filling out the sign-up form every time. */
-  function loginDemo(): AuthResult {
-    const users = readUsers();
-    if (!users[DEMO_EMAIL]) {
-      users[DEMO_EMAIL] = { nome: DEMO_NOME, email: DEMO_EMAIL, senha: DEMO_SENHA };
-      writeUsers(users);
+  /** Logs in with the seeded demo account (teste@soft.com), a shortcut for testing
+   * the cart/modal flow without filling out the sign-up form every time. */
+  async function loginDemo(): Promise<AuthResult> {
+    const res = await loginDemoFnCall();
+    if (res.ok) {
+      writeSession(res.user);
+      setUser(res.user);
     }
-    localStorage.setItem(SESSION_KEY, DEMO_EMAIL);
-    setUser({ nome: DEMO_NOME, email: DEMO_EMAIL });
-    return { ok: true, email: DEMO_EMAIL };
+    return res;
   }
 
   function logout() {

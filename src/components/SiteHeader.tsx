@@ -184,6 +184,11 @@ function AccountMenu({ size }: { size: "sm" | "lg" }) {
         <DropdownMenuItem disabled>oi, {primeiroNome} ✿</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={openCart}>minha sacolinha</DropdownMenuItem>
+        {user.role === "admin" && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin">painel admin</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onSelect={() => {
             logout();

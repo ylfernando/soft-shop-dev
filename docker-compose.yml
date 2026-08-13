@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: soft-shop-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./db/002_admin.sql:/docker-entrypoint-initdb.d/02-admin.sql:ro
+      - ./db/003_seed.sql:/docker-entrypoint-initdb.d/03-seed.sql:ro
+      - ./db/004_categoria_como_tipo.sql:/docker-entrypoint-initdb.d/04-categoria-como-tipo.sql:ro
+      - ./db/005_produto_imagens.sql:/docker-entrypoint-initdb.d/05-produto-imagens.sql:ro
+      - ./db/006_produto_tamanho_medidas.sql:/docker-entrypoint-initdb.d/06-produto-tamanho-medidas.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:

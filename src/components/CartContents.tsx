@@ -1,27 +1,44 @@
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Minus, Plus, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 import { formatPreco } from "@/data/produtos";
 import { useCart, FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { criarPedido } from "@/server-fns/pedidos";
 
 export function CartContents() {
-  const {
-    lines,
-    subtotalCentavos,
-    freteCentavos,
-    totalCentavos,
-    setQuantidade,
-    removeItem,
-    clear,
-    closeCart,
-  } = useCart();
+  const { lines, subtotalCentavos, freteCentavos, totalCentavos, removeItem, clear, closeCart } =
+    useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const criarPedidoCall = useServerFn(criarPedido);
+  const [finalizando, setFinalizando] = useState(false);
 
-  function finalizarCompra() {
-    clear();
+  async function finalizarCompra() {
+    if (!user || finalizando) return;
+    setFinalizando(true);
+    try {
+      const res = await criarPedidoCall({ data: { usuarioId: user.id } });
+      if (!res.ok) {
+        toast.error(res.erro);
+        return;
+      }
+      clear();
+      closeCart();
+      toast.success("Pedido realizado com sucesso! ✿");
+      navigate({ to: "/" });
+    } catch {
+      toast.error("não deu pra fechar o pedido, tenta de novo ✿");
+    } finally {
+      setFinalizando(false);
+    }
+  }
+
+  function continuarComprando() {
     closeCart();
-    toast.success("Pedido simulado enviado! (essa loja ainda não tem checkout de verdade)");
-    navigate({ to: "/" });
+    navigate({ to: "/produtos" });
   }
 
   if (lines.length === 0) {
@@ -42,14 +59,14 @@ export function CartContents() {
   const faltaParaFreteGratis = FRETE_GRATIS_A_PARTIR_DE_CENTAVOS - subtotalCentavos;
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">
+    <div className="flex flex-col flex-1 min-h-0 gap-3">
+      <div className="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1">
         {lines.map((line) => (
           <div
             key={line.produtoId}
-            className="flex items-center gap-3 bg-white/80 rounded-2xl p-3 border border-[color:var(--pink-deep)]/10"
+            className="flex items-center gap-2.5 bg-white/80 rounded-xl p-2.5 border border-[color:var(--pink-deep)]/10"
           >
-            <div className="w-16 h-20 rounded-lg overflow-hidden bg-[color:var(--pink-soft)] shrink-0">
+            <div className="w-14 h-[4.5rem] rounded-lg overflow-hidden bg-[color:var(--pink-soft)] shrink-0">
               <img
                 src={line.produto.img}
                 alt={line.produto.nome}
@@ -58,49 +75,29 @@ export function CartContents() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="font-menu text-base text-[color:var(--pink-deep)] truncate">
+              <p className="font-menu text-sm text-[color:var(--pink-deep)] truncate">
                 {line.produto.nome}
               </p>
-              <p className="text-sm text-foreground/70">
-                {formatPreco(line.produto.precoCentavos)}
-              </p>
-
-              <div className="flex items-center gap-2 mt-1.5">
-                <button
-                  aria-label="diminuir quantidade"
-                  onClick={() => setQuantidade(line.produtoId, line.quantidade - 1)}
-                  className="w-6 h-6 rounded-full border border-[color:var(--pink-deep)]/30 flex items-center justify-center hover:bg-[color:var(--pink-soft)]"
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="w-5 text-center font-pixel text-base">{line.quantidade}</span>
-                <button
-                  aria-label="aumentar quantidade"
-                  onClick={() => setQuantidade(line.produtoId, line.quantidade + 1)}
-                  className="w-6 h-6 rounded-full border border-[color:var(--pink-deep)]/30 flex items-center justify-center hover:bg-[color:var(--pink-soft)]"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
+              <p className="mt-0.5 text-[11px] text-foreground/50">peça única</p>
             </div>
 
-            <div className="flex flex-col items-end gap-2">
-              <span className="font-semibold text-sm">
-                {formatPreco(line.produto.precoCentavos * line.quantidade)}
+            <div className="flex flex-col items-end gap-1.5">
+              <span className="font-semibold text-xs">
+                {formatPreco(line.produto.precoCentavos)}
               </span>
               <button
                 aria-label="remover item"
                 onClick={() => removeItem(line.produtoId)}
                 className="text-foreground/40 hover:text-[color:var(--pink-deep)]"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="space-y-1.5 pt-3 border-t border-[color:var(--pink-deep)]/20 text-sm">
+      <div className="shrink-0 space-y-1 pt-2.5 border-t border-[color:var(--pink-deep)]/20 text-xs">
         <div className="flex items-center justify-between">
           <span className="text-foreground/70">Subtotal</span>
           <span>{formatPreco(subtotalCentavos)}</span>
@@ -110,22 +107,31 @@ export function CartContents() {
           <span>{freteCentavos === 0 ? "grátis ✿" : formatPreco(freteCentavos)}</span>
         </div>
         {freteCentavos > 0 && (
-          <p className="text-xs text-foreground/50">
+          <p className="text-[11px] text-foreground/50">
             faltam {formatPreco(faltaParaFreteGratis)} pro frete grátis
           </p>
         )}
-        <div className="flex items-center justify-between font-menu text-lg text-[color:var(--pink-deep)] pt-1">
+        <div className="flex items-center justify-between font-menu text-base text-[color:var(--pink-deep)] pt-1">
           <span>Total</span>
           <span>{formatPreco(totalCentavos)}</span>
         </div>
       </div>
 
-      <button
-        onClick={finalizarCompra}
-        className="w-full py-3 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-xl hover:opacity-90"
-      >
-        Finalizar compra
-      </button>
+      <div className="shrink-0 space-y-1.5">
+        <button
+          onClick={finalizarCompra}
+          disabled={finalizando}
+          className="w-full py-2.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-base hover:opacity-90 disabled:opacity-60"
+        >
+          {finalizando ? "finalizando..." : "Finalizar compra"}
+        </button>
+        <button
+          onClick={continuarComprando}
+          className="w-full py-2 rounded-full border border-[color:var(--pink-deep)] text-[color:var(--pink-deep)] font-pixel text-sm hover:bg-[color:var(--pink-deep)]/10"
+        >
+          Continuar comprando
+        </button>
+      </div>
     </div>
   );
 }

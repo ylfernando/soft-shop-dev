@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
-import { PENDING_ADD_KEY, addPendingItemToStorage } from "@/lib/cart";
+import { PENDING_ADD_KEY, addPendingItemForUser } from "@/lib/cart";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -28,9 +28,9 @@ function CriarConta() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = signUp(nome, email, senha);
+    const res = await signUp(nome, email, senha);
     if (!res.ok) {
       setErro(res.erro);
       return;
@@ -38,7 +38,7 @@ function CriarConta() {
 
     const pending = localStorage.getItem(PENDING_ADD_KEY);
     if (pending) {
-      addPendingItemToStorage(res.email, pending);
+      await addPendingItemForUser(res.user.id, pending);
       localStorage.removeItem(PENDING_ADD_KEY);
       toast.success("Conta criada e peça adicionada à sacolinha ✿");
       navigate({ to: "/carrinho" });

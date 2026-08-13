@@ -6,14 +6,15 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { produtos, tipos, categoriaLabels, type Tipo } from "@/data/produtos";
+import { tipos, categoriaLabels, type Tipo, type Produto } from "@/data/produtos";
+import { getProdutos } from "@/server-fns/produtos";
 
 const searchSchema = z.object({
   tipo: z.array(z.enum(["cima", "baixo", "calcados", "vestido", "newdrop"])).optional(),
-  categoria: z.enum(["upcycling", "rework", "autorais", "garimpos", "newdrop"]).optional(),
+  categoria: z.enum(["cima", "baixo", "calcados", "vestido", "newdrop"]).optional(),
 });
 
-function combinaComTipo(p: (typeof produtos)[number], tipo: Tipo) {
+function combinaComTipo(p: Produto, tipo: Tipo) {
   if (tipo === "newdrop") return p.categoria === "newdrop";
   return p.tipo === tipo;
 }
@@ -21,9 +22,11 @@ function combinaComTipo(p: (typeof produtos)[number], tipo: Tipo) {
 export const Route = createFileRoute("/produtos")({
   component: Produtos,
   validateSearch: searchSchema,
+  loader: () => getProdutos(),
 });
 
 function Produtos() {
+  const produtos = Route.useLoaderData();
   const { tipo, categoria } = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -77,6 +80,18 @@ function Produtos() {
             <div>
               <h3 className="font-menu text-lg text-[color:var(--pink-deep)] mb-3">Tipo</h3>
               <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="tipo-todos"
+                    checked={tiposSelecionados.length === 0}
+                    onCheckedChange={() =>
+                      navigate({ search: (prev) => ({ ...prev, tipo: undefined }) })
+                    }
+                  />
+                  <Label htmlFor="tipo-todos" className="cursor-pointer font-normal">
+                    Todos
+                  </Label>
+                </div>
                 {tipos.map((t) => (
                   <div key={t.value} className="flex items-center gap-2">
                     <Checkbox

@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
-import { PENDING_ADD_KEY, addPendingItemToStorage } from "@/lib/cart";
+import { PENDING_ADD_KEY, addPendingItemForUser } from "@/lib/cart";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -27,10 +27,10 @@ function Entrar() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
-  function aposLoginOk(email: string) {
+  async function aposLoginOk(usuarioId: number) {
     const pending = localStorage.getItem(PENDING_ADD_KEY);
     if (pending) {
-      addPendingItemToStorage(email, pending);
+      await addPendingItemForUser(usuarioId, pending);
       localStorage.removeItem(PENDING_ADD_KEY);
       toast.success("Bem-vinda(o) de volta! peça adicionada à sacolinha ✿");
       navigate({ to: "/carrinho" });
@@ -42,19 +42,19 @@ function Entrar() {
     else navigate({ to: "/" });
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const res = login(email, senha);
+    const res = await login(email, senha);
     if (!res.ok) {
       setErro(res.erro);
       return;
     }
-    aposLoginOk(res.email);
+    await aposLoginOk(res.user.id);
   }
 
-  function handleLoginDemo() {
-    const res = loginDemo();
-    if (res.ok) aposLoginOk(res.email);
+  async function handleLoginDemo() {
+    const res = await loginDemo();
+    if (res.ok) await aposLoginOk(res.user.id);
   }
 
   return (
