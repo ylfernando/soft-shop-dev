@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AuthProvider } from "../lib/auth";
+import { CartProvider } from "../lib/cart";
+import { Toaster } from "../components/ui/sonner";
+import { CartModal } from "../components/CartModal";
 
 function NotFoundComponent() {
   return (
@@ -78,9 +82,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "naniiicas — seu novo guarda-roupa ♥" },
-      { name: "description", content: "Brechó indie de peças upcycling, rework, autorais e garimpos. Curadoria com carinho por Nani." },
+      {
+        name: "description",
+        content:
+          "Brechó indie de peças upcycling, rework, autorais e garimpos. Curadoria com carinho por Nani.",
+      },
       { property: "og:title", content: "naniiicas — seu novo guarda-roupa ♥" },
-      { property: "og:description", content: "Brechó indie de peças upcycling, rework, autorais e garimpos." },
+      {
+        property: "og:description",
+        content: "Brechó indie de peças upcycling, rework, autorais e garimpos.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -89,7 +100,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Braah+One&family=VT323&family=Caveat:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Braah+One&family=VT323&family=Caveat:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -117,8 +131,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AuthProvider>
+        <CartProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <CartModal />
+          <Toaster position="top-center" />
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
