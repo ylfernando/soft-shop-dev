@@ -37,7 +37,7 @@ function Index() {
 
       {/* Hero Carousel */}
       <section className="relative" style={{ backgroundColor: "#eef9fd" }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
           <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
         </div>
       </section>
@@ -99,7 +99,7 @@ function Index() {
             não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 mt-10">
+          <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">
             {divasDaSoft.map((diva) => (
               <InstagramEmbedCard key={diva.username} {...diva} />
             ))}
@@ -126,7 +126,7 @@ function HeroCarousel({ slides }: { slides: string[] }) {
   const go = (n: number) => setIdx((n + slides.length) % slides.length);
   return (
     <div className="relative">
-      <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/8]">
+      <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/8.5]">
         {slides.map((src, i) => (
           <img
             key={i}

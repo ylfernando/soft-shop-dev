@@ -32,7 +32,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
       {/* Header */}
       <header className="bg-[#fffffe] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
         {/* Mobile bar */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 text-[color:var(--pink-deep)]">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 text-[color:var(--pink-deep)]">
           <button aria-label="menu" onClick={() => setMenuOpen((v) => !v)} className="p-1">
             {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
@@ -50,7 +50,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
           </div>
         </div>
         {menuOpen && (
-          <nav className="md:hidden flex flex-col items-center gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
+          <nav className="lg:hidden flex flex-col items-center gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>
@@ -64,7 +64,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
         )}
 
         {/* Desktop bar */}
-        <div className="hidden md:grid max-w-7xl mx-auto grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
+        <div className="hidden lg:grid max-w-7xl mx-auto grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3">
           <nav className="flex flex-wrap items-center gap-2 text-[#ffb5e3] font-menu text-xl justify-start min-w-0">
             <NavBtn to="/" active={current === "inicio"}>
               ínicio

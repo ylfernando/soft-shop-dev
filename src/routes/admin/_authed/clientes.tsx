@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,11 +24,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { formatPreco } from "@/data/produtos";
+import { FORMA_PAGAMENTO_LABEL } from "@/lib/pagamento";
 import {
   adminListClientes,
   adminDeleteCliente,
   type ClienteRow,
 } from "@/server-fns/admin/clientes";
+import {
+  adminListPedidosDoCliente,
+  adminGetPedidoItens,
+  type PedidoRow,
+  type PedidoItemRow,
+  type PedidoStatus,
+} from "@/server-fns/admin/pedidos";
+
+const STATUS_LABEL: Record<PedidoStatus, string> = {
+  pendente: "pendente",
+  pago: "pago",
+  enviado: "enviado",
+  cancelado: "cancelado",
+};
+
+const STATUS_VARIANT: Record<PedidoStatus, "default" | "secondary" | "destructive" | "outline"> = {
+  pendente: "outline",
+  pago: "default",
+  enviado: "secondary",
+  cancelado: "destructive",
+};
 
 export const Route = createFileRoute("/admin/_authed/clientes")({
   component: AdminClientes,
@@ -38,6 +62,7 @@ function AdminClientes() {
   const clientesIniciais = Route.useLoaderData();
   const [clientes, setClientes] = useState<ClienteRow[]>(clientesIniciais);
   const [excluindo, setExcluindo] = useState<ClienteRow | null>(null);
+  const [vendoPedidos, setVendoPedidos] = useState<ClienteRow | null>(null);
 
   const listCall = useServerFn(adminListClientes);
   const deleteCall = useServerFn(adminDeleteCliente);
@@ -71,6 +96,9 @@ function AdminClientes() {
                   <Badge variant="secondary">{c.totalPedidos}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
+                    <Eye />
+                  </Button>
                   <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
                     <Trash2 />
                   </Button>
@@ -113,6 +141,97 @@ function AdminClientes() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ClientePedidosDialog
+        cliente={vendoPedidos}
+        onOpenChange={(open) => !open && setVendoPedidos(null)}
+      />
     </div>
+  );
+}
+
+function ClientePedidosDialog({
+  cliente,
+  onOpenChange,
+}: {
+  cliente: ClienteRow | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [pedidos, setPedidos] = useState<PedidoRow[] | null>(null);
+  const [itensPorPedido, setItensPorPedido] = useState<Record<number, PedidoItemRow[]>>({});
+
+  const listCall = useServerFn(adminListPedidosDoCliente);
+  const itensCall = useServerFn(adminGetPedidoItens);
+
+  const clienteId = cliente?.id;
+  useEffect(() => {
+    if (!clienteId) {
+      setPedidos(null);
+      setItensPorPedido({});
+      return;
+    }
+    setPedidos(null);
+    setItensPorPedido({});
+    listCall({ data: { clienteId } }).then(async (rows) => {
+      setPedidos(rows);
+      const entries = await Promise.all(
+        rows.map(async (p) => [p.id, await itensCall({ data: { pedidoId: p.id } })] as const),
+      );
+      setItensPorPedido(Object.fromEntries(entries));
+    });
+  }, [clienteId, listCall, itensCall]);
+
+  return (
+    <Dialog
+      open={!!cliente}
+      onOpenChange={(open) => {
+        if (!open) {
+          setPedidos(null);
+          setItensPorPedido({});
+        }
+        onOpenChange(open);
+      }}
+    >
+      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Pedidos de {cliente?.nome}</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {pedidos === null && <p className="text-sm text-muted-foreground">carregando...</p>}
+          {pedidos?.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              essa pessoa ainda não fez nenhum pedido.
+            </p>
+          )}
+          {pedidos?.map((p) => (
+            <div key={p.id} className="border rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Pedido #{p.id}</span>
+                <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {new Date(p.criadoEm).toLocaleString("pt-BR")} ·{" "}
+                {FORMA_PAGAMENTO_LABEL[p.formaPagamento]}
+              </div>
+              <div className="space-y-1 text-sm">
+                {(itensPorPedido[p.id] ?? []).map((item) => (
+                  <div key={item.id} className="flex justify-between">
+                    <span>
+                      {item.quantidade}x {item.nomeSnapshot}
+                    </span>
+                    <span>{formatPreco(item.precoCentavosSnapshot * item.quantidade)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between text-sm font-semibold pt-2 border-t">
+                <span>Total pago</span>
+                <span>{formatPreco(p.totalCentavos)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

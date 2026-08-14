@@ -1,15 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
-import { useAuth } from "@/lib/auth";
 import type { Produto } from "@/data/produtos";
-import {
-  getCart,
-  addItem as addItemFn,
-  removeItem as removeItemFn,
-  clearCart as clearCartFn,
-  type CartLineRow,
-} from "@/server-fns/cart";
 
 export {
   FRETE_GRATIS_A_PARTIR_DE_CENTAVOS,
@@ -38,90 +28,54 @@ interface CartContextValue {
   closeCart: () => void;
 }
 
-export const PENDING_ADD_KEY = "soft-shop-pending-add";
+const STORAGE_KEY = "soft-shop-cart";
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-/** Adds a product straight to a user's cart via the API, bypassing React state —
- * used right after sign-up/login, when the cart context for that user hasn't mounted yet.
- * A sessão já foi criada pelo login/cadastro nesse ponto, então o servidor sabe quem é o usuário. */
-export async function addPendingItemForUser(produtoId: string) {
-  await addItemFn({ data: { produtoId } });
+function readStoredCart(): CartLine[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as CartLine[]) : [];
+  } catch {
+    return [];
+  }
 }
 
+/** A sacolinha vive no navegador (não precisa de login pra usar) — só o
+ * fechamento do pedido exige uma conta. */
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  const [items, setItems] = useState<CartLineRow[]>([]);
+  const [lines, setLines] = useState<CartLine[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const getCartCall = useServerFn(getCart);
-  const addItemCall = useServerFn(addItemFn);
-  const removeItemCall = useServerFn(removeItemFn);
-  const clearCartCall = useServerFn(clearCartFn);
+  useEffect(() => {
+    setLines(readStoredCart());
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
-    if (!user) {
-      setItems([]);
-      return;
-    }
-    getCartCall()
-      .then(setItems)
-      .catch(() => toast.error("não deu pra carregar sua sacolinha ✿"));
-  }, [user, getCartCall]);
+    if (!hydrated) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+  }, [lines, hydrated]);
 
   /** Cada peça é única, então adicionar um produto já presente na sacolinha não faz nada. */
   function addItem(produto: Produto) {
-    if (!user) return;
-    if (items.some((i) => i.produtoId === produto.id)) return;
-    setItems([
-      ...items,
-      {
-        produtoId: produto.id,
-        quantidade: 1,
-        nome: produto.nome,
-        img: produto.img,
-        precoCentavos: produto.precoCentavos,
-        tipo: produto.tipo,
-        categoria: produto.categoria,
-        tamanho: produto.tamanho,
-        medidas: produto.medidas,
-      },
-    ]);
-    addItemCall({ data: { produtoId: produto.id } }).catch(() =>
-      toast.error("não deu pra salvar sua sacolinha ✿"),
+    setLines((prev) =>
+      prev.some((l) => l.produtoId === produto.id)
+        ? prev
+        : [...prev, { produtoId: produto.id, quantidade: 1, produto }],
     );
   }
 
   function removeItem(produtoId: string) {
-    if (!user) return;
-    setItems(items.filter((i) => i.produtoId !== produtoId));
-    removeItemCall({ data: { produtoId } }).catch(() =>
-      toast.error("não deu pra salvar sua sacolinha ✿"),
-    );
+    setLines((prev) => prev.filter((l) => l.produtoId !== produtoId));
   }
 
   function clear() {
-    if (!user) return;
-    setItems([]);
-    clearCartCall().catch(() => toast.error("não deu pra limpar sua sacolinha ✿"));
+    setLines([]);
   }
 
-  const lines: CartLine[] = items.map((item) => ({
-    produtoId: item.produtoId,
-    quantidade: item.quantidade,
-    produto: {
-      id: item.produtoId,
-      nome: item.nome,
-      img: item.img,
-      precoCentavos: item.precoCentavos,
-      tipo: item.tipo,
-      categoria: item.categoria,
-      tamanho: item.tamanho,
-      medidas: item.medidas,
-    },
-  }));
-
-  const count = items.reduce((sum, i) => sum + i.quantidade, 0);
+  const count = lines.reduce((sum, l) => sum + l.quantidade, 0);
   const subtotalCentavos = lines.reduce(
     (sum, l) => sum + l.produto.precoCentavos * l.quantidade,
     0,

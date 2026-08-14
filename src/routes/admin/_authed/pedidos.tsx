@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPreco } from "@/data/produtos";
+import { FORMA_PAGAMENTO_LABEL } from "@/lib/pagamento";
 import {
   adminListPedidos,
   adminGetPedidoItens,
@@ -181,6 +182,10 @@ function PedidoDetalheDialog({
           {itens === null && <p className="text-sm text-muted-foreground">carregando...</p>}
           {pedido && (
             <div className="pt-3 mt-3 border-t space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Forma de pagamento</span>
+                <span>{FORMA_PAGAMENTO_LABEL[pedido.formaPagamento]}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatPreco(pedido.subtotalCentavos)}</span>

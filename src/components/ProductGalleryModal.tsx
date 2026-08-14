@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useLocation, useNavigate } from "@tanstack/react-router";
 import { ShoppingBasket } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getProdutoImagens, getProdutoDetalhe } from "@/server-fns/produtos";
 import type { Produto } from "@/data/produtos";
-import { useAuth } from "@/lib/auth";
-import { useCart, PENDING_ADD_KEY } from "@/lib/cart";
+import { useCart } from "@/lib/cart";
 
 export function ProductGalleryModal({
   produto,
@@ -24,20 +22,11 @@ export function ProductGalleryModal({
   const [detalhe, setDetalhe] = useState<Produto>(produto);
   const getImagensCall = useServerFn(getProdutoImagens);
   const getDetalheCall = useServerFn(getProdutoDetalhe);
-  const { user } = useAuth();
   const { lines, addItem, openCart } = useCart();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const jaNaSacolinha = lines.some((l) => l.produtoId === produto.id);
 
   function handleAdd() {
-    if (!user) {
-      localStorage.setItem(PENDING_ADD_KEY, produto.id);
-      onOpenChange(false);
-      navigate({ to: "/criar-conta", search: { redirect: location.href } });
-      return;
-    }
     addItem(detalhe);
     onOpenChange(false);
     openCart();

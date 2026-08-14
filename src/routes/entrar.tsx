@@ -7,7 +7,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
-import { PENDING_ADD_KEY, addPendingItemForUser } from "@/lib/cart";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -27,16 +26,7 @@ function Entrar() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
-  async function aposLoginOk() {
-    const pending = localStorage.getItem(PENDING_ADD_KEY);
-    if (pending) {
-      await addPendingItemForUser(pending);
-      localStorage.removeItem(PENDING_ADD_KEY);
-      toast.success("Bem-vinda(o) de volta! peça adicionada à sacolinha ✿");
-      navigate({ to: "/carrinho" });
-      return;
-    }
-
+  function aposLoginOk() {
     toast.success("Bem-vinda(o) de volta ✿");
     if (redirect) navigate({ href: redirect });
     else navigate({ to: "/" });
@@ -49,12 +39,12 @@ function Entrar() {
       setErro(res.erro);
       return;
     }
-    await aposLoginOk();
+    aposLoginOk();
   }
 
   async function handleLoginDemo() {
     const res = await loginDemo();
-    if (res.ok) await aposLoginOk();
+    if (res.ok) aposLoginOk();
   }
 
   return (

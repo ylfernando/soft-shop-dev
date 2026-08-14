@@ -24,7 +24,7 @@ export const adminListClientes = createServerFn({ method: "GET" }).handler(
               u.criado_em AS criadoEm,
               COUNT(p.id) AS totalPedidos
        FROM usuarios u
-       LEFT JOIN pedidos p ON p.usuario_id = u.id
+       LEFT JOIN pedidos p ON p.usuario_id = u.id AND p.status != 'cancelado'
        WHERE u.role = 'cliente'
        GROUP BY u.id
        ORDER BY u.criado_em DESC`,

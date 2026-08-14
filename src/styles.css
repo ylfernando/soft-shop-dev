@@ -95,17 +95,21 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html {
-    /* Rede de segurança: nenhum elemento isolado (texto largo, imagem sem
-       max-width, etc.) deve conseguir criar scroll horizontal na página. */
-    overflow-x: hidden;
-  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
   }
   h1, h2, h3 { font-family: var(--font-menu); letter-spacing: 0.02em; }
+}
+
+@utility app-shell {
+  /* Rede de segurança: nenhum elemento isolado (texto largo, imagem sem
+     max-width, etc.) deve conseguir criar scroll horizontal na página.
+     Fica num wrapper (não em html/body) para não quebrar o `position: fixed`
+     dos menus, dropdowns e modais do Radix, que são portados direto pro
+     <body> e ficam fora deste wrapper. */
+  overflow-x: hidden;
 }
 
 @utility font-pixel { font-family: var(--font-pixel); }

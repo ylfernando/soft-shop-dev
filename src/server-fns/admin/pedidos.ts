@@ -4,6 +4,7 @@ import { getPool } from "@/server/db";
 import { requireAdmin } from "./session";
 
 export type PedidoStatus = "pendente" | "pago" | "enviado" | "cancelado";
+export type FormaPagamento = "pix" | "cartao_credito" | "cartao_debito" | "boleto";
 
 export interface PedidoRow {
   id: number;
@@ -13,6 +14,7 @@ export interface PedidoRow {
   freteCentavos: number;
   totalCentavos: number;
   status: PedidoStatus;
+  formaPagamento: FormaPagamento;
   criadoEm: string;
 }
 
@@ -27,25 +29,37 @@ export interface PedidoItemRow {
 
 interface PedidoItemQueryRow extends RowDataPacket, PedidoItemRow {}
 
-export const adminListPedidos = createServerFn({ method: "GET" }).handler(
-  async (): Promise<PedidoRow[]> => {
-    await requireAdmin();
-    const pool = getPool();
-    const [rows] = await pool.query<PedidoQueryRow[]>(
-      `SELECT id,
+const PEDIDO_SELECT = `SELECT id,
               nome_cliente_snapshot AS nomeCliente,
               email_cliente_snapshot AS emailCliente,
               subtotal_centavos AS subtotalCentavos,
               frete_centavos AS freteCentavos,
               total_centavos AS totalCentavos,
               status,
+              forma_pagamento AS formaPagamento,
               criado_em AS criadoEm
-       FROM pedidos
-       ORDER BY criado_em DESC`,
-    );
+       FROM pedidos`;
+
+export const adminListPedidos = createServerFn({ method: "GET" }).handler(
+  async (): Promise<PedidoRow[]> => {
+    await requireAdmin();
+    const pool = getPool();
+    const [rows] = await pool.query<PedidoQueryRow[]>(`${PEDIDO_SELECT} ORDER BY criado_em DESC`);
     return rows;
   },
 );
+
+export const adminListPedidosDoCliente = createServerFn({ method: "GET" })
+  .validator((data: { clienteId: number }) => data)
+  .handler(async ({ data }): Promise<PedidoRow[]> => {
+    await requireAdmin();
+    const pool = getPool();
+    const [rows] = await pool.query<PedidoQueryRow[]>(
+      `${PEDIDO_SELECT} WHERE usuario_id = ? ORDER BY criado_em DESC`,
+      [data.clienteId],
+    );
+    return rows;
+  });
 
 export const adminGetPedidoItens = createServerFn({ method: "GET" })
   .validator((data: { pedidoId: number }) => data)

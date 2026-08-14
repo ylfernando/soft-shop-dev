@@ -6,7 +6,14 @@ import { toast } from "sonner";
 import { formatPreco } from "@/data/produtos";
 import { useCart, FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import { criarPedido } from "@/server-fns/pedidos";
+import { criarPedido, type FormaPagamento } from "@/server-fns/pedidos";
+
+const FORMAS_PAGAMENTO: { value: FormaPagamento; label: string }[] = [
+  { value: "pix", label: "Pix" },
+  { value: "cartao_credito", label: "Cartão de crédito" },
+  { value: "cartao_debito", label: "Cartão de débito" },
+  { value: "boleto", label: "Boleto" },
+];
 
 export function CartContents() {
   const { lines, subtotalCentavos, freteCentavos, totalCentavos, removeItem, clear, closeCart } =
@@ -15,12 +22,23 @@ export function CartContents() {
   const navigate = useNavigate();
   const criarPedidoCall = useServerFn(criarPedido);
   const [finalizando, setFinalizando] = useState(false);
+  const [formaPagamento, setFormaPagamento] = useState<FormaPagamento>("pix");
 
   async function finalizarCompra() {
-    if (!user || finalizando) return;
+    if (finalizando) return;
+    if (!user) {
+      closeCart();
+      navigate({ to: "/entrar", search: { redirect: "/carrinho" } });
+      return;
+    }
     setFinalizando(true);
     try {
-      const res = await criarPedidoCall();
+      const res = await criarPedidoCall({
+        data: {
+          itens: lines.map((l) => ({ produtoId: l.produtoId, quantidade: l.quantidade })),
+          formaPagamento,
+        },
+      });
       if (!res.ok) {
         toast.error(res.erro);
         return;
@@ -118,6 +136,23 @@ export function CartContents() {
       </div>
 
       <div className="shrink-0 space-y-1.5">
+        <p className="text-[11px] font-medium text-foreground/60">forma de pagamento</p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {FORMAS_PAGAMENTO.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setFormaPagamento(f.value)}
+              className={`py-1.5 px-2 rounded-full border text-xs font-menu transition ${
+                formaPagamento === f.value
+                  ? "bg-[color:var(--pink-deep)] text-white border-[color:var(--pink-deep)]"
+                  : "border-[color:var(--pink-deep)]/30 text-[color:var(--pink-deep)] hover:bg-[color:var(--pink-soft)]/40"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={finalizarCompra}
           disabled={finalizando}
