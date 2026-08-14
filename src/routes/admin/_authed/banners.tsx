@@ -80,7 +80,7 @@ function AdminBanners() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Banners</h1>
         <Button
           onClick={() => {
@@ -92,76 +92,130 @@ function AdminBanners() {
         </Button>
       </div>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ordem</TableHead>
-              <TableHead>Imagem</TableHead>
-              <TableHead>Título</TableHead>
-              <TableHead>Ativo</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {banners.length === 0 && (
+        <div className="border rounded-lg text-center text-muted-foreground py-8">
+          nenhum banner cadastrado ainda.
+        </div>
+      )}
+
+      {banners.length > 0 && (
+        <>
+          <div className="border rounded-lg hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ordem</TableHead>
+                  <TableHead>Imagem</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Ativo</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {banners.map((b, i) => (
+                  <TableRow key={b.id}>
+                    <TableCell className="space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={i === 0}
+                        onClick={() => mover(b.id, "up")}
+                      >
+                        <ArrowUp />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={i === banners.length - 1}
+                        onClick={() => mover(b.id, "down")}
+                      >
+                        <ArrowDown />
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <img
+                        src={b.imgUrl}
+                        alt={b.titulo ?? "banner"}
+                        className="w-24 h-14 object-cover rounded"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {b.titulo ?? <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell>{b.ativo ? "sim" : "não"}</TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setEditando(b);
+                          setSheetAberto(true);
+                        }}
+                      >
+                        <Pencil />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => setExcluindo(b)}>
+                        <Trash2 />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-3 md:hidden">
             {banners.map((b, i) => (
-              <TableRow key={b.id}>
-                <TableCell className="space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={i === 0}
-                    onClick={() => mover(b.id, "up")}
-                  >
-                    <ArrowUp />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={i === banners.length - 1}
-                    onClick={() => mover(b.id, "down")}
-                  >
-                    <ArrowDown />
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <img
-                    src={b.imgUrl}
-                    alt={b.titulo ?? "banner"}
-                    className="w-24 h-14 object-cover rounded"
-                  />
-                </TableCell>
-                <TableCell>
-                  {b.titulo ?? <span className="text-muted-foreground">—</span>}
-                </TableCell>
-                <TableCell>{b.ativo ? "sim" : "não"}</TableCell>
-                <TableCell className="text-right space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEditando(b);
-                      setSheetAberto(true);
-                    }}
-                  >
-                    <Pencil />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setExcluindo(b)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <div key={b.id} className="border rounded-lg p-3 flex gap-3">
+                <img
+                  src={b.imgUrl}
+                  alt={b.titulo ?? "banner"}
+                  className="w-24 h-16 object-cover rounded shrink-0"
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="font-medium truncate">
+                    {b.titulo ?? <span className="text-muted-foreground">sem título</span>}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {b.ativo ? "ativo" : "inativo"}
+                  </div>
+                  <div className="flex items-center gap-1 pt-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={i === 0}
+                      onClick={() => mover(b.id, "up")}
+                    >
+                      <ArrowUp />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={i === banners.length - 1}
+                      onClick={() => mover(b.id, "down")}
+                    >
+                      <ArrowDown />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setEditando(b);
+                        setSheetAberto(true);
+                      }}
+                    >
+                      <Pencil />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setExcluindo(b)}>
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ))}
-            {banners.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  nenhum banner cadastrado ainda.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
 
       <BannerFormSheet
         open={sheetAberto}

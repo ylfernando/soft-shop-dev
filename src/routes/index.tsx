@@ -6,14 +6,14 @@ import { ProductCard } from "@/components/ProductCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { InstagramEmbedCard } from "@/components/InstagramEmbedCard";
-import { getProdutos } from "@/server-fns/produtos";
+import { getVitrines } from "@/server-fns/vitrines";
 import { getBannersAtivos } from "@/server-fns/banners";
 
 export const Route = createFileRoute("/")({
   component: Index,
   loader: async () => {
-    const [produtos, banners] = await Promise.all([getProdutos(), getBannersAtivos()]);
-    return { produtos, banners };
+    const [vitrines, banners] = await Promise.all([getVitrines(), getBannersAtivos()]);
+    return { vitrines, banners };
   },
 });
 
@@ -25,11 +25,8 @@ const divasDaSoft = [
 ];
 
 function Index() {
-  const { produtos, banners } = Route.useLoaderData();
-  // "garimpos" deixou de ser uma categoria própria — mostra o próximo lote de
-  // produtos (depois dos que já aparecem em "promos da semana").
-  const garimpos = produtos.slice(4, 6);
-  const promos = produtos.slice(0, 4);
+  const { vitrines, banners } = Route.useLoaderData();
+  const { garimpos, promos } = vitrines;
 
   return (
     <div className="min-h-screen text-foreground">
@@ -43,51 +40,55 @@ function Index() {
       </section>
 
       {/* Últimos garimpos */}
-      <section className="bg-[color:var(--cream)] py-20 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
-            ÚLTIMOS GARIMPOS:
-          </h2>
-          <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2"></p>
+      {garimpos.length > 0 && (
+        <section className="bg-[color:var(--cream)] py-20 px-6">
+          <div className="max-w-6xl mx-auto text-center">
+            <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
+              ÚLTIMOS GARIMPOS:
+            </h2>
+            <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2"></p>
 
-          <div className="grid grid-cols-2 gap-6 mt-12 max-w-2xl mx-auto">
-            {garimpos.map((p) => (
-              <ProductCard key={p.id} produto={p} />
-            ))}
+            <div className="grid grid-cols-2 gap-6 mt-12 max-w-2xl mx-auto">
+              {garimpos.map((p) => (
+                <ProductCard key={p.id} produto={p} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Queridinhas */}
-      <section
-        className="py-20 px-6"
-        style={{ backgroundImage: `url(${strawberryBg})`, backgroundSize: "600px" }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
-              PROMOS DA SEMANA
-            </h2>
-            <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
-              aproveite enquanto está dispo hihi
-            </p>
-            <Link
-              to="/produtos"
-              className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
-            >
-              tudo
-            </Link>
-          </div>
+      {promos.length > 0 && (
+        <section
+          className="py-20 px-6"
+          style={{ backgroundImage: `url(${strawberryBg})`, backgroundSize: "600px" }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
+                PROMOS DA SEMANA
+              </h2>
+              <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
+                aproveite enquanto está dispo hihi
+              </p>
+              <Link
+                to="/produtos"
+                className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
+              >
+                tudo
+              </Link>
+            </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
-            {promos.map((p) => (
-              <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
-                <ProductCard produto={p} />
-              </div>
-            ))}
+            <div className="flex flex-wrap justify-center gap-6">
+              {promos.map((p) => (
+                <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
+                  <ProductCard produto={p} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Sobre */}
       <section id="sobre" className="bg-[color:var(--pink-soft)] py-20 px-6">

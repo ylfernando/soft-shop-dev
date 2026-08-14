@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, ShoppingBag, Image, Receipt, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Image, Receipt, Users, LogOut, Sparkles } from "lucide-react";
 import { getAdminSession, adminLogout } from "@/server-fns/admin/auth";
 import {
   SidebarProvider,
@@ -20,6 +20,7 @@ import {
 const NAV_ITEMS = [
   { to: "/admin", label: "Visão geral", Icon: LayoutDashboard },
   { to: "/admin/produtos", label: "Produtos", Icon: ShoppingBag },
+  { to: "/admin/vitrine", label: "Vitrine", Icon: Sparkles },
   { to: "/admin/banners", label: "Banners", Icon: Image },
   { to: "/admin/pedidos", label: "Pedidos", Icon: Receipt },
   { to: "/admin/clientes", label: "Clientes", Icon: Users },
@@ -93,7 +94,7 @@ function AdminLayout() {
           <SidebarTrigger />
           <span className="text-sm text-muted-foreground">soft shop</span>
         </header>
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-x-hidden">
           <Outlet />
         </div>
       </SidebarInset>

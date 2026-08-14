@@ -97,59 +97,93 @@ function AdminProdutos() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Produtos</h1>
         <Button onClick={abrirNovo}>
           <Plus /> Novo produto
         </Button>
       </div>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Imagem</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Tamanho</TableHead>
-              <TableHead>Preço</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {produtos.length === 0 && (
+        <div className="border rounded-lg text-center text-muted-foreground py-8">
+          nenhum produto cadastrado ainda.
+        </div>
+      )}
+
+      {produtos.length > 0 && (
+        <>
+          <div className="border rounded-lg hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Imagem</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Tamanho</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {produtos.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>
+                      <img src={p.img} alt={p.nome} className="w-12 h-14 object-cover rounded" />
+                    </TableCell>
+                    <TableCell className="font-medium">{p.nome}</TableCell>
+                    <TableCell>{tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo}</TableCell>
+                    <TableCell>{categoriaLabels[p.categoria]}</TableCell>
+                    <TableCell>
+                      {p.tamanho || <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell>{formatPreco(p.precoCentavos)}</TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)}>
+                        <Pencil />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => setExcluindo(p)}>
+                        <Trash2 />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
             {produtos.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell>
-                  <img src={p.img} alt={p.nome} className="w-12 h-14 object-cover rounded" />
-                </TableCell>
-                <TableCell className="font-medium">{p.nome}</TableCell>
-                <TableCell>{tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo}</TableCell>
-                <TableCell>{categoriaLabels[p.categoria]}</TableCell>
-                <TableCell>
-                  {p.tamanho || <span className="text-muted-foreground">—</span>}
-                </TableCell>
-                <TableCell>{formatPreco(p.precoCentavos)}</TableCell>
-                <TableCell className="text-right space-x-1">
-                  <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)}>
-                    <Pencil />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setExcluindo(p)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <div key={p.id} className="border rounded-lg p-3 flex gap-3">
+                <img
+                  src={p.img}
+                  alt={p.nome}
+                  className="w-16 h-20 object-cover rounded shrink-0"
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="font-medium truncate">{p.nome}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo} ·{" "}
+                    {categoriaLabels[p.categoria]}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Tamanho: {p.tamanho || "—"}
+                  </div>
+                  <div className="font-medium">{formatPreco(p.precoCentavos)}</div>
+                  <div className="flex gap-1 pt-1">
+                    <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)}>
+                      <Pencil />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setExcluindo(p)}>
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ))}
-            {produtos.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  nenhum produto cadastrado ainda.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
 
       <ProdutoFormSheet
         open={sheetAberto}

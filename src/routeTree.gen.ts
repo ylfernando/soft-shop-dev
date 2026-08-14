@@ -21,6 +21,7 @@ import { Route as AdminAuthedBannersRouteImport } from './routes/admin/_authed/b
 import { Route as AdminAuthedClientesRouteImport } from './routes/admin/_authed/clientes'
 import { Route as AdminAuthedPedidosRouteImport } from './routes/admin/_authed/pedidos'
 import { Route as AdminAuthedProdutosRouteImport } from './routes/admin/_authed/produtos'
+import { Route as AdminAuthedVitrineRouteImport } from './routes/admin/_authed/vitrine'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const AdminAuthedProdutosRoute = AdminAuthedProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AdminAuthedRoute,
 } as any)
+const AdminAuthedVitrineRoute = AdminAuthedVitrineRouteImport.update({
+  id: '/vitrine',
+  path: '/vitrine',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
+  '/admin/vitrine': typeof AdminAuthedVitrineRoute
   '/admin/': typeof AdminAuthedIndexRoute
 }
 export interface FileRoutesByTo {
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
+  '/admin/vitrine': typeof AdminAuthedVitrineRoute
   '/admin': typeof AdminAuthedIndexRoute
 }
 export interface FileRoutesById {
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/admin/_authed/clientes': typeof AdminAuthedClientesRoute
   '/admin/_authed/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/_authed/produtos': typeof AdminAuthedProdutosRoute
+  '/admin/_authed/vitrine': typeof AdminAuthedVitrineRoute
   '/admin/_authed/': typeof AdminAuthedIndexRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/admin/vitrine'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/pedidos'
     | '/admin/produtos'
+    | '/admin/vitrine'
     | '/admin'
   id:
     | '__root__'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/admin/_authed/clientes'
     | '/admin/_authed/pedidos'
     | '/admin/_authed/produtos'
+    | '/admin/_authed/vitrine'
     | '/admin/_authed/'
   fileRoutesById: FileRoutesById
 }
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthedProdutosRouteImport
       parentRoute: typeof AdminAuthedRoute
     }
+    '/admin/_authed/vitrine': {
+      id: '/admin/_authed/vitrine'
+      path: '/vitrine'
+      fullPath: '/admin/vitrine'
+      preLoaderRoute: typeof AdminAuthedVitrineRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
   }
 }
 
@@ -273,6 +292,7 @@ interface AdminAuthedRouteChildren {
   AdminAuthedClientesRoute: typeof AdminAuthedClientesRoute
   AdminAuthedPedidosRoute: typeof AdminAuthedPedidosRoute
   AdminAuthedProdutosRoute: typeof AdminAuthedProdutosRoute
+  AdminAuthedVitrineRoute: typeof AdminAuthedVitrineRoute
   AdminAuthedIndexRoute: typeof AdminAuthedIndexRoute
 }
 
@@ -281,6 +301,7 @@ const AdminAuthedRouteChildren: AdminAuthedRouteChildren = {
   AdminAuthedClientesRoute: AdminAuthedClientesRoute,
   AdminAuthedPedidosRoute: AdminAuthedPedidosRoute,
   AdminAuthedProdutosRoute: AdminAuthedProdutosRoute,
+  AdminAuthedVitrineRoute: AdminAuthedVitrineRoute,
   AdminAuthedIndexRoute: AdminAuthedIndexRoute,
 }
 

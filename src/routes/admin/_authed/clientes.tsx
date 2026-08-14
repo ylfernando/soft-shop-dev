@@ -75,46 +75,78 @@ function AdminClientes() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Clientes</h1>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>E-mail</TableHead>
-              <TableHead>Cadastro</TableHead>
-              <TableHead>Pedidos</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {clientes.length === 0 && (
+        <div className="border rounded-lg text-center text-muted-foreground py-8">
+          nenhum cliente cadastrado ainda.
+        </div>
+      )}
+
+      {clientes.length > 0 && (
+        <>
+          <div className="border rounded-lg hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>E-mail</TableHead>
+                  <TableHead>Cadastro</TableHead>
+                  <TableHead>Pedidos</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clientes.map((c) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.nome}</TableCell>
+                    <TableCell>{c.email}</TableCell>
+                    <TableCell>{new Date(c.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{c.totalPedidos}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
+                        <Eye />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
+                        <Trash2 />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-3 md:hidden">
             {clientes.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="font-medium">{c.nome}</TableCell>
-                <TableCell>{c.email}</TableCell>
-                <TableCell>{new Date(c.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary">{c.totalPedidos}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
-                    <Eye />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
-                    <Trash2 />
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <div key={c.id} className="border rounded-lg p-3 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{c.nome}</div>
+                    <div className="text-xs text-muted-foreground truncate">{c.email}</div>
+                  </div>
+                  <Badge variant="secondary" className="shrink-0">
+                    {c.totalPedidos} pedido{c.totalPedidos === 1 ? "" : "s"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    desde {new Date(c.criadoEm).toLocaleDateString("pt-BR")}
+                  </span>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
+                      <Eye />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ))}
-            {clientes.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                  nenhum cliente cadastrado ainda.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
 
       <AlertDialog open={!!excluindo} onOpenChange={(open) => !open && setExcluindo(null)}>
         <AlertDialogContent>

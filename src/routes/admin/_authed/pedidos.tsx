@@ -73,65 +73,114 @@ function AdminPedidos() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Pedidos</h1>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {pedidos.length === 0 && (
+        <div className="border rounded-lg text-center text-muted-foreground py-8">
+          nenhum pedido ainda.
+        </div>
+      )}
+
+      {pedidos.length > 0 && (
+        <>
+          <div className="border rounded-lg hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>#</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pedidos.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>#{p.id}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{p.nomeCliente}</div>
+                      <div className="text-xs text-muted-foreground">{p.emailCliente}</div>
+                    </TableCell>
+                    <TableCell>{formatPreco(p.totalCentavos)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
+                        <Select
+                          value={p.status}
+                          onValueChange={(v) => mudarStatus(p, v as PedidoStatus)}
+                        >
+                          <SelectTrigger className="h-7 w-28 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
+                              <SelectItem key={s} value={s}>
+                                {STATUS_LABEL[s]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </TableCell>
+                    <TableCell>{new Date(p.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => setDetalhe(p)}>
+                        <Eye />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="space-y-3 md:hidden">
             {pedidos.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell>#{p.id}</TableCell>
-                <TableCell>
-                  <div className="font-medium">{p.nomeCliente}</div>
-                  <div className="text-xs text-muted-foreground">{p.emailCliente}</div>
-                </TableCell>
-                <TableCell>{formatPreco(p.totalCentavos)}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
-                    <Select
-                      value={p.status}
-                      onValueChange={(v) => mudarStatus(p, v as PedidoStatus)}
-                    >
-                      <SelectTrigger className="h-7 w-28 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {STATUS_LABEL[s]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+              <div key={p.id} className="border rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-medium">
+                      #{p.id} · {p.nomeCliente}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {p.emailCliente}
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell>{new Date(p.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => setDetalhe(p)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() => setDetalhe(p)}
+                  >
                     <Eye />
                   </Button>
-                </TableCell>
-              </TableRow>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium">{formatPreco(p.totalCentavos)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
+                  <Select value={p.status} onValueChange={(v) => mudarStatus(p, v as PedidoStatus)}>
+                    <SelectTrigger className="h-7 w-28 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {STATUS_LABEL[s]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             ))}
-            {pedidos.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  nenhum pedido ainda.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
 
       <PedidoDetalheDialog pedido={detalhe} onOpenChange={(open) => !open && setDetalhe(null)} />
     </div>
