@@ -50,7 +50,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
           </div>
         </div>
         {menuOpen && (
-          <nav className="md:hidden flex flex-col items-stretch gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
+          <nav className="md:hidden flex flex-col items-center gap-1 px-4 pb-4 text-[#ffb5e3] font-menu text-lg">
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>

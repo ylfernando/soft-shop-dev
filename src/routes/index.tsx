@@ -37,7 +37,7 @@ function Index() {
 
       {/* Hero Carousel */}
       <section className="relative" style={{ backgroundColor: "#eef9fd" }}>
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16">
           <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
         </div>
       </section>
@@ -81,10 +81,7 @@ function Index() {
 
           <div className="flex flex-wrap justify-center gap-6">
             {promos.map((p) => (
-              <div
-                key={p.id}
-                className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)] lg:w-[calc(25%-1.125rem)]"
-              >
+              <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
                 <ProductCard produto={p} />
               </div>
             ))}
@@ -129,7 +126,7 @@ function HeroCarousel({ slides }: { slides: string[] }) {
   const go = (n: number) => setIdx((n + slides.length) % slides.length);
   return (
     <div className="relative">
-      <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/9]">
+      <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/8]">
         {slides.map((src, i) => (
           <img
             key={i}
