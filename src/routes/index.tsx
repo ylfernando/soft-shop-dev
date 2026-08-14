@@ -65,13 +65,15 @@ function Index() {
       >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-menu text-5xl md:text-6xl text-[#fffefe]">PROMOS DA SEMANA</h2>
-            <p className="font-unrulyness text-[60px] text-[#fffefe] mt-1">
+            <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
+              PROMOS DA SEMANA
+            </h2>
+            <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
               aproveite enquanto está dispo hihi
             </p>
             <Link
               to="/produtos"
-              className="inline-block mt-3 font-menu text-[20px] text-[#fffefe] underline"
+              className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
             >
               tudo
             </Link>

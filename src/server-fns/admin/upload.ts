@@ -42,14 +42,17 @@ export const uploadImagem = createServerFn({ method: "POST" })
     const bytes = Buffer.from(await arquivo.arrayBuffer());
 
     // Em produção (Vercel) o disco é somente leitura e não persiste entre
-    // deploys — sobe pro Vercel Blob nesse caso. Localmente, sem token
-    // configurado, continua salvando em public/uploads pra não exigir conta
-    // nenhuma durante o desenvolvimento.
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    // deploys — sobe pro Vercel Blob nesse caso. BLOB_STORE_ID é injetada
+    // automaticamente quando o Blob Store está conectado ao projeto; a
+    // autenticação em si usa OIDC (token automático e temporário do runtime
+    // da Vercel), então não passamos nenhum token explícito aqui — o SDK
+    // resolve sozinho (com fallback pra BLOB_READ_WRITE_TOKEN se existir).
+    // Localmente, sem loja conectada, continua salvando em public/uploads
+    // pra não exigir conta nenhuma durante o desenvolvimento.
+    if (process.env.BLOB_STORE_ID) {
       const blob = await put(`${pasta}/${filename}`, bytes, {
         access: "public",
         contentType: arquivo.type,
-        token: process.env.BLOB_READ_WRITE_TOKEN,
       });
       return { url: blob.url };
     }

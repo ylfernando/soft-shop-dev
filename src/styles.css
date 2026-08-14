@@ -95,6 +95,11 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html {
+    /* Rede de segurança: nenhum elemento isolado (texto largo, imagem sem
+       max-width, etc.) deve conseguir criar scroll horizontal na página. */
+    overflow-x: hidden;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
