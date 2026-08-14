@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { Produto } from "@/data/produtos";
 import { cotarFreteCarrinho } from "@/server-fns/frete";
 import type { OpcaoFrete } from "@/server/superfrete";
+import { aplicarCupom } from "@/server-fns/cupom";
 import { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/frete";
 
 export { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS };
@@ -13,7 +14,13 @@ export interface CartLine {
   produto: Produto;
 }
 
+interface CupomAplicado {
+  codigo: string;
+  percentualDesconto: number;
+}
+
 interface CartContextValue {
+  hydrated: boolean;
   lines: CartLine[];
   count: number;
   subtotalCentavos: number;
@@ -26,6 +33,14 @@ interface CartContextValue {
   calcularFrete: () => Promise<void>;
   freteCentavos: number;
   freteDeterminado: boolean;
+  cupomInput: string;
+  setCupomInput: (codigo: string) => void;
+  cupomAplicado: CupomAplicado | null;
+  aplicandoCupom: boolean;
+  erroCupom: string | null;
+  aplicarCupomAgora: () => Promise<void>;
+  removerCupom: () => void;
+  descontoCentavos: number;
   totalCentavos: number;
   addItem: (produto: Produto) => void;
   removeItem: (produtoId: string) => void;
@@ -61,6 +76,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [erroFrete, setErroFrete] = useState<string | null>(null);
   const cotarFreteCall = useServerFn(cotarFreteCarrinho);
 
+  const [cupomInput, setCupomInput] = useState("");
+  const [cupomAplicado, setCupomAplicado] = useState<CupomAplicado | null>(null);
+  const [aplicandoCupom, setAplicandoCupom] = useState(false);
+  const [erroCupom, setErroCupom] = useState<string | null>(null);
+  const aplicarCupomCall = useServerFn(aplicarCupom);
+
   useEffect(() => {
     setLines(readStoredCart());
     setHydrated(true);
@@ -76,6 +97,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function limparFreteCalculado() {
     setFreteEscolhido(null);
     setErroFrete(null);
+  }
+
+  function removerCupom() {
+    setCupomAplicado(null);
+    setErroCupom(null);
+    setCupomInput("");
   }
 
   /** Cada peça é única, então adicionar um produto já presente na sacolinha não faz nada. */
@@ -97,6 +124,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setLines([]);
     limparFreteCalculado();
     setCepState("");
+    removerCupom();
   }
 
   function setCep(next: string) {
@@ -136,13 +164,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /** Calcula o frete sozinho assim que o CEP completa 8 dígitos — o debounce
+   * evita disparar no meio da digitação (ex: colar o CEP). */
+  useEffect(() => {
+    const cepLimpo = cep.replace(/\D/g, "");
+    if (cepLimpo.length !== 8 || freteGratis || freteEscolhido || calculandoFrete) return;
+
+    const timer = setTimeout(() => {
+      calcularFrete();
+    }, 400);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cep, count, freteGratis]);
+
+  async function aplicarCupomAgora() {
+    const codigo = cupomInput.trim();
+    if (!codigo) return;
+    setAplicandoCupom(true);
+    setErroCupom(null);
+    try {
+      const res = await aplicarCupomCall({ data: { codigo } });
+      if (!res.ok) {
+        setErroCupom(res.erro);
+        setCupomAplicado(null);
+        return;
+      }
+      setCupomAplicado({ codigo: codigo.toUpperCase(), percentualDesconto: res.percentualDesconto });
+    } catch {
+      setErroCupom("não deu pra aplicar o cupom, tenta de novo.");
+      setCupomAplicado(null);
+    } finally {
+      setAplicandoCupom(false);
+    }
+  }
+
   const freteDeterminado = freteGratis || !!freteEscolhido;
   const freteCentavos = freteGratis ? 0 : (freteEscolhido?.precoCentavos ?? 0);
-  const totalCentavos = subtotalCentavos + freteCentavos;
+  const descontoCentavos = cupomAplicado
+    ? Math.round((subtotalCentavos * cupomAplicado.percentualDesconto) / 100)
+    : 0;
+  const totalCentavos = subtotalCentavos - descontoCentavos + freteCentavos;
 
   return (
     <CartContext.Provider
       value={{
+        hydrated,
         lines,
         count,
         subtotalCentavos,
@@ -155,6 +221,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         calcularFrete,
         freteCentavos,
         freteDeterminado,
+        cupomInput,
+        setCupomInput,
+        cupomAplicado,
+        aplicandoCupom,
+        erroCupom,
+        aplicarCupomAgora,
+        removerCupom,
+        descontoCentavos,
         totalCentavos,
         addItem,
         removeItem,

@@ -243,6 +243,14 @@ function PedidoDetalheDialog({
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatPreco(pedido.subtotalCentavos)}</span>
               </div>
+              {pedido.cupomCodigo && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Cupom ({pedido.cupomCodigo})
+                  </span>
+                  <span>-{formatPreco(pedido.descontoCentavos)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Frete</span>
                 <span>{formatPreco(pedido.freteCentavos)}</span>

@@ -13,12 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as FinalizarCompraRouteImport } from './routes/finalizar-compra'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
 import { Route as AdminAuthedIndexRouteImport } from './routes/admin/_authed/index'
 import { Route as AdminAuthedBannersRouteImport } from './routes/admin/_authed/banners'
 import { Route as AdminAuthedClientesRouteImport } from './routes/admin/_authed/clientes'
+import { Route as AdminAuthedCuponsRouteImport } from './routes/admin/_authed/cupons'
 import { Route as AdminAuthedPedidosRouteImport } from './routes/admin/_authed/pedidos'
 import { Route as AdminAuthedProdutosRouteImport } from './routes/admin/_authed/produtos'
 import { Route as AdminAuthedVitrineRouteImport } from './routes/admin/_authed/vitrine'
@@ -41,6 +43,11 @@ const CriarContaRoute = CriarContaRouteImport.update({
 const EntrarRoute = EntrarRouteImport.update({
   id: '/entrar',
   path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinalizarCompraRoute = FinalizarCompraRouteImport.update({
+  id: '/finalizar-compra',
+  path: '/finalizar-compra',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdutosRoute = ProdutosRouteImport.update({
@@ -73,6 +80,11 @@ const AdminAuthedClientesRoute = AdminAuthedClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => AdminAuthedRoute,
 } as any)
+const AdminAuthedCuponsRoute = AdminAuthedCuponsRouteImport.update({
+  id: '/cupons',
+  path: '/cupons',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
 const AdminAuthedPedidosRoute = AdminAuthedPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
@@ -94,11 +106,13 @@ export interface FileRoutesByFullPath {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
+  '/admin/cupons': typeof AdminAuthedCuponsRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
   '/admin/vitrine': typeof AdminAuthedVitrineRoute
@@ -109,10 +123,12 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
+  '/admin/cupons': typeof AdminAuthedCuponsRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
   '/admin/vitrine': typeof AdminAuthedVitrineRoute
@@ -124,11 +140,13 @@ export interface FileRoutesById {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/_authed/banners': typeof AdminAuthedBannersRoute
   '/admin/_authed/clientes': typeof AdminAuthedClientesRoute
+  '/admin/_authed/cupons': typeof AdminAuthedCuponsRoute
   '/admin/_authed/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/_authed/produtos': typeof AdminAuthedProdutosRoute
   '/admin/_authed/vitrine': typeof AdminAuthedVitrineRoute
@@ -141,11 +159,13 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/finalizar-compra'
     | '/produtos'
     | '/admin'
     | '/admin/entrar'
     | '/admin/banners'
     | '/admin/clientes'
+    | '/admin/cupons'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin/vitrine'
@@ -156,10 +176,12 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/finalizar-compra'
     | '/produtos'
     | '/admin/entrar'
     | '/admin/banners'
     | '/admin/clientes'
+    | '/admin/cupons'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin/vitrine'
@@ -170,11 +192,13 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/finalizar-compra'
     | '/produtos'
     | '/admin/_authed'
     | '/admin/entrar'
     | '/admin/_authed/banners'
     | '/admin/_authed/clientes'
+    | '/admin/_authed/cupons'
     | '/admin/_authed/pedidos'
     | '/admin/_authed/produtos'
     | '/admin/_authed/vitrine'
@@ -186,6 +210,7 @@ export interface RootRouteChildren {
   CarrinhoRoute: typeof CarrinhoRoute
   CriarContaRoute: typeof CriarContaRoute
   EntrarRoute: typeof EntrarRoute
+  FinalizarCompraRoute: typeof FinalizarCompraRoute
   ProdutosRoute: typeof ProdutosRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
@@ -219,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: '/entrar'
       fullPath: '/entrar'
       preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/finalizar-compra': {
+      id: '/finalizar-compra'
+      path: '/finalizar-compra'
+      fullPath: '/finalizar-compra'
+      preLoaderRoute: typeof FinalizarCompraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produtos': {
@@ -263,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthedClientesRouteImport
       parentRoute: typeof AdminAuthedRoute
     }
+    '/admin/_authed/cupons': {
+      id: '/admin/_authed/cupons'
+      path: '/cupons'
+      fullPath: '/admin/cupons'
+      preLoaderRoute: typeof AdminAuthedCuponsRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
     '/admin/_authed/pedidos': {
       id: '/admin/_authed/pedidos'
       path: '/pedidos'
@@ -290,6 +329,7 @@ declare module '@tanstack/react-router' {
 interface AdminAuthedRouteChildren {
   AdminAuthedBannersRoute: typeof AdminAuthedBannersRoute
   AdminAuthedClientesRoute: typeof AdminAuthedClientesRoute
+  AdminAuthedCuponsRoute: typeof AdminAuthedCuponsRoute
   AdminAuthedPedidosRoute: typeof AdminAuthedPedidosRoute
   AdminAuthedProdutosRoute: typeof AdminAuthedProdutosRoute
   AdminAuthedVitrineRoute: typeof AdminAuthedVitrineRoute
@@ -299,6 +339,7 @@ interface AdminAuthedRouteChildren {
 const AdminAuthedRouteChildren: AdminAuthedRouteChildren = {
   AdminAuthedBannersRoute: AdminAuthedBannersRoute,
   AdminAuthedClientesRoute: AdminAuthedClientesRoute,
+  AdminAuthedCuponsRoute: AdminAuthedCuponsRoute,
   AdminAuthedPedidosRoute: AdminAuthedPedidosRoute,
   AdminAuthedProdutosRoute: AdminAuthedProdutosRoute,
   AdminAuthedVitrineRoute: AdminAuthedVitrineRoute,
@@ -314,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   CarrinhoRoute: CarrinhoRoute,
   CriarContaRoute: CriarContaRoute,
   EntrarRoute: EntrarRoute,
+  FinalizarCompraRoute: FinalizarCompraRoute,
   ProdutosRoute: ProdutosRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,

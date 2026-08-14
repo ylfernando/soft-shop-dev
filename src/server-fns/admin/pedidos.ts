@@ -11,6 +11,8 @@ export interface PedidoRow {
   nomeCliente: string;
   emailCliente: string;
   subtotalCentavos: number;
+  cupomCodigo: string | null;
+  descontoCentavos: number;
   freteCentavos: number;
   cepDestino: string;
   totalCentavos: number;
@@ -34,6 +36,8 @@ const PEDIDO_SELECT = `SELECT id,
               nome_cliente_snapshot AS nomeCliente,
               email_cliente_snapshot AS emailCliente,
               subtotal_centavos AS subtotalCentavos,
+              cupom_codigo AS cupomCodigo,
+              desconto_centavos AS descontoCentavos,
               frete_centavos AS freteCentavos,
               cep_destino AS cepDestino,
               total_centavos AS totalCentavos,

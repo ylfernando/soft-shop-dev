@@ -3,6 +3,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
 import { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/frete";
 import { cotarFrete } from "@/server/superfrete";
+import { buscarCupomAtivo } from "@/server/cupons";
 import { requireUser } from "./session";
 
 type CriarPedidoResult = { ok: true; pedidoId: number } | { ok: false; erro: string };
@@ -29,7 +30,12 @@ const FORMAS_PAGAMENTO: FormaPagamento[] = ["pix", "cartao_credito", "cartao_deb
 
 export const criarPedido = createServerFn({ method: "POST" })
   .validator(
-    (data: { itens: ItemInput[]; cepDestino: string; formaPagamento?: FormaPagamento }) => data,
+    (data: {
+      itens: ItemInput[];
+      cepDestino: string;
+      cupomCodigo?: string;
+      formaPagamento?: FormaPagamento;
+    }) => data,
   )
   .handler(async ({ data }): Promise<CriarPedidoResult> => {
     const user = await requireUser();
@@ -74,6 +80,18 @@ export const criarPedido = createServerFn({ method: "POST" })
       );
       const quantidadeTotal = itens.reduce((sum, i) => sum + i.quantidade, 0);
 
+      let cupomCodigo: string | null = null;
+      let descontoCentavos = 0;
+      if (data.cupomCodigo) {
+        const percentualDesconto = await buscarCupomAtivo(data.cupomCodigo);
+        if (percentualDesconto === null) {
+          await conn.rollback();
+          return { ok: false, erro: "cupom inválido ou expirado." };
+        }
+        cupomCodigo = data.cupomCodigo.trim().toUpperCase();
+        descontoCentavos = Math.round((subtotalCentavos * percentualDesconto) / 100);
+      }
+
       let freteCentavos = 0;
       if (subtotalCentavos < FRETE_GRATIS_A_PARTIR_DE_CENTAVOS) {
         try {
@@ -87,17 +105,19 @@ export const criarPedido = createServerFn({ method: "POST" })
           };
         }
       }
-      const totalCentavos = subtotalCentavos + freteCentavos;
+      const totalCentavos = subtotalCentavos - descontoCentavos + freteCentavos;
 
       const [pedidoResult] = await conn.query<ResultSetHeader>(
         `INSERT INTO pedidos
-          (usuario_id, nome_cliente_snapshot, email_cliente_snapshot, subtotal_centavos, frete_centavos, cep_destino, total_centavos, status, forma_pagamento)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'pago', ?)`,
+          (usuario_id, nome_cliente_snapshot, email_cliente_snapshot, subtotal_centavos, cupom_codigo, desconto_centavos, frete_centavos, cep_destino, total_centavos, status, forma_pagamento)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pago', ?)`,
         [
           user.id,
           user.nome,
           user.email,
           subtotalCentavos,
+          cupomCodigo,
+          descontoCentavos,
           freteCentavos,
           cepDestino,
           totalCentavos,
