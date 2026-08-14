@@ -12,6 +12,7 @@ export interface PedidoRow {
   emailCliente: string;
   subtotalCentavos: number;
   freteCentavos: number;
+  cepDestino: string;
   totalCentavos: number;
   status: PedidoStatus;
   formaPagamento: FormaPagamento;
@@ -34,6 +35,7 @@ const PEDIDO_SELECT = `SELECT id,
               email_cliente_snapshot AS emailCliente,
               subtotal_centavos AS subtotalCentavos,
               frete_centavos AS freteCentavos,
+              cep_destino AS cepDestino,
               total_centavos AS totalCentavos,
               status,
               forma_pagamento AS formaPagamento,

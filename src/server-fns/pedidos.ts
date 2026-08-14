@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
-import { calcularFrete } from "@/lib/frete";
+import { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/frete";
+import { cotarFrete } from "@/server/superfrete";
 import { requireUser } from "./session";
 
 type CriarPedidoResult = { ok: true; pedidoId: number } | { ok: false; erro: string };
@@ -27,15 +28,22 @@ interface ProdutoRow extends RowDataPacket {
 const FORMAS_PAGAMENTO: FormaPagamento[] = ["pix", "cartao_credito", "cartao_debito", "boleto"];
 
 export const criarPedido = createServerFn({ method: "POST" })
-  .validator((data: { itens: ItemInput[]; formaPagamento: FormaPagamento }) => data)
+  .validator(
+    (data: { itens: ItemInput[]; cepDestino: string; formaPagamento?: FormaPagamento }) => data,
+  )
   .handler(async ({ data }): Promise<CriarPedidoResult> => {
     const user = await requireUser();
     if (data.itens.length === 0) {
       return { ok: false, erro: "sua sacolinha está vazia." };
     }
-    const formaPagamento = FORMAS_PAGAMENTO.includes(data.formaPagamento)
-      ? data.formaPagamento
-      : "pix";
+    const cepDestino = data.cepDestino.replace(/\D/g, "");
+    if (cepDestino.length !== 8) {
+      return { ok: false, erro: "CEP de entrega inválido." };
+    }
+    const formaPagamento =
+      data.formaPagamento && FORMAS_PAGAMENTO.includes(data.formaPagamento)
+        ? data.formaPagamento
+        : "pix";
 
     const pool = getPool();
     const conn = await pool.getConnection();
@@ -64,19 +72,34 @@ export const criarPedido = createServerFn({ method: "POST" })
         (sum, i) => sum + i.produto.precoCentavos * i.quantidade,
         0,
       );
-      const freteCentavos = calcularFrete(subtotalCentavos);
+      const quantidadeTotal = itens.reduce((sum, i) => sum + i.quantidade, 0);
+
+      let freteCentavos = 0;
+      if (subtotalCentavos < FRETE_GRATIS_A_PARTIR_DE_CENTAVOS) {
+        try {
+          const opcoes = await cotarFrete(cepDestino, quantidadeTotal);
+          freteCentavos = opcoes[0].precoCentavos;
+        } catch (e) {
+          await conn.rollback();
+          return {
+            ok: false,
+            erro: e instanceof Error ? e.message : "não deu pra calcular o frete pra esse CEP.",
+          };
+        }
+      }
       const totalCentavos = subtotalCentavos + freteCentavos;
 
       const [pedidoResult] = await conn.query<ResultSetHeader>(
         `INSERT INTO pedidos
-          (usuario_id, nome_cliente_snapshot, email_cliente_snapshot, subtotal_centavos, frete_centavos, total_centavos, status, forma_pagamento)
-         VALUES (?, ?, ?, ?, ?, ?, 'pago', ?)`,
+          (usuario_id, nome_cliente_snapshot, email_cliente_snapshot, subtotal_centavos, frete_centavos, cep_destino, total_centavos, status, forma_pagamento)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'pago', ?)`,
         [
           user.id,
           user.nome,
           user.email,
           subtotalCentavos,
           freteCentavos,
+          cepDestino,
           totalCentavos,
           formaPagamento,
         ],

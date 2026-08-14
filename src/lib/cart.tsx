@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import type { Produto } from "@/data/produtos";
+import { cotarFreteCarrinho } from "@/server-fns/frete";
+import type { OpcaoFrete } from "@/server/superfrete";
+import { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/frete";
 
-export {
-  FRETE_GRATIS_A_PARTIR_DE_CENTAVOS,
-  FRETE_PADRAO_CENTAVOS,
-  calcularFrete,
-} from "@/lib/frete";
-import { calcularFrete } from "@/lib/frete";
+export { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS };
 
 export interface CartLine {
   produtoId: string;
@@ -18,7 +17,15 @@ interface CartContextValue {
   lines: CartLine[];
   count: number;
   subtotalCentavos: number;
+  cep: string;
+  setCep: (cep: string) => void;
+  freteEscolhido: OpcaoFrete | null;
+  freteGratis: boolean;
+  calculandoFrete: boolean;
+  erroFrete: string | null;
+  calcularFrete: () => Promise<void>;
   freteCentavos: number;
+  freteDeterminado: boolean;
   totalCentavos: number;
   addItem: (produto: Produto) => void;
   removeItem: (produtoId: string) => void;
@@ -48,6 +55,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  const [cep, setCepState] = useState("");
+  const [freteEscolhido, setFreteEscolhido] = useState<OpcaoFrete | null>(null);
+  const [calculandoFrete, setCalculandoFrete] = useState(false);
+  const [erroFrete, setErroFrete] = useState<string | null>(null);
+  const cotarFreteCall = useServerFn(cotarFreteCarrinho);
+
   useEffect(() => {
     setLines(readStoredCart());
     setHydrated(true);
@@ -58,6 +71,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
   }, [lines, hydrated]);
 
+  /** Muda a composição da sacolinha muda o peso do pacote — o frete já
+   * calculado deixa de valer e precisa ser recalculado. */
+  function limparFreteCalculado() {
+    setFreteEscolhido(null);
+    setErroFrete(null);
+  }
+
   /** Cada peça é única, então adicionar um produto já presente na sacolinha não faz nada. */
   function addItem(produto: Produto) {
     setLines((prev) =>
@@ -65,14 +85,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
         ? prev
         : [...prev, { produtoId: produto.id, quantidade: 1, produto }],
     );
+    limparFreteCalculado();
   }
 
   function removeItem(produtoId: string) {
     setLines((prev) => prev.filter((l) => l.produtoId !== produtoId));
+    limparFreteCalculado();
   }
 
   function clear() {
     setLines([]);
+    limparFreteCalculado();
+    setCepState("");
+  }
+
+  function setCep(next: string) {
+    setCepState(next);
+    limparFreteCalculado();
   }
 
   const count = lines.reduce((sum, l) => sum + l.quantidade, 0);
@@ -80,7 +109,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (sum, l) => sum + l.produto.precoCentavos * l.quantidade,
     0,
   );
-  const freteCentavos = calcularFrete(subtotalCentavos);
+  const freteGratis = subtotalCentavos > 0 && subtotalCentavos >= FRETE_GRATIS_A_PARTIR_DE_CENTAVOS;
+
+  async function calcularFrete() {
+    const cepLimpo = cep.replace(/\D/g, "");
+    if (cepLimpo.length !== 8) {
+      setErroFrete("digita um CEP válido (8 dígitos).");
+      return;
+    }
+    if (freteGratis) return;
+    setCalculandoFrete(true);
+    setErroFrete(null);
+    try {
+      const res = await cotarFreteCall({ data: { cep: cepLimpo, quantidadeItens: count } });
+      if (!res.ok) {
+        setErroFrete(res.erro);
+        setFreteEscolhido(null);
+        return;
+      }
+      setFreteEscolhido(res.opcoes[0]);
+    } catch {
+      setErroFrete("não deu pra calcular o frete, tenta de novo.");
+      setFreteEscolhido(null);
+    } finally {
+      setCalculandoFrete(false);
+    }
+  }
+
+  const freteDeterminado = freteGratis || !!freteEscolhido;
+  const freteCentavos = freteGratis ? 0 : (freteEscolhido?.precoCentavos ?? 0);
   const totalCentavos = subtotalCentavos + freteCentavos;
 
   return (
@@ -89,7 +146,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
         lines,
         count,
         subtotalCentavos,
+        cep,
+        setCep,
+        freteEscolhido,
+        freteGratis,
+        calculandoFrete,
+        erroFrete,
+        calcularFrete,
         freteCentavos,
+        freteDeterminado,
         totalCentavos,
         addItem,
         removeItem,

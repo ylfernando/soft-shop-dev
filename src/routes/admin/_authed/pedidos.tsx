@@ -232,6 +232,10 @@ function PedidoDetalheDialog({
           {pedido && (
             <div className="pt-3 mt-3 border-t space-y-1 text-sm">
               <div className="flex justify-between">
+                <span className="text-muted-foreground">CEP de entrega</span>
+                <span>{pedido.cepDestino}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-muted-foreground">Forma de pagamento</span>
                 <span>{FORMA_PAGAMENTO_LABEL[pedido.formaPagamento]}</span>
               </div>

@@ -15,7 +15,6 @@ import {
 
 export function SiteHeader({ current }: { current?: "inicio" }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { openCart } = useCart();
   return (
     <>
       {/* Ticker */}
@@ -58,7 +57,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
               new DROP
             </NavBtn>
-            <NavBtn onClick={openCart}>sacolinha</NavBtn>
+            <NavBtn to="/carrinho">sacolinha</NavBtn>
             <ProdutosDropdown />
           </nav>
         )}
@@ -70,7 +69,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
               ínicio
             </NavBtn>
             <NavBtn>sobre a Soft!</NavBtn>
-            <NavBtn onClick={openCart}>sacolinha</NavBtn>
+            <NavBtn to="/carrinho">sacolinha</NavBtn>
           </nav>
           <Link to="/">
             <img
