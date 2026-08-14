@@ -33,3 +33,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dumps locais do banco (podem ter hash de senha e dados de teste) — nunca commitar
+db/dumps/
+
+# Build output do nitro/vercel gerado localmente pra debug
+.vercel/

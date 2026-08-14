@@ -12,4 +12,16 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    // Nitro picks the Lambda runtime from the build machine's own Node version
+    // (nodejs24.x on Vercel's current build image), which was hitting a
+    // CJS-interop bundling bug in @floating-ui/react-dom. Pin to a version
+    // that's tested and known to work. `vercel` is a real, documented nitro
+    // preset option — @lovable.dev/vite-tanstack-config's type for `nitro`
+    // just doesn't declare it, though it passes the object through untouched.
+    // @ts-expect-error -- see comment above
+    vercel: {
+      functions: { runtime: "nodejs22.x" },
+    },
+  },
 });
