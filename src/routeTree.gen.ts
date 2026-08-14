@@ -15,6 +15,7 @@ import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as FinalizarCompraRouteImport } from './routes/finalizar-compra'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
 import { Route as AdminAuthedIndexRouteImport } from './routes/admin/_authed/index'
@@ -53,6 +54,11 @@ const FinalizarCompraRoute = FinalizarCompraRouteImport.update({
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreASacolinhaRoute = SobreASacolinhaRouteImport.update({
+  id: '/sobre-a-sacolinha',
+  path: '/sobre-a-sacolinha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAuthedRoute = AdminAuthedRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
+  '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
+  '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/produtos': typeof ProdutosRoute
+  '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/admin/_authed/banners': typeof AdminAuthedBannersRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/finalizar-compra'
     | '/produtos'
+    | '/sobre-a-sacolinha'
     | '/admin'
     | '/admin/entrar'
     | '/admin/banners'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/finalizar-compra'
     | '/produtos'
+    | '/sobre-a-sacolinha'
     | '/admin/entrar'
     | '/admin/banners'
     | '/admin/clientes'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/entrar'
     | '/finalizar-compra'
     | '/produtos'
+    | '/sobre-a-sacolinha'
     | '/admin/_authed'
     | '/admin/entrar'
     | '/admin/_authed/banners'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   EntrarRoute: typeof EntrarRoute
   FinalizarCompraRoute: typeof FinalizarCompraRoute
   ProdutosRoute: typeof ProdutosRoute
+  SobreASacolinhaRoute: typeof SobreASacolinhaRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
 }
@@ -258,6 +271,13 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre-a-sacolinha': {
+      id: '/sobre-a-sacolinha'
+      path: '/sobre-a-sacolinha'
+      fullPath: '/sobre-a-sacolinha'
+      preLoaderRoute: typeof SobreASacolinhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/_authed': {
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   EntrarRoute: EntrarRoute,
   FinalizarCompraRoute: FinalizarCompraRoute,
   ProdutosRoute: ProdutosRoute,
+  SobreASacolinhaRoute: SobreASacolinhaRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,
 }
