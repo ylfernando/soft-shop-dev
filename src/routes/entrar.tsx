@@ -27,10 +27,10 @@ function Entrar() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
 
-  async function aposLoginOk(usuarioId: number) {
+  async function aposLoginOk() {
     const pending = localStorage.getItem(PENDING_ADD_KEY);
     if (pending) {
-      await addPendingItemForUser(usuarioId, pending);
+      await addPendingItemForUser(pending);
       localStorage.removeItem(PENDING_ADD_KEY);
       toast.success("Bem-vinda(o) de volta! peça adicionada à sacolinha ✿");
       navigate({ to: "/carrinho" });
@@ -49,12 +49,12 @@ function Entrar() {
       setErro(res.erro);
       return;
     }
-    await aposLoginOk(res.user.id);
+    await aposLoginOk();
   }
 
   async function handleLoginDemo() {
     const res = await loginDemo();
-    if (res.ok) await aposLoginOk(res.user.id);
+    if (res.ok) await aposLoginOk();
   }
 
   return (

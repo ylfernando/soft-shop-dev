@@ -4,6 +4,7 @@ import {
   signUp as signUpFn,
   login as loginFn,
   loginDemo as loginDemoFn,
+  logout as logoutFn,
 } from "@/server-fns/auth";
 import type { AuthUser } from "@/server-fns/auth";
 
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpFnCall = useServerFn(signUpFn);
   const loginFnCall = useServerFn(loginFn);
   const loginDemoFnCall = useServerFn(loginDemoFn);
+  const logoutFnCall = useServerFn(logoutFn);
 
   useEffect(() => {
     setUser(readSession());
@@ -80,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
+    logoutFnCall().catch(() => {});
     localStorage.removeItem(SESSION_KEY);
     setUser(null);
   }

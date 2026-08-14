@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { put } from "@vercel/blob";
 import { requireAdmin } from "./session";
 
 const PASTAS = ["produtos", "banners"] as const;
@@ -38,9 +39,24 @@ export const uploadImagem = createServerFn({ method: "POST" })
     }
 
     const filename = `${randomUUID()}.${ext}`;
+    const bytes = Buffer.from(await arquivo.arrayBuffer());
+
+    // Em produção (Vercel) o disco é somente leitura e não persiste entre
+    // deploys — sobe pro Vercel Blob nesse caso. Localmente, sem token
+    // configurado, continua salvando em public/uploads pra não exigir conta
+    // nenhuma durante o desenvolvimento.
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(`${pasta}/${filename}`, bytes, {
+        access: "public",
+        contentType: arquivo.type,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+      return { url: blob.url };
+    }
+
     const dir = path.join(process.cwd(), "public", "uploads", pasta);
     await mkdir(dir, { recursive: true });
-    await writeFile(path.join(dir, filename), Buffer.from(await arquivo.arrayBuffer()));
+    await writeFile(path.join(dir, filename), bytes);
 
     return { url: `/uploads/${pasta}/${filename}` };
   });

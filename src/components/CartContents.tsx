@@ -20,7 +20,7 @@ export function CartContents() {
     if (!user || finalizando) return;
     setFinalizando(true);
     try {
-      const res = await criarPedidoCall({ data: { usuarioId: user.id } });
+      const res = await criarPedidoCall();
       if (!res.ok) {
         toast.error(res.erro);
         return;

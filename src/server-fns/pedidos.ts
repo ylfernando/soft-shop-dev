@@ -2,13 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
 import { calcularFrete } from "@/lib/frete";
+import { requireUser } from "./session";
 
 type CriarPedidoResult = { ok: true; pedidoId: number } | { ok: false; erro: string };
-
-interface UsuarioRow extends RowDataPacket {
-  nome: string;
-  email: string;
-}
 
 interface CarrinhoJoinRow extends RowDataPacket {
   produtoId: string;
@@ -17,26 +13,17 @@ interface CarrinhoJoinRow extends RowDataPacket {
   precoCentavos: number;
 }
 
-/** Cria um pedido de verdade a partir da sacolinha do usuário: relê preços e
- * dados do produto no servidor (nunca confia em valores vindos do cliente),
- * grava um retrato dos itens em pedido_itens e só então esvazia o carrinho. */
-export const criarPedido = createServerFn({ method: "POST" })
-  .validator((data: { usuarioId: number }) => data)
-  .handler(async ({ data }): Promise<CriarPedidoResult> => {
+/** Cria um pedido de verdade a partir da sacolinha do usuário autenticado: relê
+ * preços e dados do produto no servidor (nunca confia em valores vindos do
+ * cliente), grava um retrato dos itens em pedido_itens e só então esvazia o
+ * carrinho. O usuário vem da sessão, nunca de um id enviado pelo cliente. */
+export const criarPedido = createServerFn({ method: "POST" }).handler(
+  async (): Promise<CriarPedidoResult> => {
+    const user = await requireUser();
     const pool = getPool();
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-
-      const [usuarioRows] = await conn.query<UsuarioRow[]>(
-        "SELECT nome, email FROM usuarios WHERE id = ? LIMIT 1",
-        [data.usuarioId],
-      );
-      const usuario = usuarioRows[0];
-      if (!usuario) {
-        await conn.rollback();
-        return { ok: false, erro: "usuário não encontrado." };
-      }
 
       const [itens] = await conn.query<CarrinhoJoinRow[]>(
         `SELECT ci.produto_id AS produtoId, ci.quantidade, p.nome, p.preco_centavos AS precoCentavos
@@ -44,7 +31,7 @@ export const criarPedido = createServerFn({ method: "POST" })
          JOIN produtos p ON p.id = ci.produto_id
          WHERE ci.usuario_id = ?
          FOR UPDATE`,
-        [data.usuarioId],
+        [user.id],
       );
       if (itens.length === 0) {
         await conn.rollback();
@@ -59,14 +46,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         `INSERT INTO pedidos
           (usuario_id, nome_cliente_snapshot, email_cliente_snapshot, subtotal_centavos, frete_centavos, total_centavos, status)
          VALUES (?, ?, ?, ?, ?, ?, 'pago')`,
-        [
-          data.usuarioId,
-          usuario.nome,
-          usuario.email,
-          subtotalCentavos,
-          freteCentavos,
-          totalCentavos,
-        ],
+        [user.id, user.nome, user.email, subtotalCentavos, freteCentavos, totalCentavos],
       );
       const pedidoId = pedidoResult.insertId;
 
@@ -78,7 +58,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         );
       }
 
-      await conn.query("DELETE FROM carrinho_itens WHERE usuario_id = ?", [data.usuarioId]);
+      await conn.query("DELETE FROM carrinho_itens WHERE usuario_id = ?", [user.id]);
 
       await conn.commit();
       return { ok: true, pedidoId };
@@ -88,4 +68,5 @@ export const criarPedido = createServerFn({ method: "POST" })
     } finally {
       conn.release();
     }
-  });
+  },
+);

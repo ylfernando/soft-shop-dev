@@ -38,7 +38,7 @@ function CriarConta() {
 
     const pending = localStorage.getItem(PENDING_ADD_KEY);
     if (pending) {
-      await addPendingItemForUser(res.user.id, pending);
+      await addPendingItemForUser(pending);
       localStorage.removeItem(PENDING_ADD_KEY);
       toast.success("Conta criada e peça adicionada à sacolinha ✿");
       navigate({ to: "/carrinho" });

@@ -43,9 +43,10 @@ export const PENDING_ADD_KEY = "soft-shop-pending-add";
 const CartContext = createContext<CartContextValue | null>(null);
 
 /** Adds a product straight to a user's cart via the API, bypassing React state —
- * used right after sign-up/login, when the cart context for that user hasn't mounted yet. */
-export async function addPendingItemForUser(usuarioId: number, produtoId: string) {
-  await addItemFn({ data: { usuarioId, produtoId } });
+ * used right after sign-up/login, when the cart context for that user hasn't mounted yet.
+ * A sessão já foi criada pelo login/cadastro nesse ponto, então o servidor sabe quem é o usuário. */
+export async function addPendingItemForUser(produtoId: string) {
+  await addItemFn({ data: { produtoId } });
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -63,7 +64,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems([]);
       return;
     }
-    getCartCall({ data: { usuarioId: user.id } })
+    getCartCall()
       .then(setItems)
       .catch(() => toast.error("não deu pra carregar sua sacolinha ✿"));
   }, [user, getCartCall]);
@@ -86,7 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         medidas: produto.medidas,
       },
     ]);
-    addItemCall({ data: { usuarioId: user.id, produtoId: produto.id, quantidade: 1 } }).catch(() =>
+    addItemCall({ data: { produtoId: produto.id } }).catch(() =>
       toast.error("não deu pra salvar sua sacolinha ✿"),
     );
   }
@@ -94,7 +95,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function removeItem(produtoId: string) {
     if (!user) return;
     setItems(items.filter((i) => i.produtoId !== produtoId));
-    removeItemCall({ data: { usuarioId: user.id, produtoId } }).catch(() =>
+    removeItemCall({ data: { produtoId } }).catch(() =>
       toast.error("não deu pra salvar sua sacolinha ✿"),
     );
   }
@@ -102,9 +103,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function clear() {
     if (!user) return;
     setItems([]);
-    clearCartCall({ data: { usuarioId: user.id } }).catch(() =>
-      toast.error("não deu pra limpar sua sacolinha ✿"),
-    );
+    clearCartCall().catch(() => toast.error("não deu pra limpar sua sacolinha ✿"));
   }
 
   const lines: CartLine[] = items.map((item) => ({

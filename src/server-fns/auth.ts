@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
+import { createUserSession, destroyUserSession } from "./session";
 
 export interface AuthUser {
   id: number;
@@ -59,13 +60,16 @@ export const signUp = createServerFn({ method: "POST" })
       "INSERT INTO usuarios (nome, email, senha_hash) VALUES (?, ?, ?)",
       [nome, email, senhaHash],
     );
+    await createUserSession(result.insertId);
     return { ok: true, user: { id: result.insertId, nome, email, role: "cliente" } };
   });
 
 export const login = createServerFn({ method: "POST" })
   .validator((data: { email: string; senha: string }) => data)
   .handler(async ({ data }): Promise<AuthResult> => {
-    return verificarLogin(data.email.trim().toLowerCase(), data.senha);
+    const res = await verificarLogin(data.email.trim().toLowerCase(), data.senha);
+    if (res.ok) await createUserSession(res.user.id);
+    return res;
   });
 
 const DEMO_EMAIL = "teste@soft.com";
@@ -73,6 +77,12 @@ const DEMO_SENHA = "teste1234";
 
 export const loginDemo = createServerFn({ method: "POST" }).handler(
   async (): Promise<AuthResult> => {
-    return verificarLogin(DEMO_EMAIL, DEMO_SENHA);
+    const res = await verificarLogin(DEMO_EMAIL, DEMO_SENHA);
+    if (res.ok) await createUserSession(res.user.id);
+    return res;
   },
 );
+
+export const logout = createServerFn({ method: "POST" }).handler(async (): Promise<void> => {
+  await destroyUserSession();
+});
