@@ -143,7 +143,7 @@ function CartButton({ size }: { size: "sm" | "lg" }) {
 
 function AccountMenu({ size }: { size: "sm" | "lg" }) {
   const { user, logout } = useAuth();
-  const { openCart } = useCart();
+  const { openCart, clear } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -191,6 +191,7 @@ function AccountMenu({ size }: { size: "sm" | "lg" }) {
         <DropdownMenuItem
           onSelect={() => {
             logout();
+            clear();
             navigate({ to: "/" });
           }}
         >

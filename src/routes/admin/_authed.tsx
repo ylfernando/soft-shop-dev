@@ -9,6 +9,7 @@ import {
   LogOut,
   Sparkles,
   Tag,
+  Store,
 } from "lucide-react";
 import { getAdminSession, adminLogout } from "@/server-fns/admin/auth";
 import {
@@ -85,6 +86,14 @@ function AdminLayout() {
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link to="/">
+                  <Store />
+                  <span>voltar para a loja</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <div className="px-2 py-1 text-xs text-sidebar-foreground/60 truncate">
                 {admin.nome}
