@@ -45,3 +45,5 @@ db/dumps/
 /playwright-report/
 /playwright/.cache/
 /.playwright-mcp/
+.vercel
+.env*
