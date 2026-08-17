@@ -14,10 +14,13 @@ import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as FinalizarCompraRouteImport } from './routes/finalizar-compra'
+import { Route as MinhaContaRouteImport } from './routes/minha-conta'
+import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
+import { Route as PedidoPedidoIdRouteImport } from './routes/pedido.$pedidoId'
 import { Route as AdminAuthedIndexRouteImport } from './routes/admin/_authed/index'
 import { Route as AdminAuthedBannersRouteImport } from './routes/admin/_authed/banners'
 import { Route as AdminAuthedClientesRouteImport } from './routes/admin/_authed/clientes'
@@ -51,6 +54,16 @@ const FinalizarCompraRoute = FinalizarCompraRouteImport.update({
   path: '/finalizar-compra',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MinhaContaRoute = MinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhasComprasRoute = MinhasComprasRouteImport.update({
+  id: '/minhas-compras',
+  path: '/minhas-compras',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -69,6 +82,11 @@ const AdminAuthedRoute = AdminAuthedRouteImport.update({
 const AdminEntrarRoute = AdminEntrarRouteImport.update({
   id: '/admin/entrar',
   path: '/admin/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidoPedidoIdRoute = PedidoPedidoIdRouteImport.update({
+  id: '/pedido/$pedidoId',
+  path: '/pedido/$pedidoId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAuthedIndexRoute = AdminAuthedIndexRouteImport.update({
@@ -113,10 +131,13 @@ export interface FileRoutesByFullPath {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
+  '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/cupons': typeof AdminAuthedCuponsRoute
@@ -131,9 +152,12 @@ export interface FileRoutesByTo {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin/entrar': typeof AdminEntrarRoute
+  '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/cupons': typeof AdminAuthedCuponsRoute
@@ -149,10 +173,13 @@ export interface FileRoutesById {
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
+  '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
   '/admin/_authed/banners': typeof AdminAuthedBannersRoute
   '/admin/_authed/clientes': typeof AdminAuthedClientesRoute
   '/admin/_authed/cupons': typeof AdminAuthedCuponsRoute
@@ -169,10 +196,13 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/finalizar-compra'
+    | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
     | '/admin'
     | '/admin/entrar'
+    | '/pedido/$pedidoId'
     | '/admin/banners'
     | '/admin/clientes'
     | '/admin/cupons'
@@ -187,9 +217,12 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/finalizar-compra'
+    | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
     | '/admin/entrar'
+    | '/pedido/$pedidoId'
     | '/admin/banners'
     | '/admin/clientes'
     | '/admin/cupons'
@@ -204,10 +237,13 @@ export interface FileRouteTypes {
     | '/criar-conta'
     | '/entrar'
     | '/finalizar-compra'
+    | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
     | '/admin/_authed'
     | '/admin/entrar'
+    | '/pedido/$pedidoId'
     | '/admin/_authed/banners'
     | '/admin/_authed/clientes'
     | '/admin/_authed/cupons'
@@ -223,10 +259,13 @@ export interface RootRouteChildren {
   CriarContaRoute: typeof CriarContaRoute
   EntrarRoute: typeof EntrarRoute
   FinalizarCompraRoute: typeof FinalizarCompraRoute
+  MinhaContaRoute: typeof MinhaContaRoute
+  MinhasComprasRoute: typeof MinhasComprasRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreASacolinhaRoute: typeof SobreASacolinhaRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
+  PedidoPedidoIdRoute: typeof PedidoPedidoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -266,6 +305,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinalizarCompraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/minha-conta': {
+      id: '/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof MinhaContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minhas-compras': {
+      id: '/minhas-compras'
+      path: '/minhas-compras'
+      fullPath: '/minhas-compras'
+      preLoaderRoute: typeof MinhasComprasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produtos': {
       id: '/produtos'
       path: '/produtos'
@@ -292,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/entrar'
       fullPath: '/admin/entrar'
       preLoaderRoute: typeof AdminEntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedido/$pedidoId': {
+      id: '/pedido/$pedidoId'
+      path: '/pedido/$pedidoId'
+      fullPath: '/pedido/$pedidoId'
+      preLoaderRoute: typeof PedidoPedidoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/_authed/': {
@@ -376,10 +436,13 @@ const rootRouteChildren: RootRouteChildren = {
   CriarContaRoute: CriarContaRoute,
   EntrarRoute: EntrarRoute,
   FinalizarCompraRoute: FinalizarCompraRoute,
+  MinhaContaRoute: MinhaContaRoute,
+  MinhasComprasRoute: MinhasComprasRoute,
   ProdutosRoute: ProdutosRoute,
   SobreASacolinhaRoute: SobreASacolinhaRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,
+  PedidoPedidoIdRoute: PedidoPedidoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

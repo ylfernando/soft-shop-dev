@@ -39,3 +39,9 @@ db/dumps/
 
 # Build output do nitro/vercel gerado localmente pra debug
 .vercel/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/.playwright-mcp/

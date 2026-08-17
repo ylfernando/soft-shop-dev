@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import type { Produto } from "@/data/produtos";
 import { cotarFreteCarrinho } from "@/server-fns/frete";
+import { getProdutosDisponiveis } from "@/server-fns/produtos";
 import type { OpcaoFrete } from "@/server/superfrete";
 import { aplicarCupom } from "@/server-fns/cupom";
 import { FRETE_GRATIS_A_PARTIR_DE_CENTAVOS } from "@/lib/frete";
@@ -81,6 +83,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [aplicandoCupom, setAplicandoCupom] = useState(false);
   const [erroCupom, setErroCupom] = useState<string | null>(null);
   const aplicarCupomCall = useServerFn(aplicarCupom);
+  const getProdutosDisponiveisCall = useServerFn(getProdutosDisponiveis);
+  const linesRef = useRef<CartLine[]>(lines);
 
   useEffect(() => {
     setLines(readStoredCart());
@@ -91,6 +95,45 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
   }, [lines, hydrated]);
+
+  useEffect(() => {
+    linesRef.current = lines;
+  }, [lines]);
+
+  /** Peça única: se ela foi vendida (por outra pessoa, ou em outra aba)
+   * enquanto estava parada numa sacolinha aberta, ela precisa sumir de lá
+   * sozinha — sem isso o cliente só descobre na hora de pagar. Roda ao
+   * carregar a página e de novo toda vez que a sacolinha é aberta. */
+  async function removerItensVendidos() {
+    const atuais = linesRef.current;
+    if (atuais.length === 0) return;
+    try {
+      const disponiveis = await getProdutosDisponiveisCall({
+        data: { produtoIds: atuais.map((l) => l.produtoId) },
+      });
+      const disponiveisSet = new Set(disponiveis);
+      const vendidos = atuais.filter((l) => !disponiveisSet.has(l.produtoId));
+      if (vendidos.length === 0) return;
+
+      setLines((prev) => prev.filter((l) => disponiveisSet.has(l.produtoId)));
+      limparFreteCalculado();
+      const nomes = vendidos.map((l) => l.produto.nome).join(", ");
+      toast.error(
+        `${nomes} ${vendidos.length === 1 ? "foi vendida" : "foram vendidas"} pra outra pessoa e ${
+          vendidos.length === 1 ? "saiu" : "saíram"
+        } da sua sacolinha ✿`,
+      );
+    } catch {
+      // checagem de melhor esforço — se falhar, tenta de novo na próxima
+      // vez que a sacolinha for aberta.
+    }
+  }
+
+  useEffect(() => {
+    if (!hydrated) return;
+    removerItensVendidos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]);
 
   /** Muda a composição da sacolinha muda o peso do pacote — o frete já
    * calculado deixa de valer e precisa ser recalculado. */
@@ -234,7 +277,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeItem,
         clear,
         isOpen,
-        openCart: () => setIsOpen(true),
+        openCart: () => {
+          setIsOpen(true);
+          removerItensVendidos();
+        },
         closeCart: () => setIsOpen(false),
       }}
     >

@@ -2,12 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { QrCode, CreditCard, Wallet, Barcode, X } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { formatPreco } from "@/data/produtos";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import { criarPedido } from "@/server-fns/pedidos";
+import { iniciarPagamentoMercadoPago, iniciarPagamentoStripe } from "@/server-fns/pedidos";
+
+type Gateway = "mercadopago" | "stripe";
 
 export const Route = createFileRoute("/finalizar-compra")({
   component: FinalizarCompra,
@@ -21,6 +24,7 @@ function FinalizarCompra() {
   const {
     hydrated: cartHydrated,
     lines,
+    removeItem,
     subtotalCentavos,
     cep,
     freteEscolhido,
@@ -30,19 +34,18 @@ function FinalizarCompra() {
     cupomAplicado,
     descontoCentavos,
     totalCentavos,
-    clear,
   } = useCart();
   const { hydrated: authHydrated, user } = useAuth();
   const navigate = useNavigate();
-  const criarPedidoCall = useServerFn(criarPedido);
-  const [confirmando, setConfirmando] = useState(false);
-  const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
+  const iniciarMercadoPagoCall = useServerFn(iniciarPagamentoMercadoPago);
+  const iniciarStripeCall = useServerFn(iniciarPagamentoStripe);
+  const [gatewayEmAndamento, setGatewayEmAndamento] = useState<Gateway | null>(null);
 
   const cepLimpo = cep.replace(/\D/g, "");
   const podeConfirmar = lines.length > 0 && cepLimpo.length === 8 && freteDeterminado;
 
   useEffect(() => {
-    if (!cartHydrated || !authHydrated || pedidoConfirmado) return;
+    if (!cartHydrated || !authHydrated) return;
     if (!user) {
       navigate({ to: "/entrar", search: { redirect: "/finalizar-compra" } });
       return;
@@ -50,13 +53,17 @@ function FinalizarCompra() {
     if (!podeConfirmar) {
       navigate({ to: "/carrinho" });
     }
-  }, [cartHydrated, authHydrated, user, podeConfirmar, pedidoConfirmado, navigate]);
+  }, [cartHydrated, authHydrated, user, podeConfirmar, navigate]);
 
-  async function confirmarPedido() {
-    if (confirmando || !podeConfirmar) return;
-    setConfirmando(true);
+  // O carrinho só é limpo depois que o pagamento é confirmado de verdade,
+  // na tela de retorno (/pedido/$id) — aqui a gente só reserva a peça e
+  // manda o cliente pro checkout hospedado do gateway escolhido.
+  async function pagarCom(gateway: Gateway) {
+    if (gatewayEmAndamento || !podeConfirmar) return;
+    setGatewayEmAndamento(gateway);
     try {
-      const res = await criarPedidoCall({
+      const chamada = gateway === "mercadopago" ? iniciarMercadoPagoCall : iniciarStripeCall;
+      const res = await chamada({
         data: {
           itens: lines.map((l) => ({ produtoId: l.produtoId, quantidade: l.quantidade })),
           cepDestino: cepLimpo,
@@ -65,21 +72,17 @@ function FinalizarCompra() {
       });
       if (!res.ok) {
         toast.error(res.erro);
+        setGatewayEmAndamento(null);
         return;
       }
-      setPedidoConfirmado(true);
-      clear();
-      toast.success("Pedido realizado com sucesso! ✿");
-      await navigate({ to: "/" });
+      window.location.href = res.redirectUrl;
     } catch {
-      toast.error("não deu pra fechar o pedido, tenta de novo ✿");
-      setPedidoConfirmado(false);
-    } finally {
-      setConfirmando(false);
+      toast.error("não deu pra iniciar o pagamento, tenta de novo ✿");
+      setGatewayEmAndamento(null);
     }
   }
 
-  if (!cartHydrated || !authHydrated || (!podeConfirmar && !pedidoConfirmado)) {
+  if (!cartHydrated || !authHydrated || !podeConfirmar) {
     return null;
   }
 
@@ -113,6 +116,13 @@ function FinalizarCompra() {
                   <span className="text-sm font-semibold shrink-0">
                     {formatPreco(line.produto.precoCentavos)}
                   </span>
+                  <button
+                    aria-label="remover item"
+                    onClick={() => removeItem(line.produtoId)}
+                    className="text-foreground/40 hover:text-[color:var(--pink-deep)] shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -139,7 +149,9 @@ function FinalizarCompra() {
               </div>
               {cupomAplicado && (
                 <div className="flex items-center justify-between text-[color:var(--pink-deep)]">
-                  <span>Cupom {cupomAplicado.codigo} (-{cupomAplicado.percentualDesconto}%)</span>
+                  <span>
+                    Cupom {cupomAplicado.codigo} (-{cupomAplicado.percentualDesconto}%)
+                  </span>
                   <span>-{formatPreco(descontoCentavos)}</span>
                 </div>
               )}
@@ -153,19 +165,50 @@ function FinalizarCompra() {
               </div>
             </div>
 
+            <div className="pt-3 border-t border-[color:var(--pink-deep)]/15">
+              <p className="text-xs text-foreground/50 mb-2">formas de pagamento aceitas</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { Icon: QrCode, label: "Pix" },
+                  { Icon: CreditCard, label: "Crédito" },
+                  { Icon: Wallet, label: "Débito" },
+                  { Icon: Barcode, label: "Boleto" },
+                ].map(({ Icon, label }) => (
+                  <span
+                    key={label}
+                    className="flex items-center gap-1.5 h-8 px-3 rounded-full border border-[color:var(--pink-deep)]/30 bg-white/70 text-xs text-[color:var(--pink-deep)]"
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-2 pt-2">
               <button
-                onClick={confirmarPedido}
-                disabled={confirmando}
+                onClick={() => pagarCom("mercadopago")}
+                disabled={gatewayEmAndamento !== null}
                 className="w-full py-2.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-base hover:opacity-90 disabled:opacity-60"
               >
-                {confirmando ? "confirmando..." : "Confirmar pedido"}
+                {gatewayEmAndamento === "mercadopago"
+                  ? "redirecionando..."
+                  : "Pagar com Mercado Pago"}
+              </button>
+              <button
+                onClick={() => pagarCom("stripe")}
+                disabled={gatewayEmAndamento !== null}
+                className="w-full py-2.5 rounded-full border border-[color:var(--pink-deep)] text-[color:var(--pink-deep)] font-pixel text-base hover:bg-[color:var(--pink-deep)]/10 disabled:opacity-60"
+              >
+                {gatewayEmAndamento === "stripe"
+                  ? "redirecionando..."
+                  : "Pagar com cartão internacional"}
               </button>
               <Link
                 to="/carrinho"
-                className="block text-center w-full py-2 rounded-full border border-[color:var(--pink-deep)] text-[color:var(--pink-deep)] font-pixel text-sm hover:bg-[color:var(--pink-deep)]/10"
+                className="block text-center w-full py-2 text-sm text-foreground/60 underline hover:text-[color:var(--pink-deep)]"
               >
-                Voltar pra sacolinha
+                voltar pra sacolinha
               </Link>
             </div>
           </div>

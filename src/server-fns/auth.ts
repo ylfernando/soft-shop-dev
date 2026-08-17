@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
-import { createUserSession, destroyUserSession } from "./session";
+import { createUserSession, destroyUserSession, requireUser } from "./session";
 
 export interface AuthUser {
   id: number;
@@ -86,3 +86,53 @@ export const loginDemo = createServerFn({ method: "POST" }).handler(
 export const logout = createServerFn({ method: "POST" }).handler(async (): Promise<void> => {
   await destroyUserSession();
 });
+
+export const atualizarConta = createServerFn({ method: "POST" })
+  .validator((data: { nome: string; email: string }) => data)
+  .handler(async ({ data }): Promise<AuthResult> => {
+    const user = await requireUser();
+    const nome = data.nome.trim();
+    const email = data.email.trim().toLowerCase();
+    if (!nome || !email) {
+      return { ok: false, erro: "preenche nome e e-mail." };
+    }
+
+    const pool = getPool();
+    const [existing] = await pool.query<UsuarioRow[]>(
+      "SELECT id FROM usuarios WHERE email = ? AND id <> ? LIMIT 1",
+      [email, user.id],
+    );
+    if (existing[0]) {
+      return { ok: false, erro: "já existe uma conta com esse e-mail." };
+    }
+
+    await pool.query("UPDATE usuarios SET nome = ?, email = ? WHERE id = ?", [
+      nome,
+      email,
+      user.id,
+    ]);
+    return { ok: true, user: { ...user, nome, email } };
+  });
+
+export const alterarSenha = createServerFn({ method: "POST" })
+  .validator((data: { senhaAtual: string; novaSenha: string }) => data)
+  .handler(async ({ data }): Promise<{ ok: true } | { ok: false; erro: string }> => {
+    const user = await requireUser();
+    if (data.novaSenha.length < 4) {
+      return { ok: false, erro: "a nova senha precisa ter pelo menos 4 caracteres." };
+    }
+
+    const pool = getPool();
+    const [rows] = await pool.query<UsuarioRow[]>(
+      "SELECT senha_hash FROM usuarios WHERE id = ? LIMIT 1",
+      [user.id],
+    );
+    const row = rows[0];
+    if (!row || !(await bcrypt.compare(data.senhaAtual, row.senha_hash))) {
+      return { ok: false, erro: "senha atual incorreta." };
+    }
+
+    const senhaHash = await bcrypt.hash(data.novaSenha, 10);
+    await pool.query("UPDATE usuarios SET senha_hash = ? WHERE id = ?", [senhaHash, user.id]);
+    return { ok: true };
+  });

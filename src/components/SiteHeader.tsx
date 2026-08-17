@@ -22,7 +22,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
         <div className="whitespace-nowrap animate-[marquee_30s_linear_infinite] flex gap-8">
           {Array.from({ length: 12 }).map((_, i) => (
             <span key={i} className="flex items-center gap-3">
-              ✦ use nosso cupom de primeira compra: #FIRSTSHOFT ✿
+              ✦ use nosso cupom de primeira compra: #FIRSTSOFT ✿
             </span>
           ))}
         </div>
@@ -143,7 +143,7 @@ function CartButton({ size }: { size: "sm" | "lg" }) {
 
 function AccountMenu({ size }: { size: "sm" | "lg" }) {
   const { user, logout } = useAuth();
-  const { openCart, clear } = useCart();
+  const { clear } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -182,12 +182,18 @@ function AccountMenu({ size }: { size: "sm" | "lg" }) {
       <DropdownMenuContent align="end" className="font-menu min-w-[10rem]">
         <DropdownMenuItem disabled>oi, {primeiroNome} ✿</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={openCart}>minha sacolinha</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/minhas-compras">minhas compras</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/minha-conta">configurações da conta</Link>
+        </DropdownMenuItem>
         {user.role === "admin" && (
           <DropdownMenuItem asChild>
             <Link to="/admin">painel admin</Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => {
             logout();

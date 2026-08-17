@@ -129,6 +129,9 @@ export function CartContents() {
             </span>
           )}
         </div>
+        <p className="text-[11px] text-foreground/50">
+          * Se for de Floripa, entrega a combinar
+        </p>
         {erroFrete && !freteGratis && (
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] text-destructive">{erroFrete}</p>

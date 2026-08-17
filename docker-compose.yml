@@ -18,6 +18,11 @@ services:
       - ./db/004_categoria_como_tipo.sql:/docker-entrypoint-initdb.d/04-categoria-como-tipo.sql:ro
       - ./db/005_produto_imagens.sql:/docker-entrypoint-initdb.d/05-produto-imagens.sql:ro
       - ./db/006_produto_tamanho_medidas.sql:/docker-entrypoint-initdb.d/06-produto-tamanho-medidas.sql:ro
+      - ./db/007_forma_pagamento.sql:/docker-entrypoint-initdb.d/07-forma-pagamento.sql:ro
+      - ./db/008_categoria_garimpos.sql:/docker-entrypoint-initdb.d/08-categoria-garimpos.sql:ro
+      - ./db/009_vitrines.sql:/docker-entrypoint-initdb.d/09-vitrines.sql:ro
+      - ./db/010_pedido_cep_destino.sql:/docker-entrypoint-initdb.d/10-pedido-cep-destino.sql:ro
+      - ./db/011_cupons.sql:/docker-entrypoint-initdb.d/11-cupons.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s

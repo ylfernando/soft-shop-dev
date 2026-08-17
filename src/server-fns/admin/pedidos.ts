@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
+import { cancelarPedidoELiberarPecas } from "@/server/pedidos-pagamento";
 import { requireAdmin } from "./session";
 
 export type PedidoStatus = "pendente" | "pago" | "enviado" | "cancelado";
@@ -32,7 +33,7 @@ export interface PedidoItemRow {
 
 interface PedidoItemQueryRow extends RowDataPacket, PedidoItemRow {}
 
-const PEDIDO_SELECT = `SELECT id,
+export const PEDIDO_SELECT = `SELECT id,
               nome_cliente_snapshot AS nomeCliente,
               email_cliente_snapshot AS emailCliente,
               subtotal_centavos AS subtotalCentavos,
@@ -88,6 +89,14 @@ export const adminUpdatePedidoStatus = createServerFn({ method: "POST" })
   .validator((data: { id: number; status: PedidoStatus }) => data)
   .handler(async ({ data }): Promise<void> => {
     await requireAdmin();
+    // Cancelar tem uma regra a mais: as peças reservadas por esse pedido
+    // voltam pro catálogo (mesma lógica usada quando um pagamento
+    // falha/expira via webhook), então esse status passa por lá em vez de
+    // um UPDATE direto.
+    if (data.status === "cancelado") {
+      await cancelarPedidoELiberarPecas(data.id);
+      return;
+    }
     const pool = getPool();
     await pool.query("UPDATE pedidos SET status = ? WHERE id = ?", [data.status, data.id]);
   });

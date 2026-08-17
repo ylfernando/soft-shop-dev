@@ -19,7 +19,7 @@ export const Route = createFileRoute("/entrar")({
 
 function Entrar() {
   const { redirect } = Route.useSearch();
-  const { login, loginDemo } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -40,11 +40,6 @@ function Entrar() {
       return;
     }
     aposLoginOk();
-  }
-
-  async function handleLoginDemo() {
-    const res = await loginDemo();
-    if (res.ok) aposLoginOk();
   }
 
   return (
@@ -88,20 +83,7 @@ function Entrar() {
             </button>
           </form>
 
-          <div className="flex items-center gap-2 mt-6 text-xs text-foreground/40">
-            <div className="h-px flex-1 bg-[color:var(--pink-deep)]/15" />
-            ou
-            <div className="h-px flex-1 bg-[color:var(--pink-deep)]/15" />
-          </div>
-
-          <button
-            onClick={handleLoginDemo}
-            className="w-full mt-4 py-2.5 rounded-full border-2 border-dashed border-[color:var(--pink-deep)]/40 text-[color:var(--pink-deep)] font-menu hover:bg-[color:var(--pink-soft)]/40"
-          >
-            entrar com conta de teste ✿
-          </button>
-
-          <p className="text-sm text-center text-foreground/60 mt-6">
+          <p className="text-lg text-center text-foreground/60 mt-6">
             ainda não tem conta?{" "}
             <Link
               to="/criar-conta"

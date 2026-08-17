@@ -19,6 +19,7 @@ interface AuthContextValue {
   login: (email: string, senha: string) => Promise<AuthResult>;
   loginDemo: () => Promise<AuthResult>;
   logout: () => void;
+  updateUser: (user: AuthUser) => void;
 }
 
 const SESSION_KEY = "soft-shop-session";
@@ -87,8 +88,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  function updateUser(updated: AuthUser) {
+    writeSession(updated);
+    setUser(updated);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, hydrated, signUp, login, loginDemo, logout }}>
+    <AuthContext.Provider
+      value={{ user, hydrated, signUp, login, loginDemo, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
