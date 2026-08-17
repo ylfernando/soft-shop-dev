@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Mail, Clock, CreditCard, QrCode, Barcode } from "lucide-react";
 import { toast } from "sonner";
-import { useCart } from "@/lib/cart";
 
 const REDES_SOCIAIS = [
   { nome: "Instagram", Icon: Instagram, href: "#" },
@@ -15,8 +14,6 @@ const FORMAS_PAGAMENTO = [
 ];
 
 export function SiteFooter() {
-  const { openCart } = useCart();
-
   return (
     <footer className="bg-[#ffb5b0] text-white py-8 sm:py-10 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
@@ -30,18 +27,17 @@ export function SiteFooter() {
             sobre a soft
           </Link>
           <Link
-            to="/produtos"
-            search={{ categoria: "newdrop" }}
+            to="/minha-conta"
             className="font-menu text-base sm:text-xl hover:underline w-fit"
           >
-            últimos produtos
+            minha conta
           </Link>
-          <button
-            onClick={openCart}
-            className="font-menu text-base sm:text-xl hover:underline text-left w-fit"
+          <Link
+            to="/sobre-a-sacolinha"
+            className="font-menu text-base sm:text-xl hover:underline w-fit"
           >
             sacolinha
-          </button>
+          </Link>
           <button
             onClick={() => toast("contato ainda não está disponível — em breve! ✿")}
             className="font-menu text-base sm:text-xl hover:underline text-left w-fit"
