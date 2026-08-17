@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Mail, Clock, CreditCard, QrCode, Barcode } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
 
 const REDES_SOCIAIS = [
   { nome: "Instagram", Icon: Instagram, href: "#" },
@@ -14,6 +15,8 @@ const FORMAS_PAGAMENTO = [
 ];
 
 export function SiteFooter() {
+  const { user } = useAuth();
+
   return (
     <footer className="bg-[#ffb5b0] text-white py-8 sm:py-10 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
@@ -27,10 +30,10 @@ export function SiteFooter() {
             sobre a soft
           </Link>
           <Link
-            to="/minha-conta"
+            to={user ? "/minhas-compras" : "/minha-conta"}
             className="font-menu text-base sm:text-xl hover:underline w-fit"
           >
-            minha conta
+            {user ? "minhas compras" : "minha conta"}
           </Link>
           <Link
             to="/sobre-a-sacolinha"
