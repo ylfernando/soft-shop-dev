@@ -16,6 +16,7 @@ export interface ProdutoRow {
   categoria: Categoria;
   tamanho: string;
   medidas: string;
+  vendidoEm: string | null;
 }
 
 interface ProdutoQueryRow extends RowDataPacket, ProdutoRow {}
@@ -78,7 +79,7 @@ export const adminListProdutos = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const pool = getPool();
     const [rows] = await pool.query<ProdutoQueryRow[]>(
-      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, tamanho, medidas FROM produtos ORDER BY criado_em DESC",
+      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, tamanho, medidas, vendido_em AS vendidoEm FROM produtos ORDER BY criado_em DESC",
     );
     return rows;
   },
@@ -107,7 +108,7 @@ export const adminCreateProduto = createServerFn({ method: "POST" })
       id,
       data.img,
     ]);
-    return { id, ...data };
+    return { id, ...data, vendidoEm: null };
   });
 
 export const adminUpdateProduto = createServerFn({ method: "POST" })

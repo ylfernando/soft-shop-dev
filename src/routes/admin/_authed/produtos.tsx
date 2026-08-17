@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +44,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { tipos, categoriaLabels, formatPreco, type Produto } from "@/data/produtos";
+import { tipos, categoriaLabels, formatPreco } from "@/data/produtos";
 import {
   MAX_IMAGENS_POR_PRODUTO,
   adminListProdutos,
@@ -54,6 +55,7 @@ import {
   adminAddProdutoImagem,
   adminRemoveProdutoImagem,
   adminMoverProdutoImagem,
+  type ProdutoRow,
   type ProdutoImagemRow,
 } from "@/server-fns/admin/produtos";
 import { uploadImagem } from "@/server-fns/admin/upload";
@@ -74,10 +76,10 @@ type ProdutoFormValues = z.infer<typeof produtoFormSchema>;
 
 function AdminProdutos() {
   const produtosIniciais = Route.useLoaderData();
-  const [produtos, setProdutos] = useState<Produto[]>(produtosIniciais);
+  const [produtos, setProdutos] = useState<ProdutoRow[]>(produtosIniciais);
   const [sheetAberto, setSheetAberto] = useState(false);
-  const [editando, setEditando] = useState<Produto | null>(null);
-  const [excluindo, setExcluindo] = useState<Produto | null>(null);
+  const [editando, setEditando] = useState<ProdutoRow | null>(null);
+  const [excluindo, setExcluindo] = useState<ProdutoRow | null>(null);
 
   const listCall = useServerFn(adminListProdutos);
   const deleteCall = useServerFn(adminDeleteProduto);
@@ -90,7 +92,7 @@ function AdminProdutos() {
     setSheetAberto(true);
   }
 
-  function abrirEdicao(produto: Produto) {
+  function abrirEdicao(produto: ProdutoRow) {
     setEditando(produto);
     setSheetAberto(true);
   }
@@ -129,9 +131,20 @@ function AdminProdutos() {
                 {produtos.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <img src={p.img} alt={p.nome} className="w-12 h-14 object-cover rounded" />
+                      <img
+                        src={p.img}
+                        alt={p.nome}
+                        className={`w-12 h-14 object-cover rounded ${p.vendidoEm ? "opacity-50" : ""}`}
+                      />
                     </TableCell>
-                    <TableCell className="font-medium">{p.nome}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className={p.vendidoEm ? "line-through text-muted-foreground" : ""}>
+                          {p.nome}
+                        </span>
+                        {p.vendidoEm && <Badge variant="secondary">vendido</Badge>}
+                      </div>
+                    </TableCell>
                     <TableCell>{tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo}</TableCell>
                     <TableCell>{categoriaLabels[p.categoria]}</TableCell>
                     <TableCell>
@@ -158,10 +171,21 @@ function AdminProdutos() {
                 <img
                   src={p.img}
                   alt={p.nome}
-                  className="w-16 h-20 object-cover rounded shrink-0"
+                  className={`w-16 h-20 object-cover rounded shrink-0 ${p.vendidoEm ? "opacity-50" : ""}`}
                 />
                 <div className="min-w-0 flex-1 space-y-1">
-                  <div className="font-medium truncate">{p.nome}</div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className={`font-medium truncate ${p.vendidoEm ? "line-through text-muted-foreground" : ""}`}
+                    >
+                      {p.nome}
+                    </div>
+                    {p.vendidoEm && (
+                      <Badge variant="secondary" className="shrink-0">
+                        vendido
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo} ·{" "}
                     {categoriaLabels[p.categoria]}
@@ -233,7 +257,7 @@ function ProdutoFormSheet({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  produto: Produto | null;
+  produto: ProdutoRow | null;
   onSaved: () => Promise<void>;
 }) {
   const uploadCall = useServerFn(uploadImagem);
