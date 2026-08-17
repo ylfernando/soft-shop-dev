@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import softLogo from "@/assets/soft-logo.png.asset.json";
+import softLogo from "@/assets/soft-logo.png";
 import { ShoppingBasket, User, Menu, X, ChevronDown } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { tipos } from "@/data/produtos";
@@ -37,7 +37,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
           </button>
           <Link to="/">
             <img
-              src={softLogo.url}
+              src={softLogo}
               alt="Soft Shop logo"
               className="h-16 w-auto object-contain"
               height={64}
@@ -73,7 +73,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
           </nav>
           <Link to="/">
             <img
-              src={softLogo.url}
+              src={softLogo}
               alt="Soft Shop logo"
               className="h-14 w-auto object-contain justify-self-center shrink-0"
               height={56}
