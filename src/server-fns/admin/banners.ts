@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { ResultSetHeader, RowDataPacket } from "mysql2";
+import type { RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
 import { requireAdmin } from "./session";
 
@@ -68,20 +68,15 @@ export const adminDeleteBanner = createServerFn({ method: "POST" })
     await pool.query("DELETE FROM banners WHERE id = ?", [data.id]);
   });
 
-export const adminMoverBanner = createServerFn({ method: "POST" })
-  .validator((data: { id: number; direcao: "up" | "down" }) => data)
+/** Persiste a nova ordem de uma vez só — ids é a lista completa de banners
+ * na ordem final desejada, definida no admin depois de reordenar
+ * localmente e confirmar com "salvar ordem". */
+export const adminReordenarBanners = createServerFn({ method: "POST" })
+  .validator((data: { ids: number[] }) => data)
   .handler(async ({ data }): Promise<void> => {
     await requireAdmin();
     const pool = getPool();
-    const [rows] = await pool.query<BannerQueryRow[]>(
-      "SELECT id, ordem FROM banners ORDER BY ordem ASC",
+    await Promise.all(
+      data.ids.map((id, i) => pool.query("UPDATE banners SET ordem = ? WHERE id = ?", [i, id])),
     );
-    const idx = rows.findIndex((r) => r.id === data.id);
-    const swapIdx = data.direcao === "up" ? idx - 1 : idx + 1;
-    if (idx === -1 || swapIdx < 0 || swapIdx >= rows.length) return;
-
-    const a = rows[idx];
-    const b = rows[swapIdx];
-    await pool.query<ResultSetHeader>("UPDATE banners SET ordem = ? WHERE id = ?", [b.ordem, a.id]);
-    await pool.query<ResultSetHeader>("UPDATE banners SET ordem = ? WHERE id = ?", [a.ordem, b.id]);
   });

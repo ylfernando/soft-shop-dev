@@ -70,21 +70,17 @@ export const adminRemoveVitrineItem = createServerFn({ method: "POST" })
     await pool.query("DELETE FROM vitrines WHERE id = ?", [data.id]);
   });
 
-export const adminMoverVitrineItem = createServerFn({ method: "POST" })
-  .validator((data: { id: number; secao: VitrineSecao; direcao: "up" | "down" }) => data)
+/** Persiste a nova ordem de uma vez só — ids é a lista completa dos itens
+ * da seção na ordem final desejada, definida no admin depois de reordenar
+ * localmente e confirmar com "salvar ordem". */
+export const adminReordenarVitrineItens = createServerFn({ method: "POST" })
+  .validator((data: { secao: VitrineSecao; ids: number[] }) => data)
   .handler(async ({ data }): Promise<void> => {
     await requireAdmin();
     const pool = getPool();
-    const [rows] = await pool.query<(RowDataPacket & { id: number; ordem: number })[]>(
-      "SELECT id, ordem FROM vitrines WHERE secao = ? ORDER BY ordem ASC",
-      [data.secao],
+    await Promise.all(
+      data.ids.map((id, i) =>
+        pool.query("UPDATE vitrines SET ordem = ? WHERE id = ? AND secao = ?", [i, id, data.secao]),
+      ),
     );
-    const idx = rows.findIndex((r) => r.id === data.id);
-    const swapIdx = data.direcao === "up" ? idx - 1 : idx + 1;
-    if (idx === -1 || swapIdx < 0 || swapIdx >= rows.length) return;
-
-    const a = rows[idx];
-    const b = rows[swapIdx];
-    await pool.query("UPDATE vitrines SET ordem = ? WHERE id = ?", [b.ordem, a.id]);
-    await pool.query("UPDATE vitrines SET ordem = ? WHERE id = ?", [a.ordem, b.id]);
   });

@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ import {
   adminCreateBanner,
   adminUpdateBanner,
   adminDeleteBanner,
-  adminMoverBanner,
+  adminReordenarBanners,
   type BannerRow,
 } from "@/server-fns/admin/banners";
 import { uploadImagem } from "@/server-fns/admin/upload";
@@ -65,17 +65,58 @@ function AdminBanners() {
   const [editando, setEditando] = useState<BannerRow | null>(null);
   const [excluindo, setExcluindo] = useState<BannerRow | null>(null);
 
+  const [ordemLocal, setOrdemLocal] = useState(bannersIniciais);
+  const [pendingMoves, setPendingMoves] = useState<{ id: number; direcao: "up" | "down" }[]>([]);
+  const [salvandoOrdem, setSalvandoOrdem] = useState(false);
+
   const listCall = useServerFn(adminListBanners);
   const deleteCall = useServerFn(adminDeleteBanner);
-  const moverCall = useServerFn(adminMoverBanner);
+  const reordenarCall = useServerFn(adminReordenarBanners);
+
+  // Só resincroniza com os dados do servidor quando não há reordenação
+  // pendente — senão um refetch no meio da reordenação (ex: banner criado
+  // ou excluído) apagaria a ordem que a pessoa ainda não salvou.
+  const pendingMovesRef = useRef(pendingMoves);
+  pendingMovesRef.current = pendingMoves;
+  useEffect(() => {
+    if (pendingMovesRef.current.length === 0) setOrdemLocal(banners);
+  }, [banners]);
+
+  const ordemAlterada = pendingMoves.length > 0;
 
   async function refetch() {
     setBanners(await listCall());
   }
 
-  async function mover(id: number, direcao: "up" | "down") {
-    await moverCall({ data: { id, direcao } });
-    await refetch();
+  function moverLocal(id: number, direcao: "up" | "down") {
+    setOrdemLocal((prev) => {
+      const idx = prev.findIndex((b) => b.id === id);
+      const swapIdx = direcao === "up" ? idx - 1 : idx + 1;
+      if (idx === -1 || swapIdx < 0 || swapIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+      return next;
+    });
+    setPendingMoves((prev) => [...prev, { id, direcao }]);
+  }
+
+  async function salvarOrdem() {
+    setSalvandoOrdem(true);
+    try {
+      await reordenarCall({ data: { ids: ordemLocal.map((b) => b.id) } });
+      setPendingMoves([]);
+      toast.success("ordem salva.");
+      await refetch();
+    } catch {
+      toast.error("não deu pra salvar a ordem, tenta de novo.");
+    } finally {
+      setSalvandoOrdem(false);
+    }
+  }
+
+  function cancelarOrdem() {
+    setOrdemLocal(banners);
+    setPendingMoves([]);
   }
 
   return (
@@ -83,6 +124,7 @@ function AdminBanners() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Banners</h1>
         <Button
+          disabled={ordemAlterada}
           onClick={() => {
             setEditando(null);
             setSheetAberto(true);
@@ -95,6 +137,20 @@ function AdminBanners() {
       {banners.length === 0 && (
         <div className="border rounded-lg text-center text-muted-foreground py-8">
           nenhum banner cadastrado ainda.
+        </div>
+      )}
+
+      {ordemAlterada && (
+        <div className="flex items-center justify-between gap-2 bg-muted rounded-lg px-3 py-2">
+          <span className="text-xs text-muted-foreground">ordem alterada, ainda não salva.</span>
+          <div className="flex gap-1 shrink-0">
+            <Button variant="ghost" size="sm" onClick={cancelarOrdem} disabled={salvandoOrdem}>
+              cancelar
+            </Button>
+            <Button size="sm" onClick={salvarOrdem} disabled={salvandoOrdem}>
+              {salvandoOrdem ? "salvando..." : "salvar ordem"}
+            </Button>
+          </div>
         </div>
       )}
 
@@ -112,22 +168,22 @@ function AdminBanners() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {banners.map((b, i) => (
+                {ordemLocal.map((b, i) => (
                   <TableRow key={b.id}>
                     <TableCell className="space-x-1">
                       <Button
                         variant="ghost"
                         size="icon"
                         disabled={i === 0}
-                        onClick={() => mover(b.id, "up")}
+                        onClick={() => moverLocal(b.id, "up")}
                       >
                         <ArrowUp />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        disabled={i === banners.length - 1}
-                        onClick={() => mover(b.id, "down")}
+                        disabled={i === ordemLocal.length - 1}
+                        onClick={() => moverLocal(b.id, "down")}
                       >
                         <ArrowDown />
                       </Button>
@@ -147,6 +203,7 @@ function AdminBanners() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        disabled={ordemAlterada}
                         onClick={() => {
                           setEditando(b);
                           setSheetAberto(true);
@@ -154,7 +211,12 @@ function AdminBanners() {
                       >
                         <Pencil />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setExcluindo(b)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={ordemAlterada}
+                        onClick={() => setExcluindo(b)}
+                      >
                         <Trash2 />
                       </Button>
                     </TableCell>
@@ -165,7 +227,7 @@ function AdminBanners() {
           </div>
 
           <div className="space-y-3 md:hidden">
-            {banners.map((b, i) => (
+            {ordemLocal.map((b, i) => (
               <div key={b.id} className="border rounded-lg p-3 flex gap-3">
                 <img
                   src={b.imgUrl}
@@ -184,21 +246,22 @@ function AdminBanners() {
                       variant="ghost"
                       size="icon"
                       disabled={i === 0}
-                      onClick={() => mover(b.id, "up")}
+                      onClick={() => moverLocal(b.id, "up")}
                     >
                       <ArrowUp />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      disabled={i === banners.length - 1}
-                      onClick={() => mover(b.id, "down")}
+                      disabled={i === ordemLocal.length - 1}
+                      onClick={() => moverLocal(b.id, "down")}
                     >
                       <ArrowDown />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
+                      disabled={ordemAlterada}
                       onClick={() => {
                         setEditando(b);
                         setSheetAberto(true);
@@ -206,7 +269,12 @@ function AdminBanners() {
                     >
                       <Pencil />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setExcluindo(b)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={ordemAlterada}
+                      onClick={() => setExcluindo(b)}
+                    >
                       <Trash2 />
                     </Button>
                   </div>

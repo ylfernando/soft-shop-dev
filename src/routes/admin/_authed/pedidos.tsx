@@ -51,22 +51,65 @@ const STATUS_VARIANT: Record<PedidoStatus, "default" | "secondary" | "destructiv
   cancelado: "destructive",
 };
 
+function StatusEditor({
+  pedido,
+  onChanged,
+}: {
+  pedido: PedidoRow;
+  onChanged: () => Promise<void>;
+}) {
+  const [pendente, setPendente] = useState<PedidoStatus>(pedido.status);
+  const [salvando, setSalvando] = useState(false);
+  const statusCall = useServerFn(adminUpdatePedidoStatus);
+
+  const mudou = pendente !== pedido.status;
+
+  async function salvar() {
+    setSalvando(true);
+    try {
+      await statusCall({ data: { id: pedido.id, status: pendente } });
+      toast.success("status atualizado.");
+      await onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "não deu pra salvar o status.");
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Badge variant={STATUS_VARIANT[pedido.status]}>{STATUS_LABEL[pedido.status]}</Badge>
+      <Select value={pendente} onValueChange={(v) => setPendente(v as PedidoStatus)}>
+        <SelectTrigger className="h-7 w-28 text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
+            <SelectItem key={s} value={s}>
+              {STATUS_LABEL[s]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {mudou && (
+        <Button size="sm" onClick={salvar} disabled={salvando}>
+          {salvando ? "salvando..." : "salvar"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function AdminPedidos() {
   const pedidosIniciais = Route.useLoaderData();
   const [pedidos, setPedidos] = useState<PedidoRow[]>(pedidosIniciais);
   const [detalhe, setDetalhe] = useState<PedidoRow | null>(null);
 
   const listCall = useServerFn(adminListPedidos);
-  const statusCall = useServerFn(adminUpdatePedidoStatus);
 
   async function refetch() {
     setPedidos(await listCall());
-  }
-
-  async function mudarStatus(pedido: PedidoRow, status: PedidoStatus) {
-    await statusCall({ data: { id: pedido.id, status } });
-    toast.success("status atualizado.");
-    await refetch();
   }
 
   return (
@@ -103,24 +146,7 @@ function AdminPedidos() {
                     </TableCell>
                     <TableCell>{formatPreco(p.totalCentavos)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
-                        <Select
-                          value={p.status}
-                          onValueChange={(v) => mudarStatus(p, v as PedidoStatus)}
-                        >
-                          <SelectTrigger className="h-7 w-28 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
-                              <SelectItem key={s} value={s}>
-                                {STATUS_LABEL[s]}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <StatusEditor pedido={p} onChanged={refetch} />
                     </TableCell>
                     <TableCell>{new Date(p.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
                     <TableCell className="text-right">
@@ -142,9 +168,7 @@ function AdminPedidos() {
                     <div className="font-medium">
                       #{p.id} · {p.nomeCliente}
                     </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {p.emailCliente}
-                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{p.emailCliente}</div>
                   </div>
                   <Button
                     variant="ghost"
@@ -161,21 +185,7 @@ function AdminPedidos() {
                     {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
-                  <Select value={p.status} onValueChange={(v) => mudarStatus(p, v as PedidoStatus)}>
-                    <SelectTrigger className="h-7 w-28 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(Object.keys(STATUS_LABEL) as PedidoStatus[]).map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {STATUS_LABEL[s]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <StatusEditor pedido={p} onChanged={refetch} />
               </div>
             ))}
           </div>
@@ -245,9 +255,7 @@ function PedidoDetalheDialog({
               </div>
               {pedido.cupomCodigo && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Cupom ({pedido.cupomCodigo})
-                  </span>
+                  <span className="text-muted-foreground">Cupom ({pedido.cupomCodigo})</span>
                   <span>-{formatPreco(pedido.descontoCentavos)}</span>
                 </div>
               )}

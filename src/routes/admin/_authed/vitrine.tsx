@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatPreco, type Produto } from "@/data/produtos";
 import { adminListProdutos } from "@/server-fns/admin/produtos";
 import {
   adminListVitrines,
   adminAddVitrineItem,
   adminRemoveVitrineItem,
-  adminMoverVitrineItem,
+  adminReordenarVitrineItens,
   type VitrineSecao,
   type VitrineItemRow,
 } from "@/server-fns/admin/vitrines";
@@ -36,12 +42,12 @@ const SECOES: { value: VitrineSecao; titulo: string; descricao: string }[] = [
   {
     value: "garimpos",
     titulo: "Últimos garimpos",
-    descricao: "produtos exibidos na seção \"Últimos garimpos\" da home.",
+    descricao: 'produtos exibidos na seção "Últimos garimpos" da home.',
   },
   {
     value: "promos",
     titulo: "Promos da semana",
-    descricao: "produtos exibidos na seção \"Promos da semana\" da home.",
+    descricao: 'produtos exibidos na seção "Promos da semana" da home.',
   },
 ];
 
@@ -94,21 +100,41 @@ function VitrineSecaoCard({
   onChanged: () => Promise<void>;
 }) {
   const [addKey, setAddKey] = useState(0);
+  const [selecionado, setSelecionado] = useState<string | undefined>(undefined);
+  const [adicionando, setAdicionando] = useState(false);
+  const [ordemLocal, setOrdemLocal] = useState(itens);
+  const [pendingMoves, setPendingMoves] = useState<{ id: number; direcao: "up" | "down" }[]>([]);
+  const [salvandoOrdem, setSalvandoOrdem] = useState(false);
+
   const addCall = useServerFn(adminAddVitrineItem);
   const removeCall = useServerFn(adminRemoveVitrineItem);
-  const moverCall = useServerFn(adminMoverVitrineItem);
+  const reordenarCall = useServerFn(adminReordenarVitrineItens);
+
+  // Só resincroniza com os dados do servidor quando não há reordenação
+  // pendente — senão um refetch no meio da reordenação (ex: outro item
+  // sendo adicionado) apagaria a ordem que a pessoa ainda não salvou.
+  const pendingMovesRef = useRef(pendingMoves);
+  pendingMovesRef.current = pendingMoves;
+  useEffect(() => {
+    if (pendingMovesRef.current.length === 0) setOrdemLocal(itens);
+  }, [itens]);
 
   const idsNaVitrine = new Set(itens.map((i) => i.produtoId));
   const disponiveis = produtos.filter((p) => !idsNaVitrine.has(p.id));
+  const ordemAlterada = pendingMoves.length > 0;
 
-  async function adicionar(produtoId: string) {
+  async function adicionar() {
+    if (!selecionado) return;
+    setAdicionando(true);
     try {
-      await addCall({ data: { produtoId, secao } });
+      await addCall({ data: { produtoId: selecionado, secao } });
       await onChanged();
+      setSelecionado(undefined);
+      setAddKey((k) => k + 1);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "não deu pra adicionar o produto.");
     } finally {
-      setAddKey((k) => k + 1);
+      setAdicionando(false);
     }
   }
 
@@ -117,9 +143,35 @@ function VitrineSecaoCard({
     await onChanged();
   }
 
-  async function mover(id: number, direcao: "up" | "down") {
-    await moverCall({ data: { id, secao, direcao } });
-    await onChanged();
+  function moverLocal(id: number, direcao: "up" | "down") {
+    setOrdemLocal((prev) => {
+      const idx = prev.findIndex((i) => i.id === id);
+      const swapIdx = direcao === "up" ? idx - 1 : idx + 1;
+      if (idx === -1 || swapIdx < 0 || swapIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+      return next;
+    });
+    setPendingMoves((prev) => [...prev, { id, direcao }]);
+  }
+
+  async function salvarOrdem() {
+    setSalvandoOrdem(true);
+    try {
+      await reordenarCall({ data: { secao, ids: ordemLocal.map((i) => i.id) } });
+      setPendingMoves([]);
+      toast.success("ordem salva.");
+      await onChanged();
+    } catch {
+      toast.error("não deu pra salvar a ordem, tenta de novo.");
+    } finally {
+      setSalvandoOrdem(false);
+    }
+  }
+
+  function cancelarOrdem() {
+    setOrdemLocal(itens);
+    setPendingMoves([]);
   }
 
   return (
@@ -129,32 +181,60 @@ function VitrineSecaoCard({
         <p className="text-xs text-muted-foreground">{descricao}</p>
       </div>
 
-      <Select key={addKey} onValueChange={adicionar} disabled={disponiveis.length === 0}>
-        <SelectTrigger>
-          <SelectValue
-            placeholder={
-              disponiveis.length === 0
-                ? "todos os produtos já estão nessa vitrine"
-                : "adicionar produto..."
-            }
-          />
-        </SelectTrigger>
-        <SelectContent>
-          {disponiveis.map((p) => (
-            <SelectItem key={p.id} value={p.id}>
-              {p.nome}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex gap-2">
+        <Select
+          key={addKey}
+          value={selecionado}
+          onValueChange={setSelecionado}
+          disabled={disponiveis.length === 0 || ordemAlterada}
+        >
+          <SelectTrigger>
+            <SelectValue
+              placeholder={
+                disponiveis.length === 0
+                  ? "todos os produtos já estão nessa vitrine"
+                  : "escolher produto..."
+              }
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {disponiveis.map((p) => (
+              <SelectItem key={p.id} value={p.id}>
+                {p.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          className="shrink-0"
+          onClick={adicionar}
+          disabled={!selecionado || adicionando || ordemAlterada}
+        >
+          {adicionando ? "adicionando..." : "adicionar"}
+        </Button>
+      </div>
 
-      {itens.length === 0 && (
+      {ordemAlterada && (
+        <div className="flex items-center justify-between gap-2 bg-muted rounded-lg px-3 py-2">
+          <span className="text-xs text-muted-foreground">ordem alterada, ainda não salva.</span>
+          <div className="flex gap-1 shrink-0">
+            <Button variant="ghost" size="sm" onClick={cancelarOrdem} disabled={salvandoOrdem}>
+              cancelar
+            </Button>
+            <Button size="sm" onClick={salvarOrdem} disabled={salvandoOrdem}>
+              {salvandoOrdem ? "salvando..." : "salvar ordem"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {ordemLocal.length === 0 && (
         <div className="text-center text-sm text-muted-foreground py-6">
           nenhum produto nessa vitrine ainda.
         </div>
       )}
 
-      {itens.length > 0 && (
+      {ordemLocal.length > 0 && (
         <>
           <div className="border rounded-lg hidden md:block">
             <Table>
@@ -167,7 +247,7 @@ function VitrineSecaoCard({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {itens.map((item, i) => (
+                {ordemLocal.map((item, i) => (
                   <TableRow key={item.id}>
                     <TableCell>
                       <img
@@ -183,19 +263,24 @@ function VitrineSecaoCard({
                         variant="ghost"
                         size="icon"
                         disabled={i === 0}
-                        onClick={() => mover(item.id, "up")}
+                        onClick={() => moverLocal(item.id, "up")}
                       >
                         <ArrowUp />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        disabled={i === itens.length - 1}
-                        onClick={() => mover(item.id, "down")}
+                        disabled={i === ordemLocal.length - 1}
+                        onClick={() => moverLocal(item.id, "down")}
                       >
                         <ArrowDown />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => remover(item.id)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={ordemAlterada}
+                        onClick={() => remover(item.id)}
+                      >
                         <Trash2 />
                       </Button>
                     </TableCell>
@@ -206,7 +291,7 @@ function VitrineSecaoCard({
           </div>
 
           <div className="space-y-3 md:hidden">
-            {itens.map((item, i) => (
+            {ordemLocal.map((item, i) => (
               <div key={item.id} className="border rounded-lg p-3 flex gap-3">
                 <img
                   src={item.img}
@@ -221,19 +306,24 @@ function VitrineSecaoCard({
                       variant="ghost"
                       size="icon"
                       disabled={i === 0}
-                      onClick={() => mover(item.id, "up")}
+                      onClick={() => moverLocal(item.id, "up")}
                     >
                       <ArrowUp />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      disabled={i === itens.length - 1}
-                      onClick={() => mover(item.id, "down")}
+                      disabled={i === ordemLocal.length - 1}
+                      onClick={() => moverLocal(item.id, "down")}
                     >
                       <ArrowDown />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => remover(item.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={ordemAlterada}
+                      onClick={() => remover(item.id)}
+                    >
                       <Trash2 />
                     </Button>
                   </div>

@@ -54,7 +54,7 @@ import {
   adminListProdutoImagens,
   adminAddProdutoImagem,
   adminRemoveProdutoImagem,
-  adminMoverProdutoImagem,
+  adminReordenarProdutoImagens,
   type ProdutoRow,
   type ProdutoImagemRow,
 } from "@/server-fns/admin/produtos";
@@ -190,9 +190,7 @@ function AdminProdutos() {
                     {tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo} ·{" "}
                     {categoriaLabels[p.categoria]}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Tamanho: {p.tamanho || "—"}
-                  </div>
+                  <div className="text-xs text-muted-foreground">Tamanho: {p.tamanho || "—"}</div>
                   <div className="font-medium">{formatPreco(p.precoCentavos)}</div>
                   <div className="flex gap-1 pt-1">
                     <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)}>
@@ -266,9 +264,10 @@ function ProdutoFormSheet({
   const listImagensCall = useServerFn(adminListProdutoImagens);
   const addImagemCall = useServerFn(adminAddProdutoImagem);
   const removeImagemCall = useServerFn(adminRemoveProdutoImagem);
-  const moverImagemCall = useServerFn(adminMoverProdutoImagem);
+  const reordenarImagensCall = useServerFn(adminReordenarProdutoImagens);
 
   const [imagensExistentes, setImagensExistentes] = useState<ProdutoImagemRow[]>([]);
+  const [imagensAtuais, setImagensAtuais] = useState<ProdutoImagemRow[]>([]);
   const [novosArquivos, setNovosArquivos] = useState<ArquivoPendente[]>([]);
   const [salvando, setSalvando] = useState(false);
 
@@ -286,16 +285,21 @@ function ProdutoFormSheet({
   useEffect(() => {
     if (!open || !produto) {
       setImagensExistentes([]);
+      setImagensAtuais([]);
       return;
     }
-    listImagensCall({ data: { produtoId: produto.id } }).then(setImagensExistentes);
+    listImagensCall({ data: { produtoId: produto.id } }).then((imgs) => {
+      setImagensExistentes(imgs);
+      setImagensAtuais(imgs);
+    });
   }, [open, produto, listImagensCall]);
 
-  const totalImagens = imagensExistentes.length + novosArquivos.length;
+  const totalImagens = imagensAtuais.length + novosArquivos.length;
 
   function handleOpenChange(next: boolean) {
     if (!next) {
       setNovosArquivos([]);
+      setImagensAtuais(imagensExistentes);
     }
     onOpenChange(next);
   }
@@ -323,22 +327,23 @@ function ProdutoFormSheet({
     setNovosArquivos((prev) => prev.filter((_, idx) => idx !== i));
   }
 
-  async function removerExistente(img: ProdutoImagemRow) {
-    if (!produto) return;
-    try {
-      await removeImagemCall({ data: { id: img.id, produtoId: produto.id } });
-      setImagensExistentes((prev) => prev.filter((i) => i.id !== img.id));
-      await onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "não deu pra remover a imagem.");
+  function removerExistente(img: ProdutoImagemRow) {
+    if (totalImagens <= 1) {
+      toast.error("o produto precisa de pelo menos 1 imagem.");
+      return;
     }
+    setImagensAtuais((prev) => prev.filter((i) => i.id !== img.id));
   }
 
-  async function moverExistente(img: ProdutoImagemRow, direcao: "up" | "down") {
-    if (!produto) return;
-    await moverImagemCall({ data: { id: img.id, produtoId: produto.id, direcao } });
-    setImagensExistentes(await listImagensCall({ data: { produtoId: produto.id } }));
-    await onSaved();
+  function moverExistente(img: ProdutoImagemRow, direcao: "up" | "down") {
+    setImagensAtuais((prev) => {
+      const idx = prev.findIndex((i) => i.id === img.id);
+      const swapIdx = direcao === "up" ? idx - 1 : idx + 1;
+      if (idx === -1 || swapIdx < 0 || swapIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[swapIdx]] = [next[swapIdx], next[idx]];
+      return next;
+    });
   }
 
   async function enviarNovosArquivos(produtoId: string) {
@@ -373,7 +378,29 @@ function ProdutoFormSheet({
             medidas: values.medidas,
           },
         });
+
+        // as remoções e a reordenação da galeria só existiam localmente até
+        // aqui — aplica elas agora, junto com o resto do formulário.
+        const idsRemovidos = imagensExistentes
+          .filter((img) => !imagensAtuais.some((a) => a.id === img.id))
+          .map((img) => img.id);
+        for (const id of idsRemovidos) {
+          await removeImagemCall({ data: { id, produtoId: produto.id } });
+        }
+
         await enviarNovosArquivos(produto.id);
+
+        if (imagensAtuais.length > 0) {
+          const atuais = await listImagensCall({ data: { produtoId: produto.id } });
+          const idsExistentesOrdenados = imagensAtuais.map((i) => i.id);
+          const idsNovos = atuais
+            .map((i) => i.id)
+            .filter((id) => !idsExistentesOrdenados.includes(id));
+          await reordenarImagensCall({
+            data: { produtoId: produto.id, ids: [...idsExistentesOrdenados, ...idsNovos] },
+          });
+        }
+
         toast.success("produto atualizado.");
       } else {
         const formDataPrimeira = new FormData();
@@ -426,7 +453,7 @@ function ProdutoFormSheet({
               </Label>
 
               <div className="flex flex-wrap gap-2">
-                {imagensExistentes.map((img, i) => (
+                {imagensAtuais.map((img, i) => (
                   <div
                     key={img.id}
                     className="group relative w-20 h-24 rounded overflow-hidden border"
@@ -451,7 +478,7 @@ function ProdutoFormSheet({
                         type="button"
                         aria-label="mover pra baixo"
                         onClick={() => moverExistente(img, "down")}
-                        disabled={i === imagensExistentes.length - 1}
+                        disabled={i === imagensAtuais.length - 1}
                         className="text-white disabled:opacity-30"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />

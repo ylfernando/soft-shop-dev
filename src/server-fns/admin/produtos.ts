@@ -190,22 +190,22 @@ export const adminRemoveProdutoImagem = createServerFn({ method: "POST" })
     await resyncCapa(pool, data.produtoId);
   });
 
-export const adminMoverProdutoImagem = createServerFn({ method: "POST" })
-  .validator((data: { produtoId: string; id: number; direcao: "up" | "down" }) => data)
+/** Persiste a nova ordem de uma vez só — ids é a lista completa das imagens
+ * do produto na ordem final desejada, aplicada junto com o resto do
+ * formulário quando o admin clica em "salvar". */
+export const adminReordenarProdutoImagens = createServerFn({ method: "POST" })
+  .validator((data: { produtoId: string; ids: number[] }) => data)
   .handler(async ({ data }): Promise<void> => {
     await requireAdmin();
     const pool = getPool();
-    const [rows] = await pool.query<ProdutoImagemQueryRow[]>(
-      "SELECT id, url, ordem FROM produto_imagens WHERE produto_id = ? ORDER BY ordem ASC",
-      [data.produtoId],
+    await Promise.all(
+      data.ids.map((id, i) =>
+        pool.query("UPDATE produto_imagens SET ordem = ? WHERE id = ? AND produto_id = ?", [
+          i,
+          id,
+          data.produtoId,
+        ]),
+      ),
     );
-    const idx = rows.findIndex((r) => r.id === data.id);
-    const swapIdx = data.direcao === "up" ? idx - 1 : idx + 1;
-    if (idx === -1 || swapIdx < 0 || swapIdx >= rows.length) return;
-
-    const a = rows[idx];
-    const b = rows[swapIdx];
-    await pool.query("UPDATE produto_imagens SET ordem = ? WHERE id = ?", [b.ordem, a.id]);
-    await pool.query("UPDATE produto_imagens SET ordem = ? WHERE id = ?", [a.ordem, b.id]);
     await resyncCapa(pool, data.produtoId);
   });
