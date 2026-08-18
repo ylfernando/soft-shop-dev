@@ -13,7 +13,8 @@ import { PEDIDO_SELECT, type PedidoRow, type PedidoItemRow } from "./admin/pedid
 
 export type { PedidoRow, PedidoItemRow };
 
-type IniciarPagamentoResult = { ok: true; redirectUrl: string } | { ok: false; erro: string };
+type IniciarPagamentoResult =
+  { ok: true; redirectUrl: string } | { ok: false; erro: string; emailNaoVerificado?: boolean };
 
 interface ItemInput {
   produtoId: string;
@@ -185,6 +186,13 @@ export const iniciarPagamentoMercadoPago = createServerFn({ method: "POST" })
   .validator((data: CheckoutInput) => data)
   .handler(async ({ data }): Promise<IniciarPagamentoResult> => {
     const user = await requireUser();
+    if (!user.emailVerificado) {
+      return {
+        ok: false,
+        erro: "confirma seu e-mail antes de finalizar a compra.",
+        emailNaoVerificado: true,
+      };
+    }
     const reserva = await reservarPedido(user, data);
     if (!reserva.ok) return reserva;
 
@@ -212,6 +220,13 @@ export const iniciarPagamentoStripe = createServerFn({ method: "POST" })
   .validator((data: CheckoutInput) => data)
   .handler(async ({ data }): Promise<IniciarPagamentoResult> => {
     const user = await requireUser();
+    if (!user.emailVerificado) {
+      return {
+        ok: false,
+        erro: "confirma seu e-mail antes de finalizar a compra.",
+        emailNaoVerificado: true,
+      };
+    }
     const reserva = await reservarPedido(user, data);
     if (!reserva.ok) return reserva;
 

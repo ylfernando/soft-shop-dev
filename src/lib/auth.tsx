@@ -6,16 +6,21 @@ import {
   loginDemo as loginDemoFn,
   logout as logoutFn,
 } from "@/server-fns/auth";
-import type { AuthUser } from "@/server-fns/auth";
+import type { AuthUser, EnderecoInput } from "@/server-fns/auth";
 
-export type { AuthUser };
+export type { AuthUser, EnderecoInput };
 
 type AuthResult = { ok: true; user: AuthUser } | { ok: false; erro: string };
 
 interface AuthContextValue {
   user: AuthUser | null;
   hydrated: boolean;
-  signUp: (nome: string, email: string, senha: string) => Promise<AuthResult>;
+  signUp: (
+    nome: string,
+    email: string,
+    senha: string,
+    endereco?: EnderecoInput,
+  ) => Promise<AuthResult>;
   login: (email: string, senha: string) => Promise<AuthResult>;
   loginDemo: () => Promise<AuthResult>;
   logout: () => void;
@@ -53,8 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
 
-  async function signUp(nome: string, email: string, senha: string): Promise<AuthResult> {
-    const res = await signUpFnCall({ data: { nome, email, senha } });
+  async function signUp(
+    nome: string,
+    email: string,
+    senha: string,
+    endereco?: EnderecoInput,
+  ): Promise<AuthResult> {
+    const res = await signUpFnCall({ data: { nome, email, senha, ...endereco } });
     if (res.ok) {
       writeSession(res.user);
       setUser(res.user);
@@ -94,9 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{ user, hydrated, signUp, login, loginDemo, logout, updateUser }}
-    >
+    <AuthContext.Provider value={{ user, hydrated, signUp, login, loginDemo, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -18,6 +18,7 @@ import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
+import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
 import { Route as PedidoPedidoIdRouteImport } from './routes/pedido.$pedidoId'
@@ -72,6 +73,11 @@ const ProdutosRoute = ProdutosRouteImport.update({
 const SobreASacolinhaRoute = SobreASacolinhaRouteImport.update({
   id: '/sobre-a-sacolinha',
   path: '/sobre-a-sacolinha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarEmailRoute = VerificarEmailRouteImport.update({
+  id: '/verificar-email',
+  path: '/verificar-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAuthedRoute = AdminAuthedRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/verificar-email': typeof VerificarEmailRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/verificar-email': typeof VerificarEmailRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
   '/admin/banners': typeof AdminAuthedBannersRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/verificar-email': typeof VerificarEmailRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
   '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
+    | '/verificar-email'
     | '/admin'
     | '/admin/entrar'
     | '/pedido/$pedidoId'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
+    | '/verificar-email'
     | '/admin/entrar'
     | '/pedido/$pedidoId'
     | '/admin/banners'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/sobre-a-sacolinha'
+    | '/verificar-email'
     | '/admin/_authed'
     | '/admin/entrar'
     | '/pedido/$pedidoId'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   MinhasComprasRoute: typeof MinhasComprasRoute
   ProdutosRoute: typeof ProdutosRoute
   SobreASacolinhaRoute: typeof SobreASacolinhaRoute
+  VerificarEmailRoute: typeof VerificarEmailRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
   PedidoPedidoIdRoute: typeof PedidoPedidoIdRoute
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre-a-sacolinha'
       fullPath: '/sobre-a-sacolinha'
       preLoaderRoute: typeof SobreASacolinhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar-email': {
+      id: '/verificar-email'
+      path: '/verificar-email'
+      fullPath: '/verificar-email'
+      preLoaderRoute: typeof VerificarEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/_authed': {
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   MinhasComprasRoute: MinhasComprasRoute,
   ProdutosRoute: ProdutosRoute,
   SobreASacolinhaRoute: SobreASacolinhaRoute,
+  VerificarEmailRoute: VerificarEmailRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,
   PedidoPedidoIdRoute: PedidoPedidoIdRoute,

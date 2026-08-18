@@ -8,7 +8,16 @@ import { ContaNav } from "@/components/ContaNav";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth, type AuthUser } from "@/lib/auth";
-import { atualizarConta, alterarSenha } from "@/server-fns/auth";
+import {
+  atualizarConta,
+  alterarSenha,
+  getMeuPerfil,
+  reenviarVerificacaoEmail,
+  type PerfilCompleto,
+} from "@/server-fns/auth";
+import { formatarCpf } from "@/lib/cpf";
+import { formatarTelefone } from "@/lib/telefone";
+import { buscarEnderecoPorCep } from "@/lib/viacep";
 
 export const Route = createFileRoute("/minha-conta")({
   component: MinhaConta,
@@ -44,6 +53,8 @@ function MinhaConta() {
             <ContaNav />
           </div>
 
+          <VerificacaoBanner user={user} />
+
           <div className="grid md:grid-cols-2 gap-4 items-start">
             <DadosForm user={user} updateUser={updateUser} />
             <SenhaForm />
@@ -52,6 +63,41 @@ function MinhaConta() {
       </section>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+function VerificacaoBanner({ user }: { user: AuthUser }) {
+  const [reenviando, setReenviando] = useState(false);
+  const [enviado, setEnviado] = useState(false);
+  const reenviarCall = useServerFn(reenviarVerificacaoEmail);
+
+  if (user.emailVerificado) return null;
+
+  async function reenviar() {
+    setReenviando(true);
+    const res = await reenviarCall();
+    setReenviando(false);
+    if (!res.ok) {
+      toast.error(res.erro);
+      return;
+    }
+    setEnviado(true);
+    toast.success("e-mail de verificação reenviado ✿");
+  }
+
+  return (
+    <div className="mt-4 bg-amber-50 border border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">
+      <p className="text-sm text-amber-800">
+        seu e-mail ainda não foi confirmado — você precisa confirmar antes de finalizar uma compra.
+      </p>
+      <button
+        onClick={reenviar}
+        disabled={reenviando || enviado}
+        className="shrink-0 text-sm font-menu text-amber-800 underline disabled:opacity-60"
+      >
+        {enviado ? "e-mail reenviado" : reenviando ? "enviando..." : "reenviar e-mail"}
+      </button>
     </div>
   );
 }
@@ -74,24 +120,78 @@ function CardConta({
   );
 }
 
-function DadosForm({
-  user,
-  updateUser,
-}: {
-  user: AuthUser;
-  updateUser: (user: AuthUser) => void;
-}) {
+function formatarCep(value: string) {
+  const digitos = value.replace(/\D/g, "").slice(0, 8);
+  return digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos;
+}
+
+function DadosForm({ user, updateUser }: { user: AuthUser; updateUser: (user: AuthUser) => void }) {
   const [nome, setNome] = useState(user.nome);
   const [email, setEmail] = useState(user.email);
+  const [telefone, setTelefone] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [cep, setCep] = useState("");
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [uf, setUf] = useState("");
+  const [carregandoPerfil, setCarregandoPerfil] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const atualizarContaCall = useServerFn(atualizarConta);
+  const getMeuPerfilCall = useServerFn(getMeuPerfil);
+
+  useEffect(() => {
+    getMeuPerfilCall().then((perfil: PerfilCompleto) => {
+      setTelefone(formatarTelefone(perfil.telefone));
+      setCpf(formatarCpf(perfil.cpf));
+      setCep(formatarCep(perfil.cep));
+      setLogradouro(perfil.logradouro);
+      setNumero(perfil.numero);
+      setComplemento(perfil.complemento);
+      setBairro(perfil.bairro);
+      setCidade(perfil.cidade);
+      setUf(perfil.uf);
+      setCarregandoPerfil(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleCepBlur() {
+    const cepLimpo = cep.replace(/\D/g, "");
+    if (cepLimpo.length !== 8) return;
+    setBuscandoCep(true);
+    const endereco = await buscarEnderecoPorCep(cepLimpo);
+    setBuscandoCep(false);
+    if (!endereco) return;
+    setLogradouro(endereco.logradouro);
+    setBairro(endereco.bairro);
+    setCidade(endereco.localidade);
+    setUf(endereco.uf);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErro(null);
     setSalvando(true);
-    const res = await atualizarContaCall({ data: { nome, email } });
+    const res = await atualizarContaCall({
+      data: {
+        nome,
+        email,
+        telefone,
+        cpf,
+        cep,
+        logradouro,
+        numero,
+        complemento,
+        bairro,
+        cidade,
+        uf,
+      },
+    });
     setSalvando(false);
     if (!res.ok) {
       setErro(res.erro);
@@ -102,7 +202,10 @@ function DadosForm({
   }
 
   return (
-    <CardConta titulo="meus dados" descricao="nome e e-mail usados no seu cadastro e nos pedidos.">
+    <CardConta
+      titulo="meus dados"
+      descricao="nome, contato, CPF e endereço usados no seu cadastro e nos pedidos."
+    >
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="nome">nome</Label>
@@ -117,13 +220,107 @@ function DadosForm({
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {email !== user.email && (
+            <p className="text-xs text-amber-700">
+              trocar o e-mail vai exigir uma nova confirmação por e-mail.
+            </p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="telefone">telefone</Label>
+          <Input
+            id="telefone"
+            value={telefone}
+            onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+            placeholder="(00) 00000-0000"
+            disabled={carregandoPerfil}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cpf">CPF</Label>
+          <Input
+            id="cpf"
+            value={cpf}
+            onChange={(e) => setCpf(formatarCpf(e.target.value))}
+            placeholder="000.000.000-00"
+            disabled={carregandoPerfil}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cep">CEP</Label>
+          <Input
+            id="cep"
+            value={cep}
+            onChange={(e) => setCep(formatarCep(e.target.value))}
+            onBlur={handleCepBlur}
+            placeholder="00000-000"
+            disabled={carregandoPerfil}
+          />
+          {buscandoCep && <p className="text-xs text-foreground/50">buscando endereço...</p>}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="col-span-2 space-y-1.5">
+            <Label htmlFor="logradouro">rua</Label>
+            <Input
+              id="logradouro"
+              value={logradouro}
+              onChange={(e) => setLogradouro(e.target.value)}
+              disabled={carregandoPerfil}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="numero">número</Label>
+            <Input
+              id="numero"
+              value={numero}
+              onChange={(e) => setNumero(e.target.value)}
+              disabled={carregandoPerfil}
+            />
+          </div>
+          <div className="col-span-3 space-y-1.5">
+            <Label htmlFor="complemento">complemento</Label>
+            <Input
+              id="complemento"
+              value={complemento}
+              onChange={(e) => setComplemento(e.target.value)}
+              disabled={carregandoPerfil}
+            />
+          </div>
+          <div className="col-span-2 space-y-1.5">
+            <Label htmlFor="bairro">bairro</Label>
+            <Input
+              id="bairro"
+              value={bairro}
+              onChange={(e) => setBairro(e.target.value)}
+              disabled={carregandoPerfil}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="uf">UF</Label>
+            <Input
+              id="uf"
+              value={uf}
+              onChange={(e) => setUf(e.target.value.toUpperCase().slice(0, 2))}
+              maxLength={2}
+              disabled={carregandoPerfil}
+            />
+          </div>
+          <div className="col-span-3 space-y-1.5">
+            <Label htmlFor="cidade">cidade</Label>
+            <Input
+              id="cidade"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+              disabled={carregandoPerfil}
+            />
+          </div>
         </div>
 
         {erro && <p className="text-sm text-red-500">{erro}</p>}
 
         <button
           type="submit"
-          disabled={salvando}
+          disabled={salvando || carregandoPerfil}
           className="w-full py-2.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-lg hover:opacity-90 disabled:opacity-60 transition"
         >
           {salvando ? "salvando..." : "salvar dados"}

@@ -39,6 +39,15 @@ export function CartContents() {
 
   const cepLimpo = cep.replace(/\D/g, "");
   const podeFinalizar = cepLimpo.length === 8 && freteDeterminado;
+  const cepSalvo = user?.cep ?? "";
+  const usandoCepSalvo = cepSalvo.length === 8 && cepLimpo === cepSalvo;
+
+  function usarEnderecoSalvo() {
+    if (cepSalvo.length !== 8) return;
+    // Só precisa mudar o CEP — o cálculo de frete já dispara sozinho
+    // quando ele completa 8 dígitos (debounce em cart.tsx).
+    setCep(formatarCep(cepSalvo));
+  }
 
   function irParaFinalizarCompra() {
     if (!podeFinalizar) return;
@@ -113,6 +122,18 @@ export function CartContents() {
 
       <div className="shrink-0 space-y-1.5 text-xs">
         <p className="text-[11px] font-medium text-foreground/60">endereço de entrega</p>
+        {cepSalvo.length === 8 && (
+          <button
+            type="button"
+            onClick={usarEnderecoSalvo}
+            disabled={usandoCepSalvo}
+            className="w-full text-left text-[11px] px-2.5 py-1.5 rounded-lg bg-[color:var(--pink-soft)]/40 border border-[color:var(--pink-deep)]/20 text-[color:var(--pink-deep)] disabled:opacity-60"
+          >
+            {usandoCepSalvo
+              ? `usando seu endereço salvo (${formatarCep(cepSalvo)})`
+              : `usar meu endereço salvo (${formatarCep(cepSalvo)})`}
+          </button>
+        )}
         <div className="flex gap-1.5">
           <input
             type="text"
@@ -129,9 +150,7 @@ export function CartContents() {
             </span>
           )}
         </div>
-        <p className="text-[11px] text-foreground/50">
-          * Se for de Floripa, entrega a combinar
-        </p>
+        <p className="text-[11px] text-foreground/50">* Se for de Floripa, entrega a combinar</p>
         {erroFrete && !freteGratis && (
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] text-destructive">{erroFrete}</p>
@@ -149,7 +168,8 @@ export function CartContents() {
         {freteEscolhido && !freteGratis && (
           <p className="text-[11px] text-foreground/50">
             {freteEscolhido.transportadora} · {freteEscolhido.nome} · até {freteEscolhido.prazoDias}{" "}
-            dia{freteEscolhido.prazoDias === 1 ? "" : "s"} útei{freteEscolhido.prazoDias === 1 ? "" : "s"}
+            dia{freteEscolhido.prazoDias === 1 ? "" : "s"} útei
+            {freteEscolhido.prazoDias === 1 ? "" : "s"}
           </p>
         )}
       </div>

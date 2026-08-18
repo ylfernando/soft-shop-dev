@@ -9,6 +9,7 @@ import { formatPreco } from "@/data/produtos";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { iniciarPagamentoMercadoPago, iniciarPagamentoStripe } from "@/server-fns/pedidos";
+import { reenviarVerificacaoEmail } from "@/server-fns/auth";
 
 type Gateway = "mercadopago" | "stripe";
 
@@ -39,7 +40,10 @@ function FinalizarCompra() {
   const navigate = useNavigate();
   const iniciarMercadoPagoCall = useServerFn(iniciarPagamentoMercadoPago);
   const iniciarStripeCall = useServerFn(iniciarPagamentoStripe);
+  const reenviarVerificacaoCall = useServerFn(reenviarVerificacaoEmail);
   const [gatewayEmAndamento, setGatewayEmAndamento] = useState<Gateway | null>(null);
+  const [emailNaoVerificado, setEmailNaoVerificado] = useState(false);
+  const [reenviando, setReenviando] = useState(false);
 
   const cepLimpo = cep.replace(/\D/g, "");
   const podeConfirmar = lines.length > 0 && cepLimpo.length === 8 && freteDeterminado;
@@ -61,6 +65,7 @@ function FinalizarCompra() {
   async function pagarCom(gateway: Gateway) {
     if (gatewayEmAndamento || !podeConfirmar) return;
     setGatewayEmAndamento(gateway);
+    setEmailNaoVerificado(false);
     try {
       const chamada = gateway === "mercadopago" ? iniciarMercadoPagoCall : iniciarStripeCall;
       const res = await chamada({
@@ -72,6 +77,7 @@ function FinalizarCompra() {
       });
       if (!res.ok) {
         toast.error(res.erro);
+        if (res.emailNaoVerificado) setEmailNaoVerificado(true);
         setGatewayEmAndamento(null);
         return;
       }
@@ -80,6 +86,17 @@ function FinalizarCompra() {
       toast.error("não deu pra iniciar o pagamento, tenta de novo ✿");
       setGatewayEmAndamento(null);
     }
+  }
+
+  async function reenviarVerificacao() {
+    setReenviando(true);
+    const res = await reenviarVerificacaoCall();
+    setReenviando(false);
+    if (!res.ok) {
+      toast.error(res.erro);
+      return;
+    }
+    toast.success("e-mail de verificação reenviado ✿");
   }
 
   if (!cartHydrated || !authHydrated || !podeConfirmar) {
@@ -184,6 +201,20 @@ function FinalizarCompra() {
                 ))}
               </div>
             </div>
+
+            {emailNaoVerificado && (
+              <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 text-sm text-amber-800 flex flex-col gap-1.5">
+                <span>confirma seu e-mail pra poder finalizar a compra.</span>
+                <button
+                  type="button"
+                  onClick={reenviarVerificacao}
+                  disabled={reenviando}
+                  className="self-start underline font-menu disabled:opacity-60"
+                >
+                  {reenviando ? "enviando..." : "reenviar e-mail de verificação"}
+                </button>
+              </div>
+            )}
 
             <div className="space-y-2 pt-2">
               <button
