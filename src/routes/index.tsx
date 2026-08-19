@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import strawberryBg from "@/assets/strawberry-bg.jpg";
+import promosBg from "@/assets/promos-bg-bala.png";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -24,6 +24,12 @@ const divasDaSoft = [
   { username: "usuaria3", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
 ];
 
+const contentGradient = `linear-gradient(to bottom,
+  #eef9fd 0%, #eef9fd 22%,
+  #fffade 26%, #fffade 46%,
+  var(--pink-soft) 50%, var(--pink-soft) 82%,
+  #d1affa 90%, #d1affa 100%)`;
+
 function Index() {
   const { vitrines, banners } = Route.useLoaderData();
   const { garimpos, promos, newdrop } = vitrines;
@@ -32,114 +38,126 @@ function Index() {
     <div className="min-h-screen text-foreground">
       <SiteHeader current="inicio" />
 
-      {/* Hero Carousel */}
-      <section className="relative" style={{ backgroundColor: "#eef9fd" }}>
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
-          <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
-        </div>
-      </section>
-
-      {/* newDROP */}
-      {newdrop.length > 0 && (
-        <section className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
-                newDROP
-              </h2>
-              <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">
-                acabou de chegar
-              </p>
-              <Link
-                to="/produtos"
-                search={{ categoria: "newdrop" }}
-                className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[color:var(--pink-deep)] underline"
-              >
-                tudo
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-6">
-              {newdrop.map((p) => (
-                <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
-                  <ProductCard produto={p} />
-                </div>
-              ))}
-            </div>
+      <div style={{ backgroundImage: contentGradient }}>
+        {/* Hero Carousel */}
+        <section className="relative">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
+            <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
           </div>
         </section>
-      )}
 
-      {/* Últimos garimpos */}
-      {garimpos.length > 0 && (
-        <section className="bg-[color:var(--cream)] py-20 px-6">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
-              ÚLTIMOS GARIMPOS:
-            </h2>
-            <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2"></p>
+        {/* newDROP */}
+        {newdrop.length > 0 && (
+          <section className="py-20 px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
+                  newDROP
+                </h2>
+                <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">
+                  acabou de chegar
+                </p>
+                <Link
+                  to="/produtos"
+                  search={{ categoria: "newdrop" }}
+                  className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[color:var(--pink-deep)] underline"
+                >
+                  tudo
+                </Link>
+              </div>
 
-            <div className="grid grid-cols-2 gap-6 mt-12 max-w-2xl mx-auto">
-              {garimpos.map((p) => (
-                <ProductCard key={p.id} produto={p} />
+              <div className="flex flex-wrap justify-center gap-6">
+                {newdrop.map((p) => (
+                  <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
+                    <ProductCard produto={p} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Últimos garimpos */}
+        {garimpos.length > 0 && (
+          <section className="py-20 px-6">
+            <div className="max-w-6xl mx-auto text-center">
+              <h2 className="font-menu text-4xl md:text-5xl text-[#a9e8eb]">ÚLTIMOS GARIMPOS:</h2>
+              <p className="font-script text-3xl text-[#a9e8eb]/80 mt-2"></p>
+
+              <div className="grid grid-cols-2 gap-6 mt-12 max-w-2xl mx-auto">
+                {garimpos.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    produto={p}
+                    titleColorClass="text-[#a9e8eb]"
+                    buttonColorClass="bg-[#a9e8eb]"
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Queridinhas */}
+        {promos.length > 0 && (
+          <section
+            className="py-20 px-6 min-h-[1000px] flex items-center"
+            style={{
+              backgroundImage: `url(${promosBg})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center 60%",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div className="w-full max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
+                  PROMOS DA SEMANA
+                </h2>
+                <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
+                  aproveite enquanto está dispo hihi
+                </p>
+                <Link
+                  to="/produtos"
+                  className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
+                >
+                  tudo
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-6">
+                {promos.map((p) => (
+                  <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
+                    <ProductCard
+                      produto={p}
+                      titleColorClass="text-[#ffb5e3]"
+                      buttonColorClass="bg-[#ffb5e3]"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Sobre */}
+        <section id="sobre" className="py-20 px-6">
+          <div className="max-w-5xl mx-auto text-center space-y-6">
+            <h2 className="font-menu text-4xl text-[#fffefe]">divas que estão usando Soft</h2>
+            <p className="max-w-2xl mx-auto text-[#fffefe]/80">
+              não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">
+              {divasDaSoft.map((diva) => (
+                <InstagramEmbedCard key={diva.username} {...diva} />
               ))}
             </div>
+
+            <p className="max-w-2xl mx-auto mt-8 text-[#fffefe]/80 font-script text-2xl">{"\n"}</p>
           </div>
         </section>
-      )}
-
-      {/* Queridinhas */}
-      {promos.length > 0 && (
-        <section
-          className="py-20 px-6"
-          style={{ backgroundImage: `url(${strawberryBg})`, backgroundSize: "600px" }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
-                PROMOS DA SEMANA
-              </h2>
-              <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
-                aproveite enquanto está dispo hihi
-              </p>
-              <Link
-                to="/produtos"
-                className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
-              >
-                tudo
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-6">
-              {promos.map((p) => (
-                <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
-                  <ProductCard produto={p} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Sobre */}
-      <section id="sobre" className="bg-[color:var(--pink-soft)] py-20 px-6">
-        <div className="max-w-5xl mx-auto text-center space-y-6">
-          <h2 className="font-menu text-4xl text-[color:var(--pink-deep)]">
-            divas que estão usando Soft
-          </h2>
-          <p className="max-w-2xl mx-auto text-foreground/80">
-            não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">
-            {divasDaSoft.map((diva) => (
-              <InstagramEmbedCard key={diva.username} {...diva} />
-            ))}
-          </div>
-
-          <p className="max-w-2xl mx-auto mt-8 text-foreground/80 font-script text-2xl">{"\n"}</p>
-        </div>
-      </section>
+      </div>
 
       <SiteFooter />
 
@@ -156,6 +174,15 @@ function Index() {
 function HeroCarousel({ slides }: { slides: string[] }) {
   const [idx, setIdx] = useState(0);
   const go = (n: number) => setIdx((n + slides.length) % slides.length);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const timer = setInterval(() => {
+      setIdx((i) => (i + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   return (
     <div className="relative">
       <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/60 bg-white/40 aspect-[16/8.5]">

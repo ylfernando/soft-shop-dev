@@ -3,7 +3,15 @@ import { formatPreco, type Produto } from "@/data/produtos";
 import { useCart } from "@/lib/cart";
 import { ProductGalleryModal } from "@/components/ProductGalleryModal";
 
-export function ProductCard({ produto }: { produto: Produto }) {
+export function ProductCard({
+  produto,
+  titleColorClass = "text-[color:var(--pink-deep)]",
+  buttonColorClass = "bg-[color:var(--pink-deep)]",
+}: {
+  produto: Produto;
+  titleColorClass?: string;
+  buttonColorClass?: string;
+}) {
   const { lines, addItem, openCart } = useCart();
   const [galeriaAberta, setGaleriaAberta] = useState(false);
 
@@ -32,7 +40,9 @@ export function ProductCard({ produto }: { produto: Produto }) {
 
       <ProductGalleryModal produto={produto} open={galeriaAberta} onOpenChange={setGaleriaAberta} />
       <div className="flex-1 flex flex-col p-3 text-center">
-        <p className="font-menu text-base text-[color:var(--pink-deep)] leading-tight line-clamp-2 min-h-[2lh]">
+        <p
+          className={`font-menu text-base ${titleColorClass} leading-tight line-clamp-2 min-h-[2lh]`}
+        >
           {produto.nome}
         </p>
         <div className="my-1.5 border-t border-dashed border-[color:var(--pink-deep)]/30" />
@@ -41,7 +51,7 @@ export function ProductCard({ produto }: { produto: Produto }) {
         </p>
         <button
           onClick={handleAdd}
-          className="mt-2 w-full py-1.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-base hover:opacity-90 disabled:opacity-60"
+          className={`mt-2 w-full py-1.5 rounded-full ${buttonColorClass} text-white font-pixel text-base hover:opacity-90 disabled:opacity-60`}
           disabled={jaNaSacolinha}
         >
           {jaNaSacolinha ? "Já está na sacolinha ✿" : "Adicionar ao carrinho"}
