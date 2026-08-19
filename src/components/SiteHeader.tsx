@@ -155,7 +155,7 @@ function AccountMenu({ size }: { size: "sm" | "lg" }) {
         aria-label="login"
         className={
           size === "lg"
-            ? "flex items-center gap-1 font-menu text-2xl shrink-0"
+            ? "flex items-center gap-1 font-menu text-xl shrink-0"
             : "flex items-center font-menu text-xl"
         }
       >
@@ -172,7 +172,7 @@ function AccountMenu({ size }: { size: "sm" | "lg" }) {
       <DropdownMenuTrigger
         className={
           size === "lg"
-            ? "flex items-center gap-1 font-menu text-2xl shrink-0 outline-none"
+            ? "flex items-center gap-1 font-menu text-xl shrink-0 outline-none"
             : "flex items-center font-menu text-xl outline-none"
         }
       >
