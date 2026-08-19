@@ -26,7 +26,7 @@ const divasDaSoft = [
 
 function Index() {
   const { vitrines, banners } = Route.useLoaderData();
-  const { garimpos, promos } = vitrines;
+  const { garimpos, promos, newdrop } = vitrines;
 
   return (
     <div className="min-h-screen text-foreground">
@@ -38,6 +38,37 @@ function Index() {
           <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
         </div>
       </section>
+
+      {/* newDROP */}
+      {newdrop.length > 0 && (
+        <section className="py-20 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
+                newDROP
+              </h2>
+              <p className="font-script text-3xl text-[color:var(--pink-deep)]/80 mt-2">
+                acabou de chegar
+              </p>
+              <Link
+                to="/produtos"
+                search={{ categoria: "newdrop" }}
+                className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[color:var(--pink-deep)] underline"
+              >
+                tudo
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6">
+              {newdrop.map((p) => (
+                <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
+                  <ProductCard produto={p} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Últimos garimpos */}
       {garimpos.length > 0 && (

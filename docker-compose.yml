@@ -23,6 +23,10 @@ services:
       - ./db/009_vitrines.sql:/docker-entrypoint-initdb.d/09-vitrines.sql:ro
       - ./db/010_pedido_cep_destino.sql:/docker-entrypoint-initdb.d/10-pedido-cep-destino.sql:ro
       - ./db/011_cupons.sql:/docker-entrypoint-initdb.d/11-cupons.sql:ro
+      - ./db/012_produto_vendido.sql:/docker-entrypoint-initdb.d/12-produto-vendido.sql:ro
+      - ./db/013_pagamento_gateway.sql:/docker-entrypoint-initdb.d/13-pagamento-gateway.sql:ro
+      - ./db/014_usuario_perfil.sql:/docker-entrypoint-initdb.d/14-usuario-perfil.sql:ro
+      - ./db/015_vitrine_newdrop.sql:/docker-entrypoint-initdb.d/15-vitrine-newdrop.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s

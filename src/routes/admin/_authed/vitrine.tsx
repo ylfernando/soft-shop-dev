@@ -49,6 +49,11 @@ const SECOES: { value: VitrineSecao; titulo: string; descricao: string }[] = [
     titulo: "Promos da semana",
     descricao: 'produtos exibidos na seção "Promos da semana" da home.',
   },
+  {
+    value: "newdrop",
+    titulo: "newDROP",
+    descricao: 'produtos exibidos na seção "newDROP" da home.',
+  },
 ];
 
 function AdminVitrine() {
@@ -67,7 +72,7 @@ function AdminVitrine() {
         escolha quais produtos aparecem em cada seção de destaque da home, e em que ordem.
       </p>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {SECOES.map((s) => (
           <VitrineSecaoCard
             key={s.value}

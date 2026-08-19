@@ -3,7 +3,7 @@ import type { RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
 import { requireAdmin } from "./session";
 
-export type VitrineSecao = "garimpos" | "promos";
+export type VitrineSecao = "garimpos" | "promos" | "newdrop";
 
 export interface VitrineItemRow {
   id: number;
@@ -34,6 +34,7 @@ export const adminListVitrines = createServerFn({ method: "GET" }).handler(
     return {
       garimpos: rows.filter((r) => r.secao === "garimpos"),
       promos: rows.filter((r) => r.secao === "promos"),
+      newdrop: rows.filter((r) => r.secao === "newdrop"),
     };
   },
 );

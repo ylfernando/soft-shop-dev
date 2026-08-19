@@ -5,7 +5,7 @@ import type { Produto } from "@/data/produtos";
 
 interface VitrineProdutoRow extends RowDataPacket, Produto {}
 
-async function listarVitrine(secao: "garimpos" | "promos"): Promise<Produto[]> {
+async function listarVitrine(secao: "garimpos" | "promos" | "newdrop"): Promise<Produto[]> {
   const pool = getPool();
   const [rows] = await pool.query<VitrineProdutoRow[]>(
     `SELECT p.id, p.img, p.nome, p.preco_centavos AS precoCentavos, p.tipo, p.categoria,
@@ -22,11 +22,12 @@ async function listarVitrine(secao: "garimpos" | "promos"): Promise<Produto[]> {
 /** Produtos escolhidos manualmente pelo admin pra aparecer em "Últimos
  * garimpos" e "Promos da semana" na home, na ordem definida no painel. */
 export const getVitrines = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ garimpos: Produto[]; promos: Produto[] }> => {
-    const [garimpos, promos] = await Promise.all([
+  async (): Promise<{ garimpos: Produto[]; promos: Produto[]; newdrop: Produto[] }> => {
+    const [garimpos, promos, newdrop] = await Promise.all([
       listarVitrine("garimpos"),
       listarVitrine("promos"),
+      listarVitrine("newdrop"),
     ]);
-    return { garimpos, promos };
+    return { garimpos, promos, newdrop };
   },
 );
