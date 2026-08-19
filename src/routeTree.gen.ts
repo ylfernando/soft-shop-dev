@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as CriarContaRouteImport } from './routes/criar-conta'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as EnviosRouteImport } from './routes/envios'
 import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as FinalizarCompraRouteImport } from './routes/finalizar-compra'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
@@ -21,7 +22,6 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
-import { Route as TrocasEDevolucoesRouteImport } from './routes/trocas-e-devolucoes'
 import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
@@ -52,6 +52,11 @@ const CriarContaRoute = CriarContaRouteImport.update({
 const EntrarRoute = EntrarRouteImport.update({
   id: '/entrar',
   path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnviosRoute = EnviosRouteImport.update({
+  id: '/envios',
+  path: '/envios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
@@ -92,11 +97,6 @@ const SobreRoute = SobreRouteImport.update({
 const SobreASacolinhaRoute = SobreASacolinhaRouteImport.update({
   id: '/sobre-a-sacolinha',
   path: '/sobre-a-sacolinha',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrocasEDevolucoesRoute = TrocasEDevolucoesRouteImport.update({
-  id: '/trocas-e-devolucoes',
-  path: '/trocas-e-devolucoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarEmailRoute = VerificarEmailRouteImport.update({
@@ -160,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/envios': typeof EnviosRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -168,7 +169,6 @@ export interface FileRoutesByFullPath {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
-  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
@@ -186,6 +186,7 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/envios': typeof EnviosRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -194,7 +195,6 @@ export interface FileRoutesByTo {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
-  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
@@ -212,6 +212,7 @@ export interface FileRoutesById {
   '/carrinho': typeof CarrinhoRoute
   '/criar-conta': typeof CriarContaRoute
   '/entrar': typeof EntrarRoute
+  '/envios': typeof EnviosRoute
   '/esqueci-senha': typeof EsqueciSenhaRoute
   '/finalizar-compra': typeof FinalizarCompraRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -220,7 +221,6 @@ export interface FileRoutesById {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
-  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
@@ -240,6 +240,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/envios'
     | '/esqueci-senha'
     | '/finalizar-compra'
     | '/minha-conta'
@@ -248,7 +249,6 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
-    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin'
     | '/admin/entrar'
@@ -266,6 +266,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/envios'
     | '/esqueci-senha'
     | '/finalizar-compra'
     | '/minha-conta'
@@ -274,7 +275,6 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
-    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin/entrar'
     | '/pedido/$pedidoId'
@@ -291,6 +291,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/criar-conta'
     | '/entrar'
+    | '/envios'
     | '/esqueci-senha'
     | '/finalizar-compra'
     | '/minha-conta'
@@ -299,7 +300,6 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
-    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin/_authed'
     | '/admin/entrar'
@@ -318,6 +318,7 @@ export interface RootRouteChildren {
   CarrinhoRoute: typeof CarrinhoRoute
   CriarContaRoute: typeof CriarContaRoute
   EntrarRoute: typeof EntrarRoute
+  EnviosRoute: typeof EnviosRoute
   EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   FinalizarCompraRoute: typeof FinalizarCompraRoute
   MinhaContaRoute: typeof MinhaContaRoute
@@ -326,7 +327,6 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SobreRoute: typeof SobreRoute
   SobreASacolinhaRoute: typeof SobreASacolinhaRoute
-  TrocasEDevolucoesRoute: typeof TrocasEDevolucoesRoute
   VerificarEmailRoute: typeof VerificarEmailRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
@@ -361,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/entrar'
       fullPath: '/entrar'
       preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/envios': {
+      id: '/envios'
+      path: '/envios'
+      fullPath: '/envios'
+      preLoaderRoute: typeof EnviosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/esqueci-senha': {
@@ -417,13 +424,6 @@ declare module '@tanstack/react-router' {
       path: '/sobre-a-sacolinha'
       fullPath: '/sobre-a-sacolinha'
       preLoaderRoute: typeof SobreASacolinhaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trocas-e-devolucoes': {
-      id: '/trocas-e-devolucoes'
-      path: '/trocas-e-devolucoes'
-      fullPath: '/trocas-e-devolucoes'
-      preLoaderRoute: typeof TrocasEDevolucoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar-email': {
@@ -535,6 +535,7 @@ const rootRouteChildren: RootRouteChildren = {
   CarrinhoRoute: CarrinhoRoute,
   CriarContaRoute: CriarContaRoute,
   EntrarRoute: EntrarRoute,
+  EnviosRoute: EnviosRoute,
   EsqueciSenhaRoute: EsqueciSenhaRoute,
   FinalizarCompraRoute: FinalizarCompraRoute,
   MinhaContaRoute: MinhaContaRoute,
@@ -543,7 +544,6 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SobreRoute: SobreRoute,
   SobreASacolinhaRoute: SobreASacolinhaRoute,
-  TrocasEDevolucoesRoute: TrocasEDevolucoesRoute,
   VerificarEmailRoute: VerificarEmailRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,
