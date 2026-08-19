@@ -84,14 +84,15 @@ function Index() {
               <h2 className="font-menu text-4xl md:text-5xl text-[#a9e8eb]">ÚLTIMOS GARIMPOS:</h2>
               <p className="font-script text-3xl text-[#a9e8eb]/80 mt-2"></p>
 
-              <div className="grid grid-cols-2 gap-6 mt-12 max-w-2xl mx-auto">
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-12">
                 {garimpos.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    produto={p}
-                    titleColorClass="text-[#a9e8eb]"
-                    buttonColorClass="bg-[#a9e8eb]"
-                  />
+                  <div key={p.id} className="w-[calc(25%-0.5625rem)] sm:w-[calc(25%-1.125rem)]">
+                    <ProductCard
+                      produto={p}
+                      titleColorClass="text-[#a9e8eb]"
+                      buttonColorClass="bg-[#a9e8eb]"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
@@ -125,9 +126,9 @@ function Index() {
                 </Link>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
                 {promos.map((p) => (
-                  <div key={p.id} className="w-[calc(50%-0.75rem)] md:w-[calc(33.333%-1rem)]">
+                  <div key={p.id} className="w-[calc(25%-0.5625rem)] sm:w-[calc(25%-1.125rem)]">
                     <ProductCard
                       produto={p}
                       titleColorClass="text-[#ffb5e3]"
