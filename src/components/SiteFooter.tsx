@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Mail, Clock, CreditCard, QrCode, Barcode } from "lucide-react";
+import { Instagram, Mail, Phone, CreditCard, QrCode, Barcode } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 function TikTokIcon({ className }: { className?: string }) {
@@ -28,14 +28,7 @@ export function SiteFooter() {
     <footer className="bg-[#ffb5b0] text-white py-8 sm:py-10 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
         <nav className="flex flex-col gap-1.5 sm:gap-2">
-          <span className="font-menu text-sm sm:text-lg text-white/70">menu</span>
-          <Link
-            to="/"
-            hash="sobre"
-            className="font-menu text-base sm:text-xl hover:underline w-fit"
-          >
-            sobre a soft
-          </Link>
+          <span className="font-menu text-sm sm:text-lg text-white/70">mais infos</span>
           <Link
             to={user ? "/minhas-compras" : "/minha-conta"}
             className="font-menu text-base sm:text-xl hover:underline w-fit"
@@ -48,15 +41,6 @@ export function SiteFooter() {
           >
             trocas e devoluções
           </Link>
-          <span className="flex flex-col gap-0.5">
-            <span className="font-menu text-base sm:text-xl">contato</span>
-            <a
-              href="mailto:contato@softshop.com"
-              className="text-xs sm:text-sm text-white/80 hover:underline hover:text-white w-fit break-all"
-            >
-              contato@softshop.com
-            </a>
-          </span>
         </nav>
 
         <nav className="flex flex-col gap-1.5 sm:gap-2">
@@ -84,10 +68,13 @@ export function SiteFooter() {
             <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             contato@softshop.com
           </a>
-          <span className="font-menu text-sm sm:text-lg flex items-center gap-2 w-fit">
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-            seg a sex, 9h às 18h
-          </span>
+          <a
+            href="tel:+5551982489638"
+            className="font-menu text-sm sm:text-lg hover:underline flex items-center gap-2 w-fit"
+          >
+            <Phone className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            (51) 98248-9638
+          </a>
         </nav>
       </div>
 
