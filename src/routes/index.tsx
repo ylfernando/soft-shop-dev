@@ -144,7 +144,7 @@ function Index() {
         {/* Sobre */}
         <section id="sobre" className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center space-y-6">
-            <h2 className="font-menu text-4xl text-[#fffefe]">divas que estão usando Soft</h2>
+            <h2 className="font-menu text-4xl text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
             <p className="max-w-2xl mx-auto text-[#fffefe]/80">
               não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
             </p>
