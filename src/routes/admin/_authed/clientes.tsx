@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
-import { Eye, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Eye, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -61,6 +62,7 @@ export const Route = createFileRoute("/admin/_authed/clientes")({
 function AdminClientes() {
   const clientesIniciais = Route.useLoaderData();
   const [clientes, setClientes] = useState<ClienteRow[]>(clientesIniciais);
+  const [busca, setBusca] = useState("");
   const [excluindo, setExcluindo] = useState<ClienteRow | null>(null);
   const [vendoPedidos, setVendoPedidos] = useState<ClienteRow | null>(null);
 
@@ -70,6 +72,14 @@ function AdminClientes() {
   async function refetch() {
     setClientes(await listCall());
   }
+
+  const clientesFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) return clientes;
+    return clientes.filter(
+      (c) => c.nome.toLowerCase().includes(termo) || c.email.toLowerCase().includes(termo),
+    );
+  }, [clientes, busca]);
 
   return (
     <div className="space-y-6">
@@ -83,68 +93,88 @@ function AdminClientes() {
 
       {clientes.length > 0 && (
         <>
-          <div className="border rounded-lg hidden md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Cadastro</TableHead>
-                  <TableHead>Pedidos</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clientes.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.nome}</TableCell>
-                    <TableCell>{c.email}</TableCell>
-                    <TableCell>{new Date(c.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{c.totalPedidos}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
-                        <Eye />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
-                        <Trash2 />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="relative max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="buscar por nome ou e-mail..."
+              className="pl-8"
+            />
           </div>
 
-          <div className="space-y-3 md:hidden">
-            {clientes.map((c) => (
-              <div key={c.id} className="border rounded-lg p-3 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">{c.nome}</div>
-                    <div className="text-xs text-muted-foreground truncate">{c.email}</div>
-                  </div>
-                  <Badge variant="secondary" className="shrink-0">
-                    {c.totalPedidos} pedido{c.totalPedidos === 1 ? "" : "s"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    desde {new Date(c.criadoEm).toLocaleDateString("pt-BR")}
-                  </span>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
-                      <Eye />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
-                      <Trash2 />
-                    </Button>
-                  </div>
-                </div>
+          {clientesFiltrados.length === 0 && (
+            <div className="border rounded-lg text-center text-muted-foreground py-8">
+              nenhum cliente encontrado para "{busca}".
+            </div>
+          )}
+
+          {clientesFiltrados.length > 0 && (
+            <>
+              <div className="border rounded-lg hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>E-mail</TableHead>
+                      <TableHead>Cadastro</TableHead>
+                      <TableHead>Pedidos</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {clientesFiltrados.map((c) => (
+                      <TableRow key={c.id}>
+                        <TableCell className="font-medium">{c.nome}</TableCell>
+                        <TableCell>{c.email}</TableCell>
+                        <TableCell>{new Date(c.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{c.totalPedidos}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
+                            <Eye />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
+                            <Trash2 />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-            ))}
-          </div>
+
+              <div className="space-y-3 md:hidden">
+                {clientesFiltrados.map((c) => (
+                  <div key={c.id} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{c.nome}</div>
+                        <div className="text-xs text-muted-foreground truncate">{c.email}</div>
+                      </div>
+                      <Badge variant="secondary" className="shrink-0">
+                        {c.totalPedidos} pedido{c.totalPedidos === 1 ? "" : "s"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        desde {new Date(c.criadoEm).toLocaleDateString("pt-BR")}
+                      </span>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => setVendoPedidos(c)}>
+                          <Eye />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => setExcluindo(c)}>
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
 

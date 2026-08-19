@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
-import { Eye } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Eye, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -101,16 +102,39 @@ function StatusEditor({
   );
 }
 
+const STATUS_FILTRO_LABEL: Record<"todos" | PedidoStatus, string> = {
+  todos: "todos os status",
+  pendente: "pendente",
+  pago: "pago",
+  enviado: "enviado",
+  cancelado: "cancelado",
+};
+
 function AdminPedidos() {
   const pedidosIniciais = Route.useLoaderData();
   const [pedidos, setPedidos] = useState<PedidoRow[]>(pedidosIniciais);
   const [detalhe, setDetalhe] = useState<PedidoRow | null>(null);
+  const [busca, setBusca] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState<"todos" | PedidoStatus>("todos");
 
   const listCall = useServerFn(adminListPedidos);
 
   async function refetch() {
     setPedidos(await listCall());
   }
+
+  const pedidosFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    return pedidos.filter((p) => {
+      if (statusFiltro !== "todos" && p.status !== statusFiltro) return false;
+      if (!termo) return true;
+      return (
+        String(p.id).includes(termo) ||
+        p.nomeCliente.toLowerCase().includes(termo) ||
+        p.emailCliente.toLowerCase().includes(termo)
+      );
+    });
+  }, [pedidos, busca, statusFiltro]);
 
   return (
     <div className="space-y-6">
@@ -124,71 +148,110 @@ function AdminPedidos() {
 
       {pedidos.length > 0 && (
         <>
-          <div className="border rounded-lg hidden md:block">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pedidos.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell>#{p.id}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{p.nomeCliente}</div>
-                      <div className="text-xs text-muted-foreground">{p.emailCliente}</div>
-                    </TableCell>
-                    <TableCell>{formatPreco(p.totalCentavos)}</TableCell>
-                    <TableCell>
-                      <StatusEditor pedido={p} onChanged={refetch} />
-                    </TableCell>
-                    <TableCell>{new Date(p.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => setDetalhe(p)}>
-                        <Eye />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative max-w-sm w-full">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="buscar por # do pedido, nome ou e-mail..."
+                className="pl-8"
+              />
+            </div>
+            <Select
+              value={statusFiltro}
+              onValueChange={(v) => setStatusFiltro(v as "todos" | PedidoStatus)}
+            >
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(STATUS_FILTRO_LABEL) as ("todos" | PedidoStatus)[]).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {STATUS_FILTRO_LABEL[s]}
+                  </SelectItem>
                 ))}
-              </TableBody>
-            </Table>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="space-y-3 md:hidden">
-            {pedidos.map((p) => (
-              <div key={p.id} className="border rounded-lg p-3 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="font-medium">
-                      #{p.id} · {p.nomeCliente}
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">{p.emailCliente}</div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0"
-                    onClick={() => setDetalhe(p)}
-                  >
-                    <Eye />
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{formatPreco(p.totalCentavos)}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
-                  </span>
-                </div>
-                <StatusEditor pedido={p} onChanged={refetch} />
+          {pedidosFiltrados.length === 0 && (
+            <div className="border rounded-lg text-center text-muted-foreground py-8">
+              nenhum pedido encontrado.
+            </div>
+          )}
+
+          {pedidosFiltrados.length > 0 && (
+            <>
+              <div className="border rounded-lg hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pedidosFiltrados.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell>#{p.id}</TableCell>
+                        <TableCell>
+                          <div className="font-medium">{p.nomeCliente}</div>
+                          <div className="text-xs text-muted-foreground">{p.emailCliente}</div>
+                        </TableCell>
+                        <TableCell>{formatPreco(p.totalCentavos)}</TableCell>
+                        <TableCell>
+                          <StatusEditor pedido={p} onChanged={refetch} />
+                        </TableCell>
+                        <TableCell>{new Date(p.criadoEm).toLocaleDateString("pt-BR")}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => setDetalhe(p)}>
+                            <Eye />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-            ))}
-          </div>
+
+              <div className="space-y-3 md:hidden">
+                {pedidosFiltrados.map((p) => (
+                  <div key={p.id} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="font-medium">
+                          #{p.id} · {p.nomeCliente}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {p.emailCliente}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                        onClick={() => setDetalhe(p)}
+                      >
+                        <Eye />
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">{formatPreco(p.totalCentavos)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
+                      </span>
+                    </div>
+                    <StatusEditor pedido={p} onChanged={refetch} />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
 

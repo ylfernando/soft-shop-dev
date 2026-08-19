@@ -1,8 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertCircle, DollarSign, Package, Receipt, Users } from "lucide-react";
+import { AlertCircle, DollarSign, Package, Receipt, Search, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ChartContainer,
   ChartTooltip,
@@ -16,18 +25,20 @@ import {
   adminGetProdutosVendidosRecentes,
   adminGetReceitaPorDia,
 } from "@/server-fns/admin/dashboard";
-import type { PedidoStatus } from "@/server-fns/admin/pedidos";
+import { adminListPedidos, type PedidoStatus } from "@/server-fns/admin/pedidos";
 
 export const Route = createFileRoute("/admin/_authed/")({
   component: AdminOverview,
   loader: async () => {
-    const [stats, pedidosRecentes, produtosVendidos, receitaPorDia] = await Promise.all([
-      adminGetStats(),
-      adminGetPedidosRecentes(),
-      adminGetProdutosVendidosRecentes(),
-      adminGetReceitaPorDia(),
-    ]);
-    return { stats, pedidosRecentes, produtosVendidos, receitaPorDia };
+    const [stats, pedidosRecentes, produtosVendidos, receitaPorDia, historicoVendas] =
+      await Promise.all([
+        adminGetStats(),
+        adminGetPedidosRecentes(),
+        adminGetProdutosVendidosRecentes(),
+        adminGetReceitaPorDia(),
+        adminListPedidos(),
+      ]);
+    return { stats, pedidosRecentes, produtosVendidos, receitaPorDia, historicoVendas };
   },
 });
 
@@ -49,6 +60,14 @@ const STATUS_CLASS: Partial<Record<PedidoStatus, string>> = {
   pendente: "border-amber-300 bg-amber-50 text-amber-700",
 };
 
+const STATUS_FILTRO_LABEL: Record<"todos" | PedidoStatus, string> = {
+  todos: "todos os status",
+  pendente: "pendente",
+  pago: "pago",
+  enviado: "enviado",
+  cancelado: "cancelado",
+};
+
 const chartConfig = {
   receitaCentavos: {
     label: "receita",
@@ -57,7 +76,24 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function AdminOverview() {
-  const { stats, pedidosRecentes, produtosVendidos, receitaPorDia } = Route.useLoaderData();
+  const { stats, pedidosRecentes, produtosVendidos, receitaPorDia, historicoVendas } =
+    Route.useLoaderData();
+
+  const [busca, setBusca] = useState("");
+  const [statusFiltro, setStatusFiltro] = useState<"todos" | PedidoStatus>("todos");
+
+  const historicoFiltrado = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    return historicoVendas.filter((p) => {
+      if (statusFiltro !== "todos" && p.status !== statusFiltro) return false;
+      if (!termo) return true;
+      return (
+        String(p.id).includes(termo) ||
+        p.nomeCliente.toLowerCase().includes(termo) ||
+        p.emailCliente.toLowerCase().includes(termo)
+      );
+    });
+  }, [historicoVendas, busca, statusFiltro]);
 
   const tiles = [
     { label: "Receita total", value: formatPreco(stats.receitaTotalCentavos), Icon: DollarSign },
@@ -216,6 +252,70 @@ function AdminOverview() {
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Histórico de vendas</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative max-w-sm w-full">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="buscar por # do pedido, nome ou e-mail..."
+                className="pl-8"
+              />
+            </div>
+            <Select
+              value={statusFiltro}
+              onValueChange={(v) => setStatusFiltro(v as "todos" | PedidoStatus)}
+            >
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(STATUS_FILTRO_LABEL) as ("todos" | PedidoStatus)[]).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {STATUS_FILTRO_LABEL[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="text-xs text-muted-foreground">
+            mostrando {historicoFiltrado.length} de {historicoVendas.length} pedidos
+          </div>
+
+          <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
+            {historicoFiltrado.length === 0 && (
+              <p className="text-sm text-muted-foreground py-4 text-center">
+                nenhum pedido encontrado.
+              </p>
+            )}
+            {historicoFiltrado.map((p) => (
+              <div key={p.id} className="flex items-center justify-between gap-3 text-sm">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">
+                    #{p.id} · {p.nomeCliente}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {p.emailCliente} · {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span>{formatPreco(p.totalCentavos)}</span>
+                  <Badge variant={STATUS_VARIANT[p.status]} className={STATUS_CLASS[p.status]}>
+                    {STATUS_LABEL[p.status]}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
