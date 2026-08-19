@@ -53,12 +53,12 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>
-            <NavBtn to="/sobre">sobre a Soft!</NavBtn>
-            <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
-              new DROP
-            </NavBtn>
-            <NavBtn to="/sobre-a-sacolinha">sacolinha</NavBtn>
+            <NavBtn to="/sobre">sobre a Soft</NavBtn>
             <ProdutosDropdown />
+            <NavBtn to="/sobre-a-sacolinha">sacolinha</NavBtn>
+            <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
+              new drop
+            </NavBtn>
           </nav>
         )}
 
@@ -68,7 +68,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>
-            <NavBtn to="/sobre">sobre a Soft!</NavBtn>
+            <NavBtn to="/sobre">sobre a Soft</NavBtn>
             <NavBtn to="/sobre-a-sacolinha">sacolinha</NavBtn>
           </nav>
           <Link to="/">
@@ -80,10 +80,10 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             />
           </Link>
           <div className="flex items-center gap-2 justify-end text-[#ffb5e3] font-menu text-xl min-w-0">
-            <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
-              NewDrop
-            </NavBtn>
             <ProdutosDropdown />
+            <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
+              new drop
+            </NavBtn>
             <CartButton size="lg" />
             <AccountMenu size="lg" />
           </div>
