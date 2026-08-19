@@ -33,8 +33,7 @@ function produto(overrides: Partial<Produto> = {}): Produto {
     precoCentavos: 5000,
     tipo: "cima",
     categoria: "cima",
-    tamanho: "M",
-    medidas: "",
+    descricao: "M",
     ...overrides,
   };
 }
@@ -108,7 +107,9 @@ describe("CartProvider", () => {
   it("applies the shipping quote returned by the server", async () => {
     cotarFreteCarrinho.mockResolvedValue({
       ok: true,
-      opcoes: [{ id: 1, nome: "PAC", precoCentavos: 1500, prazoDias: 5, transportadora: "Correios" }],
+      opcoes: [
+        { id: 1, nome: "PAC", precoCentavos: 1500, prazoDias: 5, transportadora: "Correios" },
+      ],
     });
     const { result } = setup();
     await waitFor(() => expect(result.current.hydrated).toBe(true));
@@ -173,7 +174,9 @@ describe("CartProvider", () => {
   it("resets shipping quote when the cart contents change after a quote was fetched", async () => {
     cotarFreteCarrinho.mockResolvedValue({
       ok: true,
-      opcoes: [{ id: 1, nome: "PAC", precoCentavos: 1500, prazoDias: 5, transportadora: "Correios" }],
+      opcoes: [
+        { id: 1, nome: "PAC", precoCentavos: 1500, prazoDias: 5, transportadora: "Correios" },
+      ],
     });
     const { result } = setup();
     await waitFor(() => expect(result.current.hydrated).toBe(true));

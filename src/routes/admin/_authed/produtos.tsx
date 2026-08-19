@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -69,8 +70,7 @@ const produtoFormSchema = z.object({
   nome: z.string().trim().min(1, "obrigatório"),
   precoReais: z.coerce.number({ message: "obrigatório" }).positive("precisa ser maior que zero"),
   categoria: z.enum(["cima", "baixo", "calcados", "vestido", "newdrop"]),
-  tamanho: z.string().trim().min(1, "obrigatório"),
-  medidas: z.string().trim().min(1, "obrigatório"),
+  descricao: z.string().trim().min(1, "obrigatório"),
 });
 type ProdutoFormValues = z.infer<typeof produtoFormSchema>;
 
@@ -122,7 +122,7 @@ function AdminProdutos() {
                   <TableHead>Nome</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Categoria</TableHead>
-                  <TableHead>Tamanho</TableHead>
+                  <TableHead>Descrição</TableHead>
                   <TableHead>Preço</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -147,8 +147,8 @@ function AdminProdutos() {
                     </TableCell>
                     <TableCell>{tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo}</TableCell>
                     <TableCell>{categoriaLabels[p.categoria]}</TableCell>
-                    <TableCell>
-                      {p.tamanho || <span className="text-muted-foreground">—</span>}
+                    <TableCell className="max-w-48 truncate">
+                      {p.descricao || <span className="text-muted-foreground">—</span>}
                     </TableCell>
                     <TableCell>{formatPreco(p.precoCentavos)}</TableCell>
                     <TableCell className="text-right space-x-1">
@@ -190,7 +190,7 @@ function AdminProdutos() {
                     {tipos.find((t) => t.value === p.tipo)?.label ?? p.tipo} ·{" "}
                     {categoriaLabels[p.categoria]}
                   </div>
-                  <div className="text-xs text-muted-foreground">Tamanho: {p.tamanho || "—"}</div>
+                  <div className="text-xs text-muted-foreground truncate">{p.descricao || "—"}</div>
                   <div className="font-medium">{formatPreco(p.precoCentavos)}</div>
                   <div className="flex gap-1 pt-1">
                     <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)}>
@@ -277,8 +277,7 @@ function ProdutoFormSheet({
       nome: produto?.nome ?? "",
       precoReais: produto ? produto.precoCentavos / 100 : 0,
       categoria: produto?.categoria ?? "cima",
-      tamanho: produto?.tamanho ?? "",
-      medidas: produto?.medidas ?? "",
+      descricao: produto?.descricao ?? "",
     },
   });
 
@@ -374,8 +373,7 @@ function ProdutoFormSheet({
             precoCentavos,
             tipo: values.categoria,
             categoria: values.categoria,
-            tamanho: values.tamanho,
-            medidas: values.medidas,
+            descricao: values.descricao,
           },
         });
 
@@ -415,8 +413,7 @@ function ProdutoFormSheet({
             precoCentavos,
             tipo: values.categoria,
             categoria: values.categoria,
-            tamanho: values.tamanho,
-            medidas: values.medidas,
+            descricao: values.descricao,
           },
         });
 
@@ -557,26 +554,16 @@ function ProdutoFormSheet({
 
             <FormField
               control={form.control}
-              name="tamanho"
+              name="descricao"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tamanho</FormLabel>
+                  <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input placeholder="M, G, 38, único..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="medidas"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Medidas</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Comprimento 70cm, Busto 90cm..." {...field} />
+                    <Textarea
+                      placeholder="Tamanho M, comprimento 70cm, busto 90cm..."
+                      rows={4}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

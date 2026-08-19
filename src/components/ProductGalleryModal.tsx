@@ -116,15 +116,10 @@ export function ProductGalleryModal({
         </DialogHeader>
 
         <div className="shrink-0 flex flex-col items-center px-6 py-6 border-t border-[color:var(--pink-deep)]/10">
-          {(detalhe.tamanho || detalhe.medidas) && (
-            <div className="mb-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-[color:var(--pink-deep)]">
-              {detalhe.tamanho && (
-                <span className="font-menu text-xl mr-2">
-                  Tamanho <span className="font-semibold ml-1">{detalhe.tamanho}</span>
-                </span>
-              )}
-              {detalhe.medidas && <span className="text-base">{detalhe.medidas}</span>}
-            </div>
+          {detalhe.descricao && (
+            <p className="mb-6 max-w-md text-center text-base text-[color:var(--pink-deep)] whitespace-pre-line">
+              {detalhe.descricao}
+            </p>
           )}
 
           <button

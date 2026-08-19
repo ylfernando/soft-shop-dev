@@ -11,14 +11,14 @@ export const getProdutos = createServerFn({ method: "GET" }).handler(
   async (): Promise<Produto[]> => {
     const pool = getPool();
     const [rows] = await pool.query<ProdutoQueryRow[]>(
-      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, tamanho, medidas FROM produtos WHERE vendido_em IS NULL ORDER BY criado_em DESC",
+      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, descricao FROM produtos WHERE vendido_em IS NULL ORDER BY criado_em DESC",
     );
     return rows;
   },
 );
 
 /** Um produto específico direto do banco — usada pelo modal de galeria pra
- * garantir que tamanho/medidas estejam sempre atualizados, mesmo que a lista
+ * garantir que a descrição esteja sempre atualizada, mesmo que a lista
  * carregada na página já esteja desatualizada (ex: editado no admin numa
  * aba diferente). */
 export const getProdutoDetalhe = createServerFn({ method: "GET" })
@@ -26,7 +26,7 @@ export const getProdutoDetalhe = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<Produto | null> => {
     const pool = getPool();
     const [rows] = await pool.query<ProdutoQueryRow[]>(
-      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, tamanho, medidas FROM produtos WHERE id = ? LIMIT 1",
+      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, descricao FROM produtos WHERE id = ? LIMIT 1",
       [data.produtoId],
     );
     return rows[0] ?? null;

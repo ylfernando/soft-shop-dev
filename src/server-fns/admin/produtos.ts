@@ -14,8 +14,7 @@ export interface ProdutoRow {
   precoCentavos: number;
   tipo: Tipo;
   categoria: Categoria;
-  tamanho: string;
-  medidas: string;
+  descricao: string;
   vendidoEm: string | null;
 }
 
@@ -27,8 +26,7 @@ interface ProdutoCreateInput {
   precoCentavos: number;
   tipo: Tipo;
   categoria: Categoria;
-  tamanho: string;
-  medidas: string;
+  descricao: string;
 }
 
 interface ProdutoUpdateInput {
@@ -37,8 +35,7 @@ interface ProdutoUpdateInput {
   precoCentavos: number;
   tipo: Tipo;
   categoria: Categoria;
-  tamanho: string;
-  medidas: string;
+  descricao: string;
 }
 
 export interface ProdutoImagemRow {
@@ -79,7 +76,7 @@ export const adminListProdutos = createServerFn({ method: "GET" }).handler(
     await requireAdmin();
     const pool = getPool();
     const [rows] = await pool.query<ProdutoQueryRow[]>(
-      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, tamanho, medidas, vendido_em AS vendidoEm FROM produtos ORDER BY criado_em DESC",
+      "SELECT id, img, nome, preco_centavos AS precoCentavos, tipo, categoria, descricao, vendido_em AS vendidoEm FROM produtos ORDER BY criado_em DESC",
     );
     return rows;
   },
@@ -92,17 +89,8 @@ export const adminCreateProduto = createServerFn({ method: "POST" })
     const id = gerarId(data.nome);
     const pool = getPool();
     await pool.query(
-      "INSERT INTO produtos (id, img, nome, preco_centavos, tipo, categoria, tamanho, medidas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        id,
-        data.img,
-        data.nome,
-        data.precoCentavos,
-        data.tipo,
-        data.categoria,
-        data.tamanho,
-        data.medidas,
-      ],
+      "INSERT INTO produtos (id, img, nome, preco_centavos, tipo, categoria, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [id, data.img, data.nome, data.precoCentavos, data.tipo, data.categoria, data.descricao],
     );
     await pool.query("INSERT INTO produto_imagens (produto_id, url, ordem) VALUES (?, ?, 0)", [
       id,
@@ -117,16 +105,8 @@ export const adminUpdateProduto = createServerFn({ method: "POST" })
     await requireAdmin();
     const pool = getPool();
     await pool.query(
-      "UPDATE produtos SET nome = ?, preco_centavos = ?, tipo = ?, categoria = ?, tamanho = ?, medidas = ? WHERE id = ?",
-      [
-        data.nome,
-        data.precoCentavos,
-        data.tipo,
-        data.categoria,
-        data.tamanho,
-        data.medidas,
-        data.id,
-      ],
+      "UPDATE produtos SET nome = ?, preco_centavos = ?, tipo = ?, categoria = ?, descricao = ? WHERE id = ?",
+      [data.nome, data.precoCentavos, data.tipo, data.categoria, data.descricao, data.id],
     );
   });
 

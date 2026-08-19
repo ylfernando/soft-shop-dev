@@ -16,8 +16,7 @@ export interface Produto {
   precoCentavos: number;
   tipo: Tipo;
   categoria: Categoria;
-  tamanho: string;
-  medidas: string;
+  descricao: string;
 }
 
 export const tipos: { value: Tipo; label: string }[] = [

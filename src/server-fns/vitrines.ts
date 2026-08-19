@@ -9,7 +9,7 @@ async function listarVitrine(secao: "garimpos" | "promos" | "newdrop"): Promise<
   const pool = getPool();
   const [rows] = await pool.query<VitrineProdutoRow[]>(
     `SELECT p.id, p.img, p.nome, p.preco_centavos AS precoCentavos, p.tipo, p.categoria,
-            p.tamanho, p.medidas
+            p.descricao
      FROM vitrines v
      JOIN produtos p ON p.id = v.produto_id
      WHERE v.secao = ?
