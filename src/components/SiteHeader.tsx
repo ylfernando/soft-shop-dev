@@ -53,7 +53,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>
-            <NavBtn>sobre a Soft!</NavBtn>
+            <NavBtn to="/sobre">sobre a Soft!</NavBtn>
             <NavBtn to="/produtos" search={{ categoria: "newdrop" }}>
               new DROP
             </NavBtn>
@@ -68,7 +68,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
             <NavBtn to="/" active={current === "inicio"}>
               ínicio
             </NavBtn>
-            <NavBtn>sobre a Soft!</NavBtn>
+            <NavBtn to="/sobre">sobre a Soft!</NavBtn>
             <NavBtn to="/sobre-a-sacolinha">sacolinha</NavBtn>
           </nav>
           <Link to="/">

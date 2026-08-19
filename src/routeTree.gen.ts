@@ -19,6 +19,7 @@ import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
 import { Route as TrocasEDevolucoesRouteImport } from './routes/trocas-e-devolucoes'
 import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
@@ -81,6 +82,11 @@ const ProdutosRoute = ProdutosRouteImport.update({
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
   path: '/redefinir-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SobreASacolinhaRoute = SobreASacolinhaRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
+  '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
   '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/redefinir-senha'
+    | '/sobre'
     | '/sobre-a-sacolinha'
     | '/trocas-e-devolucoes'
     | '/verificar-email'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/redefinir-senha'
+    | '/sobre'
     | '/sobre-a-sacolinha'
     | '/trocas-e-devolucoes'
     | '/verificar-email'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/minhas-compras'
     | '/produtos'
     | '/redefinir-senha'
+    | '/sobre'
     | '/sobre-a-sacolinha'
     | '/trocas-e-devolucoes'
     | '/verificar-email'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   MinhasComprasRoute: typeof MinhasComprasRoute
   ProdutosRoute: typeof ProdutosRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  SobreRoute: typeof SobreRoute
   SobreASacolinhaRoute: typeof SobreASacolinhaRoute
   TrocasEDevolucoesRoute: typeof TrocasEDevolucoesRoute
   VerificarEmailRoute: typeof VerificarEmailRoute
@@ -390,6 +403,13 @@ declare module '@tanstack/react-router' {
       path: '/redefinir-senha'
       fullPath: '/redefinir-senha'
       preLoaderRoute: typeof RedefinirSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sobre-a-sacolinha': {
@@ -521,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   MinhasComprasRoute: MinhasComprasRoute,
   ProdutosRoute: ProdutosRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
+  SobreRoute: SobreRoute,
   SobreASacolinhaRoute: SobreASacolinhaRoute,
   TrocasEDevolucoesRoute: TrocasEDevolucoesRoute,
   VerificarEmailRoute: VerificarEmailRoute,
