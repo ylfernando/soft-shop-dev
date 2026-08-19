@@ -64,19 +64,19 @@ export function SiteFooter() {
         </nav>
 
         <nav className="col-span-2 sm:col-span-1 flex flex-col gap-1.5 sm:gap-2">
-          <span className="font-menu text-sm sm:text-lg text-[color:var(--pink-deep)]/60">
+          <span className="font-menu font-semibold text-sm sm:text-lg text-[color:var(--pink-deep)]/60">
             atendimento
           </span>
           <a
-            href="mailto:contato@softshop.com"
-            className="font-menu text-sm sm:text-lg hover:underline flex items-center gap-2 w-fit break-all"
+            href="mailto:softshopatendimento@hotmail.com"
+            className="font-menu font-semibold text-sm sm:text-lg hover:underline flex items-center gap-2 w-fit break-all"
           >
             <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-            contato@softshop.com
+            softshopatendimento@hotmail.com
           </a>
           <a
             href="tel:+5551982489638"
-            className="font-menu text-sm sm:text-lg hover:underline flex items-center gap-2 w-fit"
+            className="font-menu font-semibold text-sm sm:text-lg hover:underline flex items-center gap-2 w-fit"
           >
             <Phone className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
             (51) 98248-9638
