@@ -45,6 +45,10 @@ const STATUS_VARIANT: Record<PedidoStatus, "default" | "secondary" | "destructiv
   cancelado: "destructive",
 };
 
+const STATUS_CLASS: Partial<Record<PedidoStatus, string>> = {
+  pendente: "border-amber-300 bg-amber-50 text-amber-700",
+};
+
 const chartConfig = {
   receitaCentavos: {
     label: "receita",
@@ -206,7 +210,9 @@ function AdminOverview() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span>{formatPreco(p.totalCentavos)}</span>
-                <Badge variant={STATUS_VARIANT[p.status]}>{STATUS_LABEL[p.status]}</Badge>
+                <Badge variant={STATUS_VARIANT[p.status]} className={STATUS_CLASS[p.status]}>
+                  {STATUS_LABEL[p.status]}
+                </Badge>
               </div>
             </div>
           ))}

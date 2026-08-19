@@ -242,12 +242,39 @@ function PedidoCard({
         </div>
       </button>
 
-      <span
-        className={`sm:hidden mx-5 mb-3 -mt-2 inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium w-fit ${STATUS_CLASS[pedido.status]}`}
-      >
-        <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[pedido.status]}`} />
-        {STATUS_LABEL[pedido.status]}
-      </span>
+      <div className="sm:hidden mx-5 mb-3 -mt-2 flex items-center gap-2 flex-wrap">
+        <span
+          className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium w-fit ${STATUS_CLASS[pedido.status]}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[pedido.status]}`} />
+          {STATUS_LABEL[pedido.status]}
+        </span>
+        {pedido.status === "pendente" && (
+          <Link
+            to="/pedido/$pedidoId"
+            params={{ pedidoId: String(pedido.id) }}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--pink-deep)] hover:underline"
+          >
+            finalizar pagamento
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        )}
+      </div>
+
+      {pedido.status === "pendente" && (
+        <div className="hidden sm:block px-5 pb-3 -mt-1">
+          <Link
+            to="/pedido/$pedidoId"
+            params={{ pedidoId: String(pedido.id) }}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--pink-deep)] hover:underline"
+          >
+            finalizar pagamento
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
 
       {aberto && (
         <div className="px-5 pb-5 pt-1 border-t border-[color:var(--pink-deep)]/10 space-y-2 text-sm">
