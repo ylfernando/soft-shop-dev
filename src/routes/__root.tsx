@@ -81,13 +81,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "naniiicas — seu novo guarda-roupa ♥" },
+      { title: "softshop" },
       {
         name: "description",
         content:
           "Brechó indie de peças upcycling, rework, autorais e garimpos. Curadoria com carinho por Nani.",
       },
-      { property: "og:title", content: "naniiicas — seu novo guarda-roupa ♥" },
+      { property: "og:title", content: "softshop" },
       {
         property: "og:description",
         content: "Brechó indie de peças upcycling, rework, autorais e garimpos.",
