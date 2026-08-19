@@ -115,8 +115,10 @@ function Index() {
                 <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
                   PROMOS DA SEMANA
                 </h2>
-                <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1">
-                  aproveite enquanto está dispo hihi
+                <p className="font-unrulyness text-3xl sm:text-4xl md:text-[60px] text-[#fffefe] mt-1 leading-[0.95]">
+                  aproveite enquanto está disponível,
+                  <br />
+                  toda semana temos promos diferentes!
                 </p>
                 <Link
                   to="/produtos"
@@ -146,7 +148,7 @@ function Index() {
           <div className="max-w-5xl mx-auto text-center space-y-6">
             <h2 className="font-menu text-4xl text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
             <p className="max-w-2xl mx-auto text-[#fffefe]/80">
-              não esqueça de nos marcar nas suas fotinhos usando peças da Soft Shop {"<"}3
+              comprou algo na Soft? poste sua fotinho e nos marque
             </p>
 
             <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">
