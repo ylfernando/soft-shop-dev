@@ -35,12 +35,30 @@ describe("customer session (session.ts)", () => {
   it("requireUser resolves the real DB row for the session's user id, never trusting a client-supplied user object", async () => {
     getSession.mockResolvedValue({ data: { usuarioId: 5 } });
     mockPool.query.mockResolvedValue([
-      [{ id: 5, nome: "Ana", email: "ana@example.com", role: "cliente" }],
+      [
+        {
+          id: 5,
+          nome: "Ana",
+          email: "ana@example.com",
+          role: "cliente",
+          cep: "01001000",
+          cpf: "12345678901",
+          emailVerificadoEm: new Date(),
+        },
+      ],
     ]);
     const { requireUser } = await import("./session");
 
     const user = await requireUser();
-    expect(user).toEqual({ id: 5, nome: "Ana", email: "ana@example.com", role: "cliente" });
+    expect(user).toEqual({
+      id: 5,
+      nome: "Ana",
+      email: "ana@example.com",
+      role: "cliente",
+      cep: "01001000",
+      cpf: "12345678901",
+      emailVerificado: true,
+    });
     expect(mockPool.query).toHaveBeenCalledWith(expect.stringContaining("WHERE id = ?"), [5]);
   });
 

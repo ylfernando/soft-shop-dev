@@ -107,7 +107,15 @@ describe("login", () => {
     const res = await login({ data: { email: "ana@example.com", senha: "senha-correta" } });
     expect(res).toEqual({
       ok: true,
-      user: { id: 1, nome: "Ana", email: "ana@example.com", role: "cliente" },
+      user: {
+        id: 1,
+        nome: "Ana",
+        email: "ana@example.com",
+        role: "cliente",
+        cep: "",
+        cpf: "",
+        emailVerificado: true,
+      },
     });
     expect(createUserSession).toHaveBeenCalledWith(1);
   });

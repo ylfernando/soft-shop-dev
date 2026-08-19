@@ -68,6 +68,9 @@ const USER = {
   nome: "Cliente Teste",
   email: "cliente@example.com",
   role: "cliente" as const,
+  cep: "01001000",
+  cpf: "12345678901",
+  emailVerificado: true,
 };
 
 function insertPedidoArgs() {
@@ -133,6 +136,34 @@ describe("iniciarPagamentoMercadoPago / iniciarPagamentoStripe — reserva e pri
       data: { itens: [{ produtoId: "p1", quantidade: 1 }], cepDestino: "123" },
     });
     expect(res).toEqual({ ok: false, erro: expect.stringMatching(/CEP/i) });
+    expect(mockPool.getConnection).not.toHaveBeenCalled();
+  });
+
+  it("blocks checkout when the account's e-mail isn't verified yet", async () => {
+    requireUser.mockResolvedValue({ ...USER, emailVerificado: false });
+    const { iniciarPagamentoMercadoPago } = await loadServerFns();
+    const res = await iniciarPagamentoMercadoPago({
+      data: { itens: [{ produtoId: "p1", quantidade: 1 }], cepDestino: "01310100" },
+    });
+    expect(res).toEqual({
+      ok: false,
+      erro: expect.stringMatching(/e-mail/i),
+      emailNaoVerificado: true,
+    });
+    expect(mockPool.getConnection).not.toHaveBeenCalled();
+  });
+
+  it("blocks checkout when the account has no CPF on file", async () => {
+    requireUser.mockResolvedValue({ ...USER, cpf: "" });
+    const { iniciarPagamentoMercadoPago } = await loadServerFns();
+    const res = await iniciarPagamentoMercadoPago({
+      data: { itens: [{ produtoId: "p1", quantidade: 1 }], cepDestino: "01310100" },
+    });
+    expect(res).toEqual({
+      ok: false,
+      erro: expect.stringMatching(/CPF/i),
+      cpfNaoPreenchido: true,
+    });
     expect(mockPool.getConnection).not.toHaveBeenCalled();
   });
 

@@ -14,7 +14,8 @@ import { PEDIDO_SELECT, type PedidoRow, type PedidoItemRow } from "./admin/pedid
 export type { PedidoRow, PedidoItemRow };
 
 type IniciarPagamentoResult =
-  { ok: true; redirectUrl: string } | { ok: false; erro: string; emailNaoVerificado?: boolean };
+  | { ok: true; redirectUrl: string }
+  | { ok: false; erro: string; emailNaoVerificado?: boolean; cpfNaoPreenchido?: boolean };
 
 interface ItemInput {
   produtoId: string;
@@ -193,6 +194,13 @@ export const iniciarPagamentoMercadoPago = createServerFn({ method: "POST" })
         emailNaoVerificado: true,
       };
     }
+    if (!user.cpf) {
+      return {
+        ok: false,
+        erro: "cadastra seu CPF antes de finalizar a compra.",
+        cpfNaoPreenchido: true,
+      };
+    }
     const reserva = await reservarPedido(user, data);
     if (!reserva.ok) return reserva;
 
@@ -225,6 +233,13 @@ export const iniciarPagamentoStripe = createServerFn({ method: "POST" })
         ok: false,
         erro: "confirma seu e-mail antes de finalizar a compra.",
         emailNaoVerificado: true,
+      };
+    }
+    if (!user.cpf) {
+      return {
+        ok: false,
+        erro: "cadastra seu CPF antes de finalizar a compra.",
+        cpfNaoPreenchido: true,
       };
     }
     const reserva = await reservarPedido(user, data);

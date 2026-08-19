@@ -14,6 +14,7 @@ export interface AuthUser {
   email: string;
   role: "cliente" | "admin";
   cep: string;
+  cpf: string;
   emailVerificado: boolean;
 }
 
@@ -90,6 +91,7 @@ interface UsuarioRow extends RowDataPacket {
   senha_hash: string;
   role: "cliente" | "admin";
   cep: string | null;
+  cpf: string | null;
   email_verificado_em: Date | null;
 }
 
@@ -100,6 +102,7 @@ function paraAuthUser(row: UsuarioRow): AuthUser {
     email: row.email,
     role: row.role,
     cep: row.cep ?? "",
+    cpf: row.cpf ?? "",
     emailVerificado: row.email_verificado_em !== null,
   };
 }
@@ -107,7 +110,7 @@ function paraAuthUser(row: UsuarioRow): AuthUser {
 async function verificarLogin(email: string, senha: string): Promise<AuthResult> {
   const pool = getPool();
   const [rows] = await pool.query<UsuarioRow[]>(
-    "SELECT id, nome, email, senha_hash, role, cep, email_verificado_em FROM usuarios WHERE email = ? LIMIT 1",
+    "SELECT id, nome, email, senha_hash, role, cep, cpf, email_verificado_em FROM usuarios WHERE email = ? LIMIT 1",
     [email],
   );
   const row = rows[0];
@@ -193,6 +196,7 @@ export const signUp = createServerFn({ method: "POST" })
         email,
         role: "cliente",
         cep: v.cep,
+        cpf: v.cpf,
         emailVerificado: false,
       },
     };
@@ -318,6 +322,7 @@ export const atualizarConta = createServerFn({ method: "POST" })
         nome,
         email,
         cep: v.cep,
+        cpf: v.cpf,
         emailVerificado: emailMudou ? false : user.emailVerificado,
       },
     };

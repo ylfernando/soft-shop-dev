@@ -18,6 +18,7 @@ interface UsuarioRow extends RowDataPacket {
   email: string;
   role: "cliente" | "admin";
   cep: string | null;
+  cpf: string | null;
   emailVerificadoEm: Date | null;
 }
 
@@ -55,7 +56,7 @@ export async function readUserSession(): Promise<AuthUser | null> {
 
   const pool = getPool();
   const [rows] = await pool.query<UsuarioRow[]>(
-    "SELECT id, nome, email, role, cep, email_verificado_em AS emailVerificadoEm FROM usuarios WHERE id = ? LIMIT 1",
+    "SELECT id, nome, email, role, cep, cpf, email_verificado_em AS emailVerificadoEm FROM usuarios WHERE id = ? LIMIT 1",
     [usuarioId],
   );
   const row = rows[0];
@@ -66,6 +67,7 @@ export async function readUserSession(): Promise<AuthUser | null> {
         email: row.email,
         role: row.role,
         cep: row.cep ?? "",
+        cpf: row.cpf ?? "",
         emailVerificado: row.emailVerificadoEm !== null,
       }
     : null;

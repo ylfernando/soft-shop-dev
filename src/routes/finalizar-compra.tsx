@@ -43,6 +43,7 @@ function FinalizarCompra() {
   const reenviarVerificacaoCall = useServerFn(reenviarVerificacaoEmail);
   const [gatewayEmAndamento, setGatewayEmAndamento] = useState<Gateway | null>(null);
   const [emailNaoVerificado, setEmailNaoVerificado] = useState(false);
+  const [cpfNaoPreenchido, setCpfNaoPreenchido] = useState(false);
   const [reenviando, setReenviando] = useState(false);
 
   const cepLimpo = cep.replace(/\D/g, "");
@@ -66,6 +67,7 @@ function FinalizarCompra() {
     if (gatewayEmAndamento || !podeConfirmar) return;
     setGatewayEmAndamento(gateway);
     setEmailNaoVerificado(false);
+    setCpfNaoPreenchido(false);
     try {
       const chamada = gateway === "mercadopago" ? iniciarMercadoPagoCall : iniciarStripeCall;
       const res = await chamada({
@@ -78,6 +80,7 @@ function FinalizarCompra() {
       if (!res.ok) {
         toast.error(res.erro);
         if (res.emailNaoVerificado) setEmailNaoVerificado(true);
+        if (res.cpfNaoPreenchido) setCpfNaoPreenchido(true);
         setGatewayEmAndamento(null);
         return;
       }
@@ -213,6 +216,15 @@ function FinalizarCompra() {
                 >
                   {reenviando ? "enviando..." : "reenviar e-mail de verificação"}
                 </button>
+              </div>
+            )}
+
+            {cpfNaoPreenchido && (
+              <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 text-sm text-amber-800 flex flex-col gap-1.5">
+                <span>cadastra seu CPF pra poder finalizar a compra.</span>
+                <Link to="/minha-conta" className="self-start underline font-menu">
+                  completar cadastro
+                </Link>
               </div>
             )}
 
