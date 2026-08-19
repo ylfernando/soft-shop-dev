@@ -22,6 +22,11 @@ function urlVerificacao(token: string): string {
   return `${siteUrl}/verificar-email?token=${token}`;
 }
 
+function urlRedefinicaoSenha(token: string): string {
+  const siteUrl = (process.env.SITE_URL ?? "http://localhost:8080").replace(/\/$/, "");
+  return `${siteUrl}/redefinir-senha?token=${token}`;
+}
+
 export async function enviarEmailVerificacao(destinatario: string, nome: string, token: string) {
   const link = urlVerificacao(token);
   const { error } = await getResend().emails.send({
@@ -37,5 +42,27 @@ export async function enviarEmailVerificacao(destinatario: string, nome: string,
   });
   if (error) {
     throw new Error(`não deu pra enviar o e-mail de verificação: ${error.message}`);
+  }
+}
+
+export async function enviarEmailRedefinicaoSenha(
+  destinatario: string,
+  nome: string,
+  token: string,
+) {
+  const link = urlRedefinicaoSenha(token);
+  const { error } = await getResend().emails.send({
+    from: remetente(),
+    to: destinatario,
+    subject: "Redefinir sua senha — Soft Shop",
+    html: `
+      <p>Oi, ${nome}! ✿</p>
+      <p>Pediram pra redefinir a senha da sua conta na Soft Shop. Clica no link abaixo pra escolher uma nova:</p>
+      <p><a href="${link}">${link}</a></p>
+      <p>Esse link expira em 1 hora. Se não foi você, pode ignorar este e-mail — sua senha continua a mesma.</p>
+    `,
+  });
+  if (error) {
+    throw new Error(`não deu pra enviar o e-mail de redefinição de senha: ${error.message}`);
   }
 }

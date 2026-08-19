@@ -63,7 +63,15 @@ function Entrar() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="senha">senha</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="senha">senha</Label>
+                <Link
+                  to="/esqueci-senha"
+                  className="text-xs underline text-[color:var(--pink-deep)]/80"
+                >
+                  esqueceu a senha?
+                </Link>
+              </div>
               <Input
                 id="senha"
                 type="password"

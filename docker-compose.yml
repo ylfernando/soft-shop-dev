@@ -27,6 +27,7 @@ services:
       - ./db/013_pagamento_gateway.sql:/docker-entrypoint-initdb.d/13-pagamento-gateway.sql:ro
       - ./db/014_usuario_perfil.sql:/docker-entrypoint-initdb.d/14-usuario-perfil.sql:ro
       - ./db/015_vitrine_newdrop.sql:/docker-entrypoint-initdb.d/15-vitrine-newdrop.sql:ro
+      - ./db/016_recuperacao_senha.sql:/docker-entrypoint-initdb.d/16-recuperacao-senha.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s

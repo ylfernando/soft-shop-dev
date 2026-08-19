@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "@/server/db";
-import { enviarEmailVerificacao } from "@/server/email";
+import { enviarEmailVerificacao, enviarEmailRedefinicaoSenha } from "@/server/email";
 import { limparCpf, validarCpf } from "@/lib/cpf";
 import { limparTelefone } from "@/lib/telefone";
 import { createUserSession, destroyUserSession, requireUser } from "./session";
@@ -47,6 +47,7 @@ export interface PerfilCompleto {
 type AuthResult = { ok: true; user: AuthUser } | { ok: false; erro: string };
 
 const TOKEN_VALIDADE_HORAS = 24;
+const SENHA_RESET_VALIDADE_HORAS = 1;
 
 function gerarTokenVerificacao() {
   return { token: randomBytes(32).toString("hex"), horasValidade: TOKEN_VALIDADE_HORAS };
@@ -448,3 +449,72 @@ export const reenviarVerificacaoEmail = createServerFn({ method: "POST" }).handl
     return { ok: true };
   },
 );
+
+interface SenhaResetRow extends RowDataPacket {
+  id: number;
+  nome: string;
+  email: string;
+}
+
+/** Chamada pela tela /esqueci-senha. Sempre responde com sucesso, exista ou
+ * não uma conta com esse e-mail — senão dava pra usar esse endpoint pra
+ * descobrir quais e-mails têm conta só testando um por um. */
+export const solicitarRedefinicaoSenha = createServerFn({ method: "POST" })
+  .validator((data: { email: string }) => data)
+  .handler(async ({ data }): Promise<{ ok: true }> => {
+    const email = data.email.trim().toLowerCase();
+    const pool = getPool();
+    const [rows] = await pool.query<SenhaResetRow[]>(
+      "SELECT id, nome, email FROM usuarios WHERE email = ? LIMIT 1",
+      [email],
+    );
+    const row = rows[0];
+    if (row) {
+      const token = randomBytes(32).toString("hex");
+      await pool.query(
+        "UPDATE usuarios SET senha_reset_token = ?, senha_reset_expira = DATE_ADD(NOW(), INTERVAL ? HOUR) WHERE id = ?",
+        [token, SENHA_RESET_VALIDADE_HORAS, row.id],
+      );
+      try {
+        await enviarEmailRedefinicaoSenha(row.email, row.nome, token);
+      } catch (error) {
+        console.error("erro enviando e-mail de redefinição de senha:", error);
+      }
+    }
+    return { ok: true };
+  });
+
+interface SenhaResetTokenRow extends RowDataPacket {
+  id: number;
+  senha_reset_expira: Date | null;
+}
+
+/** Chamada pela tela /redefinir-senha quando a pessoa clica no link do
+ * e-mail — o token é de uso único (é limpo assim que a senha é trocada). */
+export const redefinirSenha = createServerFn({ method: "POST" })
+  .validator((data: { token: string; novaSenha: string }) => data)
+  .handler(async ({ data }): Promise<VerificacaoResult> => {
+    if (data.novaSenha.length < 4) {
+      return { ok: false, erro: "a nova senha precisa ter pelo menos 4 caracteres." };
+    }
+
+    const pool = getPool();
+    const [rows] = await pool.query<SenhaResetTokenRow[]>(
+      "SELECT id, senha_reset_expira FROM usuarios WHERE senha_reset_token = ? LIMIT 1",
+      [data.token],
+    );
+    const row = rows[0];
+    if (!row) {
+      return { ok: false, erro: "link inválido ou já usado." };
+    }
+    if (!row.senha_reset_expira || row.senha_reset_expira.getTime() < Date.now()) {
+      return { ok: false, erro: "esse link expirou — peça uma nova redefinição de senha." };
+    }
+
+    const senhaHash = await bcrypt.hash(data.novaSenha, 10);
+    await pool.query(
+      "UPDATE usuarios SET senha_hash = ?, senha_reset_token = NULL, senha_reset_expira = NULL WHERE id = ?",
+      [senhaHash, row.id],
+    );
+    return { ok: true };
+  });
