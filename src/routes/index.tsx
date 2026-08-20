@@ -86,7 +86,7 @@ function Index() {
 
               <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-12">
                 {garimpos.map((p) => (
-                  <div key={p.id} className="w-[calc(25%-0.5625rem)] sm:w-[calc(25%-1.125rem)]">
+                  <div key={p.id} className="w-[calc(50%-0.375rem)] sm:w-[calc(25%-1.125rem)]">
                     <ProductCard
                       produto={p}
                       titleColorClass="text-[#a9e8eb]"
@@ -130,7 +130,7 @@ function Index() {
 
               <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
                 {promos.map((p) => (
-                  <div key={p.id} className="w-[calc(25%-0.5625rem)] sm:w-[calc(25%-1.125rem)]">
+                  <div key={p.id} className="w-[calc(50%-0.375rem)] sm:w-[calc(25%-1.125rem)]">
                     <ProductCard
                       produto={p}
                       titleColorClass="text-[#ffb5e3]"
