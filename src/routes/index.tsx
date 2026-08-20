@@ -210,14 +210,14 @@ function HeroCarousel({ slides }: { slides: string[] }) {
       <button
         aria-label="anterior"
         onClick={() => go(idx - 1)}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[color:var(--pink-deep)] font-pixel text-xl flex items-center justify-center shadow-md"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-xl flex items-center justify-center shadow-md"
       >
         ‹
       </button>
       <button
         aria-label="próximo"
         onClick={() => go(idx + 1)}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[color:var(--pink-deep)] font-pixel text-xl flex items-center justify-center shadow-md"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-xl flex items-center justify-center shadow-md"
       >
         ›
       </button>
