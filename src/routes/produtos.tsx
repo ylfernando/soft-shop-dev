@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { X } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -29,6 +30,8 @@ function Produtos() {
   const produtos = Route.useLoaderData();
   const { tipo, categoria } = Route.useSearch();
   const navigate = Route.useNavigate();
+
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
 
   const tiposSelecionados = tipo ?? [];
   const temFiltros = tiposSelecionados.length > 0 || !!categoria;
@@ -64,9 +67,18 @@ function Produtos() {
 
       <section className="py-10 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-[220px_1fr] gap-8">
-          <aside className="space-y-8">
+          <aside className="space-y-6 md:space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="font-menu text-xl text-[color:var(--pink-deep)]">Filtros</h2>
+              <button
+                onClick={() => setFiltrosAbertos((v) => !v)}
+                aria-expanded={filtrosAbertos}
+                className="flex items-center gap-1.5 font-menu text-xl text-[color:var(--pink-deep)] md:pointer-events-none"
+              >
+                Filtros
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform md:hidden ${filtrosAbertos ? "rotate-180" : ""}`}
+                />
+              </button>
               {temFiltros && (
                 <button
                   onClick={() => navigate({ search: {} })}
@@ -77,33 +89,35 @@ function Produtos() {
               )}
             </div>
 
-            <div>
-              <h3 className="font-menu text-lg text-[color:var(--pink-deep)] mb-3">Tipo</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="tipo-todos"
-                    checked={tiposSelecionados.length === 0}
-                    onCheckedChange={() =>
-                      navigate({ search: (prev) => ({ ...prev, tipo: undefined }) })
-                    }
-                  />
-                  <Label htmlFor="tipo-todos" className="cursor-pointer font-normal">
-                    Todos
-                  </Label>
-                </div>
-                {tipos.map((t) => (
-                  <div key={t.value} className="flex items-center gap-2">
+            <div className={`${filtrosAbertos ? "block" : "hidden"} md:block space-y-8`}>
+              <div>
+                <h3 className="font-menu text-lg text-[color:var(--pink-deep)] mb-3">Tipo</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
                     <Checkbox
-                      id={`tipo-${t.value}`}
-                      checked={tiposSelecionados.includes(t.value)}
-                      onCheckedChange={() => toggleTipo(t.value)}
+                      id="tipo-todos"
+                      checked={tiposSelecionados.length === 0}
+                      onCheckedChange={() =>
+                        navigate({ search: (prev) => ({ ...prev, tipo: undefined }) })
+                      }
                     />
-                    <Label htmlFor={`tipo-${t.value}`} className="cursor-pointer font-normal">
-                      {t.label}
+                    <Label htmlFor="tipo-todos" className="cursor-pointer font-normal">
+                      Todos
                     </Label>
                   </div>
-                ))}
+                  {tipos.map((t) => (
+                    <div key={t.value} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`tipo-${t.value}`}
+                        checked={tiposSelecionados.includes(t.value)}
+                        onCheckedChange={() => toggleTipo(t.value)}
+                      />
+                      <Label htmlFor={`tipo-${t.value}`} className="cursor-pointer font-normal">
+                        {t.label}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>
