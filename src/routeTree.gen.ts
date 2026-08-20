@@ -22,6 +22,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SobreASacolinhaRouteImport } from './routes/sobre-a-sacolinha'
+import { Route as TrocasEDevolucoesRouteImport } from './routes/trocas-e-devolucoes'
 import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
 import { Route as AdminAuthedRouteImport } from './routes/admin/_authed'
 import { Route as AdminEntrarRouteImport } from './routes/admin/entrar'
@@ -99,6 +100,11 @@ const SobreASacolinhaRoute = SobreASacolinhaRouteImport.update({
   path: '/sobre-a-sacolinha',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrocasEDevolucoesRoute = TrocasEDevolucoesRouteImport.update({
+  id: '/trocas-e-devolucoes',
+  path: '/trocas-e-devolucoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerificarEmailRoute = VerificarEmailRouteImport.update({
   id: '/verificar-email',
   path: '/verificar-email',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/pedido/$pedidoId': typeof PedidoPedidoIdRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sobre': typeof SobreRoute
   '/sobre-a-sacolinha': typeof SobreASacolinhaRoute
+  '/trocas-e-devolucoes': typeof TrocasEDevolucoesRoute
   '/verificar-email': typeof VerificarEmailRoute
   '/admin/_authed': typeof AdminAuthedRouteWithChildren
   '/admin/entrar': typeof AdminEntrarRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
+    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin'
     | '/admin/entrar'
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
+    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin/entrar'
     | '/pedido/$pedidoId'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/redefinir-senha'
     | '/sobre'
     | '/sobre-a-sacolinha'
+    | '/trocas-e-devolucoes'
     | '/verificar-email'
     | '/admin/_authed'
     | '/admin/entrar'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SobreRoute: typeof SobreRoute
   SobreASacolinhaRoute: typeof SobreASacolinhaRoute
+  TrocasEDevolucoesRoute: typeof TrocasEDevolucoesRoute
   VerificarEmailRoute: typeof VerificarEmailRoute
   AdminAuthedRoute: typeof AdminAuthedRouteWithChildren
   AdminEntrarRoute: typeof AdminEntrarRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre-a-sacolinha'
       fullPath: '/sobre-a-sacolinha'
       preLoaderRoute: typeof SobreASacolinhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trocas-e-devolucoes': {
+      id: '/trocas-e-devolucoes'
+      path: '/trocas-e-devolucoes'
+      fullPath: '/trocas-e-devolucoes'
+      preLoaderRoute: typeof TrocasEDevolucoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar-email': {
@@ -544,6 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SobreRoute: SobreRoute,
   SobreASacolinhaRoute: SobreASacolinhaRoute,
+  TrocasEDevolucoesRoute: TrocasEDevolucoesRoute,
   VerificarEmailRoute: VerificarEmailRoute,
   AdminAuthedRoute: AdminAuthedRouteWithChildren,
   AdminEntrarRoute: AdminEntrarRoute,

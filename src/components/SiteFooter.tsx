@@ -40,7 +40,10 @@ export function SiteFooter() {
           <Link to="/envios" className="font-menu text-base sm:text-xl hover:underline w-fit">
             envios
           </Link>
-          <Link to="/envios" className="font-menu text-base sm:text-xl hover:underline w-fit">
+          <Link
+            to="/trocas-e-devolucoes"
+            className="font-menu text-base sm:text-xl hover:underline w-fit"
+          >
             trocas e devoluções
           </Link>
         </nav>
