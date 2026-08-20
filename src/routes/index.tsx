@@ -24,12 +24,12 @@ const divasDaSoft = [
   { username: "usuaria3", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
 ];
 
-/** Cada seção define o próprio degradê, de ponta a ponta da sua altura —
- * assim a cor de saída (a que a próxima seção herda visualmente) nunca
- * depende da altura combinada de tudo que veio antes, que muda conforme a
- * curadoria das vitrines (mais ou menos produtos). Um degradê único calculado
- * em % da altura total quebrava sempre que o conteúdo real não batia com a
- * proporção assumida — ex: "PROMOS DA SEMANA" caindo na faixa amarela. */
+const contentGradient = `linear-gradient(to bottom,
+  #eef9fd 0%, #eef9fd 22%,
+  #fffade 26%, #fffade 46%,
+  var(--pink-soft) 50%, var(--pink-soft) 82%,
+  #d1affa 90%, #d1affa 100%)`;
+
 function Index() {
   const { vitrines, banners } = Route.useLoaderData();
   const { garimpos, promos, newdrop } = vitrines;
@@ -38,9 +38,9 @@ function Index() {
     <div className="min-h-screen text-foreground">
       <SiteHeader current="inicio" />
 
-      <div>
+      <div style={{ backgroundImage: contentGradient }}>
         {/* Hero Carousel */}
-        <section className="relative" style={{ backgroundColor: "#eef9fd" }}>
+        <section className="relative">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-10 md:py-16">
             <HeroCarousel slides={banners.map((b) => b.imgUrl)} />
           </div>
@@ -48,10 +48,7 @@ function Index() {
 
         {/* newDROP */}
         {newdrop.length > 0 && (
-          <section
-            className="py-20 px-6"
-            style={{ backgroundImage: "linear-gradient(to bottom, #eef9fd 0%, #fffade 100%)" }}
-          >
+          <section className="py-20 px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
@@ -82,14 +79,11 @@ function Index() {
 
         {/* Últimos garimpos */}
         {garimpos.length > 0 && (
-          <section
-            className="py-20 px-6"
-            style={{
-              backgroundImage: "linear-gradient(to bottom, #fffade 0%, var(--pink-soft) 100%)",
-            }}
-          >
+          <section className="py-20 px-6">
             <div className="max-w-6xl mx-auto text-center">
-              <h2 className="font-menu text-4xl md:text-5xl text-[#a9e8eb]">ÚLTIMOS GARIMPOS:</h2>
+              <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#a9e8eb]">
+                ÚLTIMOS GARIMPOS
+              </h2>
               <p className="font-script text-3xl text-[#a9e8eb]/80 mt-2"></p>
 
               <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-12">
@@ -112,10 +106,10 @@ function Index() {
           <section
             className="py-20 px-6 min-h-[1000px] flex items-center"
             style={{
-              backgroundImage: `url(${promosBg}), linear-gradient(to bottom, var(--pink-soft) 0%, #d1affa 100%)`,
-              backgroundSize: "contain, 100% 100%",
-              backgroundPosition: "center 60%, center",
-              backgroundRepeat: "no-repeat, no-repeat",
+              backgroundImage: `url(${promosBg})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center 60%",
+              backgroundRepeat: "no-repeat",
             }}
           >
             <div className="w-full max-w-6xl mx-auto">
@@ -128,12 +122,6 @@ function Index() {
                   <br />
                   toda semana temos promos diferentes!
                 </p>
-                <Link
-                  to="/produtos"
-                  className="inline-block mt-3 font-menu text-base sm:text-[20px] text-[#fffefe] underline"
-                >
-                  tudo
-                </Link>
               </div>
 
               <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
@@ -152,7 +140,7 @@ function Index() {
         )}
 
         {/* Sobre */}
-        <section id="sobre" className="py-20 px-6" style={{ backgroundColor: "#d1affa" }}>
+        <section id="sobre" className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center space-y-6">
             <h2 className="font-menu text-4xl text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
             <p className="max-w-2xl mx-auto text-[#fffefe]/80">
@@ -210,14 +198,14 @@ function HeroCarousel({ slides }: { slides: string[] }) {
       <button
         aria-label="anterior"
         onClick={() => go(idx - 1)}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-xl flex items-center justify-center shadow-md"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-base sm:text-xl flex items-center justify-center shadow-md"
       >
         ‹
       </button>
       <button
         aria-label="próximo"
         onClick={() => go(idx + 1)}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-xl flex items-center justify-center shadow-md"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-base sm:text-xl flex items-center justify-center shadow-md"
       >
         ›
       </button>

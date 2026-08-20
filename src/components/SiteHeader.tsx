@@ -31,7 +31,7 @@ export function SiteHeader({ current }: { current?: "inicio" }) {
       {/* Header */}
       <header className="bg-[#fffffe] sticky top-0 z-40 border-b border-[color:var(--pink-deep)]/10">
         {/* Mobile bar */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 text-[color:var(--pink-deep)]">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 text-[#ffb5e3]">
           <button aria-label="menu" onClick={() => setMenuOpen((v) => !v)} className="p-1">
             {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
