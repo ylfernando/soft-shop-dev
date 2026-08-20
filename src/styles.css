@@ -101,6 +101,9 @@
     font-family: var(--font-body);
   }
   h1, h2, h3 { font-family: var(--font-menu); letter-spacing: 0.02em; }
+  /* mesmo verde do hover dos botões do menu (SiteHeader), aplicado como
+     feedback de clique em todo link do site. */
+  a:active { background-color: #ebffde; }
 }
 
 @utility app-shell {

@@ -125,6 +125,7 @@ function NavBtn({
 
 function CartButton({ size }: { size: "sm" | "lg" }) {
   const { count, openCart } = useCart();
+  const { user } = useAuth();
   return (
     <button
       onClick={openCart}
@@ -136,7 +137,7 @@ function CartButton({ size }: { size: "sm" | "lg" }) {
       }
     >
       <ShoppingBasket className={size === "lg" ? "w-7 h-7" : "w-6 h-6"} />
-      <span>{count}</span>
+      {user && <span>{count}</span>}
     </button>
   );
 }
