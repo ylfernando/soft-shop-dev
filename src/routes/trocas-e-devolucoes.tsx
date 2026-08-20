@@ -13,7 +13,7 @@ function TrocasEDevolucoes() {
 
       <section className="flex-1 bg-[color:var(--cream)] py-12 px-6">
         <div className="max-w-2xl mx-auto">
-          <h1 className="font-menu text-3xl md:text-4xl text-[color:var(--pink-deep)] text-center">
+          <h1 className="font-menu text-3xl md:text-4xl text-[color:var(--pink-deep)]">
             POLÍTICA DE TROCAS E DEVOLUÇÕES
           </h1>
 

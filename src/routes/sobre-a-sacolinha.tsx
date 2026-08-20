@@ -29,8 +29,16 @@ function SobreASacolinha() {
               </h2>
               <p>
                 quando for comprar algo selecione a opção de envio "sacolinha", nessa opção você
-                pagará SOMENTE o valor da peça, sinalize na DM do Instagram (@softshopl) que você
-                abriu sua sacolinha, para mantermos contato quando precisar!
+                pagará SOMENTE o valor da peça, sinalize na DM do Instagram (
+                <a
+                  href="https://www.instagram.com/softshopl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[color:var(--pink-deep)] underline"
+                >
+                  @softshopl
+                </a>
+                ) que você abriu sua sacolinha, para mantermos contato quando precisar!
               </p>
             </div>
 
