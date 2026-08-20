@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Instagram, Heart } from "lucide-react";
+import { Instagram } from "lucide-react";
+import iconSobre from "@/assets/icon-sobre.jpeg";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -16,10 +17,13 @@ function Sobre() {
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">SOBRE</h1>
 
-          {/* imagem redonda: troque este placeholder por uma foto real assim que tiver uma */}
           <div className="mt-8 flex flex-col items-center gap-3">
-            <div className="w-40 h-40 rounded-full bg-[color:var(--pink-soft)] border-4 border-white shadow-md flex items-center justify-center text-[color:var(--pink-deep)]">
-              <Heart className="w-14 h-14" />
+            <div className="w-40 h-40 rounded-full bg-[color:var(--pink-soft)] border-4 border-white shadow-md overflow-hidden">
+              <img
+                src={iconSobre}
+                alt="Luiza Oltramari, fundadora da Soft"
+                className="w-full h-full object-cover"
+              />
             </div>
             <a
               href="https://www.instagram.com/luizaoltramari"
