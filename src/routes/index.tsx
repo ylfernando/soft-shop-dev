@@ -26,8 +26,8 @@ const divasDaSoft = [
 
 const contentGradient = `linear-gradient(to bottom,
   #eef9fd 0%, #eef9fd 22%,
-  #fffade 26%, #fffade 36%,
-  var(--pink-soft) 40%, var(--pink-soft) 82%,
+  #fffade 26%, #fffade 33%,
+  var(--pink-soft) 37%, var(--pink-soft) 82%,
   #d1affa 90%, #d1affa 100%)`;
 
 function Index() {
