@@ -18,15 +18,16 @@ export const Route = createFileRoute("/")({
   },
 });
 
-// TODO: trocar pelos destaques reais das divas que a Soft quer destacar
+// TODO: trocar pelos destaques reais de clientes que a Soft quer mostrar
+// (os 3 links apontam para destaques salvos no perfil @softshopl)
 const divasDaSoft = [
   {
-    username: "usuaria1",
+    username: "softshopl",
     highlightUrl:
       "https://www.instagram.com/s/aGlnaGxpZ2h0OjE4MDgwMTY1ODMzMzAyNTk3?story_media_id=3955176068107035355&igsi=MWF2bnN5c2ZzYTJsdw==",
   },
-  { username: "usuaria2", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
-  { username: "usuaria3", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
+  { username: "softshopl", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
+  { username: "softshopl", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
 ];
 
 const contentGradient = `linear-gradient(to bottom,
@@ -155,7 +156,7 @@ function Index() {
             {/* Desktop: os 3 usuários empilhados */}
             <div className="hidden sm:flex flex-col gap-6 max-w-md mx-auto mt-10">
               {divasDaSoft.map((diva) => (
-                <InstagramEmbedCard key={diva.username} {...diva} />
+                <InstagramEmbedCard key={diva.highlightUrl} {...diva} />
               ))}
             </div>
 
