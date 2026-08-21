@@ -31,6 +31,7 @@ import { Route as AdminAuthedIndexRouteImport } from './routes/admin/_authed/ind
 import { Route as AdminAuthedBannersRouteImport } from './routes/admin/_authed/banners'
 import { Route as AdminAuthedClientesRouteImport } from './routes/admin/_authed/clientes'
 import { Route as AdminAuthedCuponsRouteImport } from './routes/admin/_authed/cupons'
+import { Route as AdminAuthedDivasRouteImport } from './routes/admin/_authed/divas'
 import { Route as AdminAuthedPedidosRouteImport } from './routes/admin/_authed/pedidos'
 import { Route as AdminAuthedProdutosRouteImport } from './routes/admin/_authed/produtos'
 import { Route as AdminAuthedVitrineRouteImport } from './routes/admin/_authed/vitrine'
@@ -145,6 +146,11 @@ const AdminAuthedCuponsRoute = AdminAuthedCuponsRouteImport.update({
   path: '/cupons',
   getParentRoute: () => AdminAuthedRoute,
 } as any)
+const AdminAuthedDivasRoute = AdminAuthedDivasRouteImport.update({
+  id: '/divas',
+  path: '/divas',
+  getParentRoute: () => AdminAuthedRoute,
+} as any)
 const AdminAuthedPedidosRoute = AdminAuthedPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/cupons': typeof AdminAuthedCuponsRoute
+  '/admin/divas': typeof AdminAuthedDivasRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
   '/admin/vitrine': typeof AdminAuthedVitrineRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/admin/banners': typeof AdminAuthedBannersRoute
   '/admin/clientes': typeof AdminAuthedClientesRoute
   '/admin/cupons': typeof AdminAuthedCuponsRoute
+  '/admin/divas': typeof AdminAuthedDivasRoute
   '/admin/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/produtos': typeof AdminAuthedProdutosRoute
   '/admin/vitrine': typeof AdminAuthedVitrineRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/admin/_authed/banners': typeof AdminAuthedBannersRoute
   '/admin/_authed/clientes': typeof AdminAuthedClientesRoute
   '/admin/_authed/cupons': typeof AdminAuthedCuponsRoute
+  '/admin/_authed/divas': typeof AdminAuthedDivasRoute
   '/admin/_authed/pedidos': typeof AdminAuthedPedidosRoute
   '/admin/_authed/produtos': typeof AdminAuthedProdutosRoute
   '/admin/_authed/vitrine': typeof AdminAuthedVitrineRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/clientes'
     | '/admin/cupons'
+    | '/admin/divas'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin/vitrine'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/banners'
     | '/admin/clientes'
     | '/admin/cupons'
+    | '/admin/divas'
     | '/admin/pedidos'
     | '/admin/produtos'
     | '/admin/vitrine'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/admin/_authed/banners'
     | '/admin/_authed/clientes'
     | '/admin/_authed/cupons'
+    | '/admin/_authed/divas'
     | '/admin/_authed/pedidos'
     | '/admin/_authed/produtos'
     | '/admin/_authed/vitrine'
@@ -502,6 +514,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuthedCuponsRouteImport
       parentRoute: typeof AdminAuthedRoute
     }
+    '/admin/_authed/divas': {
+      id: '/admin/_authed/divas'
+      path: '/divas'
+      fullPath: '/admin/divas'
+      preLoaderRoute: typeof AdminAuthedDivasRouteImport
+      parentRoute: typeof AdminAuthedRoute
+    }
     '/admin/_authed/pedidos': {
       id: '/admin/_authed/pedidos'
       path: '/pedidos'
@@ -530,6 +549,7 @@ interface AdminAuthedRouteChildren {
   AdminAuthedBannersRoute: typeof AdminAuthedBannersRoute
   AdminAuthedClientesRoute: typeof AdminAuthedClientesRoute
   AdminAuthedCuponsRoute: typeof AdminAuthedCuponsRoute
+  AdminAuthedDivasRoute: typeof AdminAuthedDivasRoute
   AdminAuthedPedidosRoute: typeof AdminAuthedPedidosRoute
   AdminAuthedProdutosRoute: typeof AdminAuthedProdutosRoute
   AdminAuthedVitrineRoute: typeof AdminAuthedVitrineRoute
@@ -540,6 +560,7 @@ const AdminAuthedRouteChildren: AdminAuthedRouteChildren = {
   AdminAuthedBannersRoute: AdminAuthedBannersRoute,
   AdminAuthedClientesRoute: AdminAuthedClientesRoute,
   AdminAuthedCuponsRoute: AdminAuthedCuponsRoute,
+  AdminAuthedDivasRoute: AdminAuthedDivasRoute,
   AdminAuthedPedidosRoute: AdminAuthedPedidosRoute,
   AdminAuthedProdutosRoute: AdminAuthedProdutosRoute,
   AdminAuthedVitrineRoute: AdminAuthedVitrineRoute,

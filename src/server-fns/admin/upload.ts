@@ -5,7 +5,7 @@ import path from "node:path";
 import { put } from "@vercel/blob";
 import { requireAdmin } from "./session";
 
-const PASTAS = ["produtos", "banners"] as const;
+const PASTAS = ["produtos", "banners", "divas"] as const;
 type Pasta = (typeof PASTAS)[number];
 
 const MIME_EXT: Record<string, string> = {

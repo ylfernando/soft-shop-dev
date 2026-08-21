@@ -10,6 +10,7 @@ import {
   Sparkles,
   Tag,
   Store,
+  Heart,
 } from "lucide-react";
 import { getAdminSession, adminLogout } from "@/server-fns/admin/auth";
 import {
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { to: "/admin/produtos", label: "Produtos", Icon: ShoppingBag },
   { to: "/admin/vitrine", label: "Vitrine", Icon: Sparkles },
   { to: "/admin/banners", label: "Banners", Icon: Image },
+  { to: "/admin/divas", label: "Divas", Icon: Heart },
   { to: "/admin/cupons", label: "Cupons", Icon: Tag },
   { to: "/admin/pedidos", label: "Pedidos", Icon: Receipt },
   { to: "/admin/clientes", label: "Clientes", Icon: Users },

@@ -9,26 +9,19 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { InstagramEmbedCard } from "@/components/InstagramEmbedCard";
 import { getVitrines } from "@/server-fns/vitrines";
 import { getBannersAtivos } from "@/server-fns/banners";
+import { getDivas, type DivaAtiva } from "@/server-fns/divas";
 
 export const Route = createFileRoute("/")({
   component: Index,
   loader: async () => {
-    const [vitrines, banners] = await Promise.all([getVitrines(), getBannersAtivos()]);
-    return { vitrines, banners };
+    const [vitrines, banners, divas] = await Promise.all([
+      getVitrines(),
+      getBannersAtivos(),
+      getDivas(),
+    ]);
+    return { vitrines, banners, divas };
   },
 });
-
-// TODO: trocar pelos destaques reais de clientes que a Soft quer mostrar
-// (os 3 links apontam para destaques salvos no perfil @softshopl)
-const divasDaSoft = [
-  {
-    username: "softshopl",
-    highlightUrl:
-      "https://www.instagram.com/s/aGlnaGxpZ2h0OjE4MDgwMTY1ODMzMzAyNTk3?story_media_id=3955176068107035355&igsi=MWF2bnN5c2ZzYTJsdw==",
-  },
-  { username: "softshopl", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
-  { username: "softshopl", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
-];
 
 const contentGradient = `linear-gradient(to bottom,
   #eef9fd 0%, #eef9fd 22%,
@@ -37,7 +30,7 @@ const contentGradient = `linear-gradient(to bottom,
   #d1affa 90%, #d1affa 100%)`;
 
 function Index() {
-  const { vitrines, banners } = Route.useLoaderData();
+  const { vitrines, banners, divas } = Route.useLoaderData();
   const { garimpos, promos, newdrop } = vitrines;
 
   return (
@@ -153,16 +146,16 @@ function Index() {
               comprou algo na Soft? poste sua fotinho e nos marque!
             </p>
 
-            {/* Desktop: os 3 usuários empilhados */}
-            <div className="hidden sm:flex flex-col gap-6 max-w-md mx-auto mt-10">
-              {divasDaSoft.map((diva) => (
-                <InstagramEmbedCard key={diva.highlightUrl} {...diva} />
+            {/* Desktop: os 3 usuários lado a lado, cards grandes */}
+            <div className="hidden sm:grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto mt-10 place-items-center">
+              {divas.map((diva) => (
+                <InstagramEmbedCard key={diva.id} {...diva} />
               ))}
             </div>
 
             {/* Responsivo: um usuário por vez, em slide */}
-            <div className="sm:hidden max-w-md mx-auto mt-10">
-              <DivasCarousel divas={divasDaSoft} />
+            <div className="sm:hidden max-w-xs mx-auto mt-10">
+              <DivasCarousel divas={divas} />
             </div>
 
             <p className="max-w-2xl mx-auto mt-8 text-[#fffefe]/80 font-script text-2xl">{"\n"}</p>
@@ -235,7 +228,7 @@ function HeroCarousel({ slides }: { slides: string[] }) {
   );
 }
 
-function DivasCarousel({ divas }: { divas: { username: string; highlightUrl: string }[] }) {
+function DivasCarousel({ divas }: { divas: DivaAtiva[] }) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
