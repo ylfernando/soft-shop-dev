@@ -18,11 +18,15 @@ export const Route = createFileRoute("/")({
   },
 });
 
-// TODO: trocar pelos posts/reels reais das divas que a Soft quer destacar
+// TODO: trocar pelos destaques reais das divas que a Soft quer destacar
 const divasDaSoft = [
-  { username: "usuaria1", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
-  { username: "usuaria2", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
-  { username: "usuaria3", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
+  {
+    username: "usuaria1",
+    highlightUrl:
+      "https://www.instagram.com/s/aGlnaGxpZ2h0OjE4MDgwMTY1ODMzMzAyNTk3?story_media_id=3955176068107035355&igsi=MWF2bnN5c2ZzYTJsdw==",
+  },
+  { username: "usuaria2", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
+  { username: "usuaria3", highlightUrl: "https://www.instagram.com/s/SEU_DESTAQUE_AQUI/" },
 ];
 
 const contentGradient = `linear-gradient(to bottom,
@@ -230,7 +234,7 @@ function HeroCarousel({ slides }: { slides: string[] }) {
   );
 }
 
-function DivasCarousel({ divas }: { divas: { username: string; postUrl: string }[] }) {
+function DivasCarousel({ divas }: { divas: { username: string; highlightUrl: string }[] }) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
