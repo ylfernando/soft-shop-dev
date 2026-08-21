@@ -18,12 +18,15 @@ export const Route = createFileRoute("/")({
   },
 });
 
-// TODO: trocar pelos posts/reels reais das divas que a Soft quer destacar
-const divasDaSoft = [
-  { username: "usuaria1", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
-  { username: "usuaria2", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
-  { username: "usuaria3", postUrl: "https://www.instagram.com/p/SEU_POST_AQUI/" },
-];
+// TODO: trocar pelos posts/reels reais da diva que a Soft quer destacar
+const divaDaSoft = {
+  username: "usuaria1",
+  postUrls: [
+    "https://www.instagram.com/p/SEU_POST_AQUI/",
+    "https://www.instagram.com/p/SEU_POST_AQUI/",
+    "https://www.instagram.com/p/SEU_POST_AQUI/",
+  ],
+};
 
 const contentGradient = `linear-gradient(to bottom,
   #eef9fd 0%, #eef9fd 22%,
@@ -148,10 +151,8 @@ function Index() {
               comprou algo na Soft? poste sua fotinho e nos marque!
             </p>
 
-            <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">
-              {divasDaSoft.map((diva) => (
-                <InstagramEmbedCard key={diva.username} {...diva} />
-              ))}
+            <div className="max-w-md mx-auto mt-10">
+              <DivasCarousel username={divaDaSoft.username} postUrls={divaDaSoft.postUrls} />
             </div>
 
             <p className="max-w-2xl mx-auto mt-8 text-[#fffefe]/80 font-script text-2xl">{"\n"}</p>
@@ -220,6 +221,46 @@ function HeroCarousel({ slides }: { slides: string[] }) {
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+function DivasCarousel({ username, postUrls }: { username: string; postUrls: string[] }) {
+  const [idx, setIdx] = useState(0);
+  const go = (n: number) => setIdx((n + postUrls.length) % postUrls.length);
+
+  return (
+    <div className="relative">
+      <InstagramEmbedCard username={username} postUrl={postUrls[idx]} />
+
+      {postUrls.length > 1 && (
+        <>
+          <button
+            aria-label="anterior"
+            onClick={() => go(idx - 1)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
+          <button
+            aria-label="próximo"
+            onClick={() => go(idx + 1)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
+          >
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
+          <div className="flex justify-center gap-2 mt-4">
+            {postUrls.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`ir para foto ${i + 1}`}
+                onClick={() => setIdx(i)}
+                className={`w-2.5 h-2.5 rounded-full transition ${i === idx ? "bg-[#ffb5e3]" : "bg-[#ffb5e3]/30"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
