@@ -20,10 +20,10 @@ export interface Produto {
 }
 
 export const tipos: { value: Tipo; label: string }[] = [
-  { value: "cima", label: "Parte de cima" },
-  { value: "baixo", label: "Parte de baixo" },
-  { value: "calcados", label: "Calçados" },
-  { value: "vestido", label: "Vestido" },
+  { value: "cima", label: "top" },
+  { value: "baixo", label: "bottom" },
+  { value: "calcados", label: "calçados" },
+  { value: "vestido", label: "vestidos" },
   { value: "newdrop", label: "NewDrop" },
 ];
 

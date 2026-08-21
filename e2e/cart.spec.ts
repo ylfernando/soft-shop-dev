@@ -7,13 +7,13 @@ test.describe("sacolinha (carrinho)", () => {
     // (que só funciona via handler React) não tem efeito nenhum.
     await page.waitForLoadState("networkidle");
 
-    const addButtons = page.getByRole("button", { name: "Adicionar ao carrinho" });
+    const addButtons = page.getByRole("button", { name: "comprar" });
     const total = await addButtons.count();
     test.skip(total === 0, "nenhum produto disponível para testar o carrinho");
 
     const primeiroCard = page
       .locator("div.rounded-2xl")
-      .filter({ has: page.getByRole("button", { name: "Adicionar ao carrinho" }) })
+      .filter({ has: page.getByRole("button", { name: "comprar" }) })
       .first();
     const nomeProduto = await primeiroCard.locator("p.font-menu").first().innerText();
 

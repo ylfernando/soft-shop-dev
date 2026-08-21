@@ -51,7 +51,7 @@ async function prepararCompraDaPrimeiraPeca(page: Page) {
   await page.goto("/produtos");
   await page.waitForLoadState("networkidle");
 
-  const primeiroBotao = page.getByRole("button", { name: "Adicionar ao carrinho" }).first();
+  const primeiroBotao = page.getByRole("button", { name: "comprar" }).first();
   const primeiroCard = page
     .locator("div.rounded-2xl")
     .filter({ has: primeiroBotao })

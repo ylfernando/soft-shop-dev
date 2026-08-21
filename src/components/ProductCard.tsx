@@ -54,7 +54,7 @@ export function ProductCard({
           className={`mt-2 w-full py-1.5 rounded-full ${buttonColorClass} text-white font-pixel text-base hover:opacity-90 disabled:opacity-60`}
           disabled={jaNaSacolinha}
         >
-          {jaNaSacolinha ? "Já está na sacolinha ✿" : "Adicionar ao carrinho"}
+          {jaNaSacolinha ? "Já está na sacolinha ✿" : "comprar"}
         </button>
       </div>
     </div>

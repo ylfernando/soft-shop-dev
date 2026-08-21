@@ -143,8 +143,8 @@ function Index() {
         <section id="sobre" className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center space-y-6">
             <h2 className="font-menu text-4xl text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
-            <p className="max-w-2xl mx-auto text-[#fffefe]/80">
-              comprou algo na Soft? poste sua fotinho e nos marque
+            <p className="font-unrulyness max-w-2xl mx-auto text-3xl sm:text-4xl md:text-[60px] text-[#fffefe]/80 leading-[0.95]">
+              comprou algo na Soft? poste sua fotinho e nos marque!
             </p>
 
             <div className="grid md:grid-cols-3 gap-3 md:gap-6 mt-10">

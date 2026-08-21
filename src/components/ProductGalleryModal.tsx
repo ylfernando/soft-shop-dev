@@ -128,7 +128,7 @@ export function ProductGalleryModal({
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-base shadow-md hover:opacity-90 hover:shadow-lg transition disabled:opacity-60"
           >
             <ShoppingBasket className="w-4 h-4" />
-            {jaNaSacolinha ? "Já está na sacolinha ✿" : "Adicionar ao carrinho"}
+            {jaNaSacolinha ? "Já está na sacolinha ✿" : "comprar"}
           </button>
         </div>
       </DialogContent>

@@ -216,16 +216,18 @@ function ProdutosDropdown() {
         produtos <ChevronDown className="w-4 h-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" className="font-menu min-w-[10rem]">
-        {tipos.map((t) => (
-          <DropdownMenuItem key={t.value} asChild>
-            <Link to="/produtos" search={{ tipo: [t.value] }}>
-              {t.label}
-            </Link>
-          </DropdownMenuItem>
-        ))}
+        {tipos
+          .filter((t) => t.value !== "newdrop")
+          .map((t) => (
+            <DropdownMenuItem key={t.value} asChild>
+              <Link to="/produtos" search={{ tipo: [t.value] }}>
+                {t.label}
+              </Link>
+            </DropdownMenuItem>
+          ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/produtos">Ver todos os produtos</Link>
+          <Link to="/produtos">ver tudo</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

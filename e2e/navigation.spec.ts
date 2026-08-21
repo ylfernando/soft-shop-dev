@@ -20,7 +20,7 @@ test.describe("navegação principal", () => {
   test("acessa a listagem de produtos pelo menu", async ({ page }) => {
     await page.goto("/");
 
-    await page.getByRole("link", { name: "NewDrop" }).click();
+    await page.getByRole("link", { name: "new drop", exact: true }).click();
 
     await expect(page).toHaveURL(/\/produtos/);
     await expect(page.getByRole("heading", { name: "TODOS OS PRODUTOS" })).toBeVisible();
