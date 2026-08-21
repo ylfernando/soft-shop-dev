@@ -25,10 +25,10 @@ export function SiteFooter() {
   const { user } = useAuth();
 
   return (
-    <footer className="bg-white text-[color:var(--pink-deep)] py-8 sm:py-10 px-6 border-t border-[color:var(--pink-deep)]/10">
+    <footer className="bg-white text-[rgb(255,181,227)] py-8 sm:py-10 px-6 border-t border-[color:var(--pink-deep)]/10">
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-8 sm:gap-x-8">
         <nav className="flex flex-col gap-1.5 sm:gap-2">
-          <span className="font-menu text-[16px] text-[color:var(--pink-deep)]/60">
+          <span className="font-menu text-[16px] text-[rgb(255,181,227)]/60">
             mais infos
           </span>
           <Link
@@ -49,7 +49,7 @@ export function SiteFooter() {
         </nav>
 
         <nav className="flex flex-col gap-1.5 sm:gap-2">
-          <span className="font-menu text-[16px] text-[color:var(--pink-deep)]/60">
+          <span className="font-menu text-[16px] text-[rgb(255,181,227)]/60">
             redes sociais
           </span>
           {REDES_SOCIAIS.map(({ nome, Icon, href }) => (
@@ -67,7 +67,7 @@ export function SiteFooter() {
         </nav>
 
         <nav className="col-span-2 sm:col-span-1 flex flex-col gap-1.5 sm:gap-2">
-          <span className="font-menu text-[16px] text-[color:var(--pink-deep)]/60">
+          <span className="font-menu text-[16px] text-[rgb(255,181,227)]/60">
             atendimento
           </span>
           <a
@@ -88,7 +88,7 @@ export function SiteFooter() {
       </div>
 
       <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-[color:var(--pink-deep)]/10 flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
-        <span className="font-menu text-[16px] text-[color:var(--pink-deep)]/60">
+        <span className="font-menu text-[16px] text-[rgb(255,181,227)]/60">
           formas de pagamento
         </span>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">

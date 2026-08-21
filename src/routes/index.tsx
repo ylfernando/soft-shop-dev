@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import promosBg from "@/assets/promos-bg-bala.png";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
@@ -142,7 +143,7 @@ function Index() {
         {/* Sobre */}
         <section id="sobre" className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center space-y-6">
-            <h2 className="font-menu text-4xl text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
+            <h2 className="font-menu text-[60px] text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
             <p className="font-unrulyness max-w-2xl mx-auto text-3xl sm:text-4xl md:text-[60px] text-[#fffefe]/80 leading-[0.95]">
               comprou algo na Soft? poste sua fotinho e nos marque!
             </p>
@@ -198,16 +199,16 @@ function HeroCarousel({ slides }: { slides: string[] }) {
       <button
         aria-label="anterior"
         onClick={() => go(idx - 1)}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-base sm:text-xl flex items-center justify-center shadow-md"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
       >
-        ‹
+        <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
       </button>
       <button
         aria-label="próximo"
         onClick={() => go(idx + 1)}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] font-menu text-base sm:text-xl flex items-center justify-center shadow-md"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
       >
-        ›
+        <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
       </button>
       <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, i) => (
