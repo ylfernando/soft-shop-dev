@@ -232,40 +232,18 @@ function HeroCarousel({ slides }: { slides: string[] }) {
 
 function DivasCarousel({ divas }: { divas: { username: string; postUrl: string }[] }) {
   const [idx, setIdx] = useState(0);
-  const go = (n: number) => setIdx((n + divas.length) % divas.length);
+
+  useEffect(() => {
+    if (divas.length < 2) return;
+    const timer = setInterval(() => {
+      setIdx((i) => (i + 1) % divas.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [divas.length]);
 
   return (
     <div className="relative">
       <InstagramEmbedCard {...divas[idx]} />
-
-      {divas.length > 1 && (
-        <>
-          <button
-            aria-label="anterior"
-            onClick={() => go(idx - 1)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
-          >
-            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
-          </button>
-          <button
-            aria-label="próximo"
-            onClick={() => go(idx + 1)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-[#ffb5e3] flex items-center justify-center shadow-md"
-          >
-            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
-          </button>
-          <div className="flex justify-center gap-2 mt-4">
-            {divas.map((diva, i) => (
-              <button
-                key={diva.username}
-                aria-label={`ir para @${diva.username}`}
-                onClick={() => setIdx(i)}
-                className={`w-2.5 h-2.5 rounded-full transition ${i === idx ? "bg-[#ffb5e3]" : "bg-[#ffb5e3]/30"}`}
-              />
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 }
