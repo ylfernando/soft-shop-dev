@@ -51,108 +51,118 @@ function Produtos() {
   }
 
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="min-h-screen text-[#A9E8EB]">
       <SiteHeader />
 
-      <section className="bg-[color:var(--cream)] py-12 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
-            TODOS OS PRODUTOS
-          </h1>
-          <p className="font-script text-2xl text-[color:var(--pink-deep)]/80 mt-2">
-            garimpe até achar sua peça perfeita
-          </p>
-        </div>
-      </section>
+      <div
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, #EEF9FD 0%, #EEF9FD 30%, #FDDDEC 70%, #FDDDEC 100%)",
+        }}
+      >
+        <section className="py-12 px-6">
+          <div className="max-w-6xl mx-auto text-center">
+            <h1 className="font-menu text-4xl md:text-5xl text-[#A9E8EB]">TODOS OS PRODUTOS</h1>
+            <p className="font-unrulyness text-3xl text-[#A9E8EB]/80 mt-2">
+              garimpe até achar sua peça perfeita!
+            </p>
+          </div>
+        </section>
 
-      <section className="py-10 px-6">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[220px_1fr] gap-8">
-          <aside className="space-y-6 md:space-y-8">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => setFiltrosAbertos((v) => !v)}
-                aria-expanded={filtrosAbertos}
-                className="flex items-center gap-1.5 font-menu text-xl text-[color:var(--pink-deep)] md:pointer-events-none"
-              >
-                Filtros
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform md:hidden ${filtrosAbertos ? "rotate-180" : ""}`}
-                />
-              </button>
-              {temFiltros && (
+        <section className="py-10 px-6">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-[220px_1fr] gap-8">
+            <aside className="space-y-6 md:space-y-8">
+              <div className="flex items-center justify-between">
                 <button
-                  onClick={() => navigate({ search: {} })}
-                  className="text-sm underline text-[color:var(--pink-deep)]/70 hover:text-[color:var(--pink-deep)]"
+                  onClick={() => setFiltrosAbertos((v) => !v)}
+                  aria-expanded={filtrosAbertos}
+                  className="flex items-center gap-1.5 font-menu text-xl text-[#A9E8EB] md:pointer-events-none"
                 >
-                  limpar
+                  Filtros
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform md:hidden ${filtrosAbertos ? "rotate-180" : ""}`}
+                  />
                 </button>
-              )}
-            </div>
+                {temFiltros && (
+                  <button
+                    onClick={() => navigate({ search: {} })}
+                    className="text-sm underline text-[#A9E8EB]/70 hover:text-[#A9E8EB]"
+                  >
+                    limpar
+                  </button>
+                )}
+              </div>
 
-            <div className={`${filtrosAbertos ? "block" : "hidden"} md:block space-y-8`}>
-              <div>
-                <h3 className="font-menu text-lg text-[color:var(--pink-deep)] mb-3">Tipo</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="tipo-todos"
-                      checked={tiposSelecionados.length === 0}
-                      onCheckedChange={() =>
-                        navigate({ search: (prev) => ({ ...prev, tipo: undefined }) })
-                      }
-                    />
-                    <Label htmlFor="tipo-todos" className="cursor-pointer font-normal">
-                      Todos
-                    </Label>
-                  </div>
-                  {tipos.map((t) => (
-                    <div key={t.value} className="flex items-center gap-2">
+              <div className={`${filtrosAbertos ? "block" : "hidden"} md:block space-y-8`}>
+                <div>
+                  <h3 className="font-menu text-lg text-[#A9E8EB] mb-3">Tipo</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
                       <Checkbox
-                        id={`tipo-${t.value}`}
-                        checked={tiposSelecionados.includes(t.value)}
-                        onCheckedChange={() => toggleTipo(t.value)}
+                        id="tipo-todos"
+                        checked={tiposSelecionados.length === 0}
+                        onCheckedChange={() =>
+                          navigate({ search: (prev) => ({ ...prev, tipo: undefined }) })
+                        }
                       />
-                      <Label htmlFor={`tipo-${t.value}`} className="cursor-pointer font-normal">
-                        {t.label}
+                      <Label htmlFor="tipo-todos" className="cursor-pointer font-normal">
+                        Todos
                       </Label>
                     </div>
-                  ))}
+                    {tipos.map((t) => (
+                      <div key={t.value} className="flex items-center gap-2">
+                        <Checkbox
+                          id={`tipo-${t.value}`}
+                          checked={tiposSelecionados.includes(t.value)}
+                          onCheckedChange={() => toggleTipo(t.value)}
+                        />
+                        <Label htmlFor={`tipo-${t.value}`} className="cursor-pointer font-normal">
+                          {t.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </aside>
+            </aside>
 
-          <div>
-            {categoria && (
-              <button
-                onClick={() => navigate({ search: (prev) => ({ ...prev, categoria: undefined }) })}
-                className="inline-flex items-center gap-1.5 mb-4 px-3 py-1 rounded-full bg-[color:var(--pink-soft)] text-[color:var(--pink-deep)] text-sm font-menu"
-              >
-                {categoriaLabels[categoria]}
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-            <p className="text-sm text-foreground/60 mb-4">
-              {produtosFiltrados.length}{" "}
-              {produtosFiltrados.length === 1 ? "produto encontrado" : "produtos encontrados"}
-            </p>
-            {produtosFiltrados.length === 0 ? (
-              <div className="text-center py-20 text-foreground/60">
-                <p className="font-menu text-xl text-[color:var(--pink-deep)]">
-                  nenhum produto por aqui ainda
-                </p>
-                <p className="mt-2">tenta outro filtro ou volta mais tarde ✿</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {produtosFiltrados.map((p) => (
-                  <ProductCard key={p.id} produto={p} />
-                ))}
-              </div>
-            )}
+            <div>
+              {categoria && (
+                <button
+                  onClick={() =>
+                    navigate({ search: (prev) => ({ ...prev, categoria: undefined }) })
+                  }
+                  className="inline-flex items-center gap-1.5 mb-4 px-3 py-1 rounded-full bg-[#A9E8EB]/20 text-[#A9E8EB] text-sm font-menu"
+                >
+                  {categoriaLabels[categoria]}
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <p className="text-sm text-[#A9E8EB]/60 mb-4">
+                {produtosFiltrados.length}{" "}
+                {produtosFiltrados.length === 1 ? "produto encontrado" : "produtos encontrados"}
+              </p>
+              {produtosFiltrados.length === 0 ? (
+                <div className="text-center py-20 text-[#A9E8EB]/60">
+                  <p className="font-menu text-xl text-[#A9E8EB]">nenhum produto por aqui ainda</p>
+                  <p className="mt-2">tenta outro filtro ou volta mais tarde ✿</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  {produtosFiltrados.map((p) => (
+                    <ProductCard
+                      key={p.id}
+                      produto={p}
+                      titleColorClass="text-[#A9E8EB]"
+                      buttonColorClass="bg-[#A9E8EB]"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <SiteFooter />
     </div>

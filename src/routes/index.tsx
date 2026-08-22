@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import promosBg from "@/assets/promos-bg-bala.png";
+import sacolinhaBg from "@/assets/sacolinha.jpeg";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -24,9 +25,9 @@ export const Route = createFileRoute("/")({
 });
 
 const contentGradient = `linear-gradient(to bottom,
-  #eef9fd 0%, #eef9fd 22%,
-  #fffade 26%, #fffade 33%,
-  var(--pink-soft) 37%, var(--pink-soft) 82%,
+  #eef9fd 0%, #eef9fd 16%,
+  #fffade 20%, #fffade 38%,
+  var(--pink-soft) 42%, var(--pink-soft) 82%,
   #d1affa 90%, #d1affa 100%)`;
 
 function Index() {
@@ -47,7 +48,15 @@ function Index() {
 
         {/* newDROP */}
         {newdrop.length > 0 && (
-          <section className="py-20 px-6">
+          <section
+            className="py-20 px-6"
+            style={{
+              backgroundImage: `url(${sacolinhaBg})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="font-menu text-4xl md:text-5xl text-[color:var(--pink-deep)]">
@@ -113,10 +122,10 @@ function Index() {
           >
             <div className="w-full max-w-6xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffefe]">
+                <h2 className="font-menu text-3xl sm:text-4xl md:text-6xl text-[#fffffe]">
                   PROMOS DA SEMANA
                 </h2>
-                <p className="font-unrulyness text-5xl sm:text-6xl md:text-[80px] text-[#fffefe] mt-1 leading-[0.95]">
+                <p className="font-unrulyness text-5xl sm:text-6xl md:text-[80px] text-[#fffffe] mt-1 leading-[0.95]">
                   aproveite enquanto está disponível,
                   <br />
                   toda semana temos promos diferentes!
@@ -141,8 +150,10 @@ function Index() {
         {/* Sobre */}
         <section id="sobre" className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center space-y-6">
-            <h2 className="font-menu text-[30px] sm:text-[60px] text-[#fffefe]">DIVAS QUE ESTÃO USANDO SOFT</h2>
-            <p className="font-unrulyness max-w-2xl mx-auto text-5xl sm:text-6xl md:text-[80px] text-[#fffefe]/80 leading-[0.95]">
+            <h2 className="font-menu text-[30px] sm:text-[60px] text-[#fffffe]">
+              DIVAS QUE ESTÃO USANDO SOFT
+            </h2>
+            <p className="font-unrulyness max-w-2xl mx-auto text-5xl sm:text-6xl md:text-[80px] text-[#fffffe]/80 leading-[0.95]">
               comprou algo na Soft? poste sua fotinho e nos marque!
             </p>
 
@@ -158,7 +169,7 @@ function Index() {
               <DivasCarousel divas={divas} />
             </div>
 
-            <p className="max-w-2xl mx-auto mt-8 text-[#fffefe]/80 font-script text-2xl">{"\n"}</p>
+            <p className="max-w-2xl mx-auto mt-8 text-[#fffffe]/80 font-script text-2xl">{"\n"}</p>
           </div>
         </section>
       </div>

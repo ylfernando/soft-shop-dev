@@ -46,9 +46,7 @@ export function ProductCard({
           {produto.nome}
         </p>
         <div className="my-1.5 border-t border-dashed border-[color:var(--pink-deep)]/30" />
-        <p className="text-xs">
-          Preço<span className="font-semibold ml-1">{formatPreco(produto.precoCentavos)}</span>
-        </p>
+        <p className="text-xs font-semibold">{formatPreco(produto.precoCentavos)} | P/M</p>
         <button
           onClick={handleAdd}
           className={`mt-2 w-full py-1.5 rounded-full ${buttonColorClass} text-white font-pixel text-base hover:opacity-90 disabled:opacity-60`}

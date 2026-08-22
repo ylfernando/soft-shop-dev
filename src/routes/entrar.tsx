@@ -46,10 +46,10 @@ function Entrar() {
     <div className="min-h-screen text-foreground flex flex-col">
       <SiteHeader />
 
-      <section className="flex-1 bg-[color:var(--cream)] py-16 px-6">
+      <section className="flex-1 bg-[#FDDDEC] py-16 px-6">
         <div className="max-w-sm mx-auto bg-white/80 rounded-3xl p-8 shadow-md border border-[color:var(--pink-deep)]/10">
-          <h1 className="font-menu text-3xl text-[color:var(--pink-deep)] text-center">entrar</h1>
-          <p className="text-sm text-center text-foreground/60 mt-2">que bom te ver de novo ✿</p>
+          <h1 className="font-menu text-3xl text-[#A882F4] text-center">entrar</h1>
+          <p className="text-sm text-center text-[#D1AFFA] mt-2">que bom te ver de novo ✿</p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className="space-y-1.5">
@@ -65,10 +65,7 @@ function Entrar() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="senha">senha</Label>
-                <Link
-                  to="/esqueci-senha"
-                  className="text-xs underline text-[color:var(--pink-deep)]/80"
-                >
+                <Link to="/esqueci-senha" className="text-xs underline text-[#A882F4]">
                   esqueceu a senha?
                 </Link>
               </div>
@@ -85,19 +82,15 @@ function Entrar() {
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-full bg-[color:var(--pink-deep)] text-white font-pixel text-lg hover:opacity-90"
+              className="w-full py-2.5 rounded-full bg-[#A882F4] text-white font-pixel text-lg hover:opacity-90"
             >
               entrar
             </button>
           </form>
 
-          <p className="text-lg text-center text-foreground/60 mt-6">
+          <p className="text-lg text-center text-[#D1AFFA] mt-6">
             ainda não tem conta?{" "}
-            <Link
-              to="/criar-conta"
-              search={{ redirect }}
-              className="underline text-[color:var(--pink-deep)]"
-            >
+            <Link to="/criar-conta" search={{ redirect }} className="underline text-[#A882F4]">
               criar uma
             </Link>
           </p>

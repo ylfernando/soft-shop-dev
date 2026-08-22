@@ -24,7 +24,7 @@ export const tipos: { value: Tipo; label: string }[] = [
   { value: "baixo", label: "bottom" },
   { value: "calcados", label: "calçados" },
   { value: "vestido", label: "vestidos" },
-  { value: "newdrop", label: "NewDrop" },
+  { value: "newdrop", label: "new drop" },
 ];
 
 export function formatPreco(centavos: number) {
