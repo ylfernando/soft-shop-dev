@@ -12,17 +12,17 @@ function SobreASacolinha() {
     <div className="min-h-screen text-foreground flex flex-col">
       <SiteHeader />
 
-      <section className="flex-1 bg-[color:var(--cream)] py-12 px-4 flex justify-center">
-        <div
-          className="w-full max-w-2xl"
-          style={{
-            borderStyle: "solid",
-            borderWidth: "34px 40px",
-            borderImageSource: `url(${sacolinhaBg})`,
-            borderImageSlice: "128 144 128 144",
-            borderImageRepeat: "round",
-          }}
-        >
+      <section
+        className="flex-1 bg-[color:var(--cream)] flex justify-center"
+        style={{
+          borderStyle: "solid",
+          borderWidth: "48px 56px",
+          borderImageSource: `url(${sacolinhaBg})`,
+          borderImageSlice: "128 144 128 144",
+          borderImageRepeat: "round",
+        }}
+      >
+        <div className="w-full max-w-2xl py-6">
           <div className="bg-white/70 rounded-2xl px-6 py-8 sm:px-10 sm:py-10">
             <h1 className="font-menu text-3xl md:text-4xl text-[#D1AFFA] text-center">SACOLINHA</h1>
 
